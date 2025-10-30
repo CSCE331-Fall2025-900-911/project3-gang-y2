@@ -6,4 +6,6 @@ app.get('/', (req, res) => {
   res.send('Basic template for our POS');
 });
 
-app.listen(port, () => {});
+app.listen(port, () => {
+    console.log(`listening on port ${port}`);
+});
