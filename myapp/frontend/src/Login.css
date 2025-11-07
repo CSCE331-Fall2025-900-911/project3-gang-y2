@@ -61,3 +61,21 @@ body {
 .login-box button:hover {
   background-color: #689f38;
 }
+
+.back-button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background-color: transparent;
+  color: var(--matcha-green);
+  font-weight: 600;
+  border: 2px solid var(--matcha-green);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: var(--matcha-green);
+  color: var(--white);
+}
