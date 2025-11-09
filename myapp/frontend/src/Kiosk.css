@@ -44,6 +44,11 @@ body {
   font-weight: 600;
 }
 
+.pageTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
 .nav-links {
   list-style: none;
   display: flex;
@@ -61,7 +66,10 @@ body {
   opacity: 0.8;
 }
 
-.content {
+.menu-container {
+  text-align: center;
+  padding: 20px;
+  overflow: auto;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -71,13 +79,32 @@ body {
   margin-top: 90px; /* height of navbar */
 }
 
-.content h2 {
-  font-size: 2rem;
-  margin-bottom: 10px;
+.menu-grid {
+  /* flex: 1; */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  gap: 50px;
+  padding: 15px;
+  max-width: 1000px;
+  margin: 1 auto;
 }
 
-.content p {
-  font-size: 1.1rem;
-  color: #555;
-  max-width: 600px;
+.menu-button {
+  background-color: lightgray;
+  color: black;
+  border: 1px solid gray;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  width: 900px;
+  transition: background 0.3s;
+}
+
+.menu-button:hover {
+  background-color: var(--matcha-green);
 }
