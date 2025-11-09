@@ -68,7 +68,7 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  margin-top: 90px; /* height of navbar */
+  margin-top: 90px;
 }
 
 .content h2 {
@@ -81,3 +81,39 @@ body {
   color: #555;
   max-width: 600px;
 }
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  gap: 1.2rem;
+  justify-items: center;
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.menu-button {
+  background-color: #4C8C2B; 
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 200px;           
+  height: 60px;           
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.menu-button:hover {
+  background-color: #3a6d21;
+}
+
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: gray;
+}
+
