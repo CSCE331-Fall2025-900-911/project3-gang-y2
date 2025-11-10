@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App.jsx";
 import Login from "./Login.jsx";
 import Kiosk from "./Kiosk.jsx";
+import Cashier from "./Cashier.jsx";
 import ManagerDashboard from "./ManagerDash.jsx";
 import EmployeesView from "./EmployeesView.jsx";
 import InventoryView from "./InventoryView.jsx";
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
         <Route path="/kiosk" element={<Kiosk />} />
+        <Route path="/cashier" element={<Cashier />} />
         <Route path="/manager" element={<ManagerDashboard />} />
         <Route path="/employees" element={<EmployeesView />} />
         <Route path="/inventory" element={<InventoryView />} />

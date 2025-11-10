@@ -32,10 +32,11 @@ function Login() {
           navigate('/manager');
         } 
         else {
-          navigate('/');
+          navigate('/cashier');
         }
       } 
       else {
+        alert("login failed! check username & password");
         console.error('Login failed:', data.error);
       }
     } 
