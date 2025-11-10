@@ -29,10 +29,10 @@ function Login() {
         console.log('Login successful:', data);
         
         if (data.isManager) {
-          navigate('/manager-dashboard');
+          navigate('/manager');
         } 
         else {
-          navigate('/dashboard');
+          navigate('/');
         }
       } 
       else {

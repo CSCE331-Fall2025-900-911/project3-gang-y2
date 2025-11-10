@@ -38,10 +38,10 @@ app.post("/api/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM users WHERE username = $1", [username]
+      "SELECT * FROM employees WHERE username = $1", [username]
     );
 
-    if (result.rows.length() == 0) {
+    if (result.rows.length === 0) {
       return res.status(401).json({error: 'Invalid credentials'});
     }
 
