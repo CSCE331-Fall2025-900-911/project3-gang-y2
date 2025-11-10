@@ -77,6 +77,6 @@ function Kiosk() {
       </main>
     </div>
   );
-};
+}
 
 export default Kiosk;
