@@ -111,7 +111,14 @@ body {
 .modify-button {
   background-color: #4C8C2B; 
   color: white;
-  border: 1px solid white;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 0.2rem;
+}
+.cancel-button{
+  background-color: #a90f07; 
+  color: white;
+  border: 1px solid black;
   border-radius: 4px;
   padding: 0.2rem;
 }
@@ -132,7 +139,7 @@ body {
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
   gap: 1.2rem;
   justify-items: center;
   padding: 2rem;
@@ -148,9 +155,9 @@ body {
   border-radius: 10px;
   font-size: 1rem;
   cursor: pointer;
-  width: 200px;           
+  width: 400px;           
   height: 60px;           
-  text-align: center;
+  text-align: left;
   transition: background-color 0.2s ease;
 }
 

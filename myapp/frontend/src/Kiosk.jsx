@@ -18,6 +18,9 @@ function Kiosk() {
   // holds a value for modifiers 
   const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
 
+  // sub total for order
+  const[subtotal, setSubtotal] = useState([]);
+
   const openModification = (item) => {
     setCurrentItem(item);
     setCurrentModifiers({iceLevel:"medium", sugarLevel:"medium", topping:"none"}); // default values for each item
@@ -86,7 +89,7 @@ function Kiosk() {
             (<ul>
                 {currentOrder.map((item, index) => 
                 ( <li key={index}>
-                    {item.name} :   
+                    ${item.price} : <strong>{item.name} :</strong>   
                     <small>
                         <br/>
                         Ice:     {item.modifiers.iceLevel}<br/>
@@ -111,7 +114,7 @@ function Kiosk() {
               className="menu-button"
               onClick={() => openModification(item)}
             >
-              {item.name}
+              ${item.price} : <strong>{item.name}</strong>
             </button>
           ))}
         </div>
@@ -137,6 +140,7 @@ function Kiosk() {
               background: "white",
               padding: "2rem",
               borderRadius: "8px",
+              border: "1px solid black",
               width: "300px",
               textAlign: "center",
             }}
@@ -202,10 +206,10 @@ function Kiosk() {
               </label>
             </div>
 
-            <button onClick={addToOrder} style={{ marginRight: "0.5rem" }}>
+            <button onClick={addToOrder} className="modify-button">
               Add to Order
             </button>
-            <button onClick={closeModification}>Cancel</button>
+            <button onClick={closeModification} className="cancel-button">Cancel</button>
           </div>
         </div>
       )}
