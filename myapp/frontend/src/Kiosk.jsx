@@ -9,6 +9,14 @@ function Kiosk() {
   // Tracks whether the data is still loading
   const [loading, setLoading] = useState(true);
 
+  // currentOrder = ["test item 1", "test item 2"]; // list to keep current order in memory
+  const [currentOrder, setCurrentOrder] = useState([]);
+
+  const addToOrder = (item) => {
+    setCurrentOrder((prevOrder) => [...prevOrder, item]);
+  };
+
+
   // Fetch menu items from backend when the component loads
   useEffect(() => {
     fetch("http://localhost:3000/api/menu") // replace with real backend URL
@@ -42,14 +50,25 @@ function Kiosk() {
         </div>
       </nav>
 
-      <main className="content">
-        <h2 className="menu-title">Select an Item</h2>
+      <div className="sidebar-container">
+        <div className="sidebar">
+            <h2>Order</h2>
+            {currentOrder.length === 0 ? ( <p>no items yet</p>) : 
+            (<ul>
+                {currentOrder.map((item, index) => 
+                ( <li key={index}>{item.name}</li>))}
+            </ul>
+            )}
+        </div>
+      </div>
+
+      <main className="menu-container">
         <div className="menu-grid">
           {menuItems.map((item) => (
             <button
               key={item.id} // unique key for React
               className="menu-button"
-              onClick={() => alert(`You selected ${item.name}`)}
+              onClick={() => addToOrder(item)}
             >
               {item.name}
             </button>

@@ -66,6 +66,24 @@ body {
   opacity: 0.8;
 }
 
+.sidebar-container {
+  background-color: gray;
+  color: white;
+  width: 400px;
+  height: 100%;
+  position: fixed;
+  top: 58px;
+  left: 0px;
+  margin: 0px;
+}
+
+.sidebar {
+  display: grid;
+  grid-template-columns: 1;
+  padding: 0 20px;
+  margin: 10px;
+}
+
 .menu-container {
   text-align: center;
   padding: 20px;
@@ -77,32 +95,7 @@ body {
   align-items: center;
   text-align: center;
   margin-top: 90px;
-}
-
-.menu-grid {
-  /* flex: 1; */
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-
-  gap: 50px;
-  padding: 15px;
-  max-width: 1000px;
-  margin: 1 auto;
-}
-
-.menu-button {
-  background-color: lightgray;
-  color: black;
-  border: 1px solid gray;
-  padding: 20px;
-  border-radius: 8px;
-  font-size: 20px;
-  cursor: pointer;
-  width: 900px;
-  transition: background 0.3s;
+  margin-left: 400px;
 }
 
 .menu-grid {
@@ -132,7 +125,6 @@ body {
 .menu-button:hover {
   background-color: #3a6d21;
 }
-
 
 .loading {
   text-align: center;
