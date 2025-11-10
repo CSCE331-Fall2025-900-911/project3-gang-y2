@@ -9,7 +9,7 @@ function EmployeesView() {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/employees")
+    fetch("/api/employees")
       .then((res) => res.json())
       .then((data) => setEmployees(data))
       .catch((err) => console.error("Error fetching employees:", err));
@@ -20,8 +20,8 @@ function EmployeesView() {
     e.preventDefault();
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
-      ? `http://localhost:3000/api/employees/${formData.id}`
-      : "http://localhost:3000/api/employees";
+      ? `/api/employees/${formData.id}`
+      : "/api/employees";
 
     const res = await fetch(url, {
       method,
@@ -34,7 +34,7 @@ function EmployeesView() {
       setIsEditing(false);
       setFormData({ id: null, name: "", role: "", wage: "" });
       // Refresh table
-      const data = await (await fetch("http://localhost:3000/api/employees")).json();
+      const data = await (await fetch("/api/employees")).json();
       setEmployees(data);
     }
   };
@@ -49,7 +49,7 @@ function EmployeesView() {
   // Delete Employee
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this employee?")) return;
-    await fetch(`http://localhost:3000/api/employees/${id}`, { method: "DELETE" });
+    await fetch(`/api/employees/${id}`, { method: "DELETE" });
     setEmployees(employees.filter((e) => e.id !== id));
   };
 
