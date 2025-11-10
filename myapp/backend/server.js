@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -14,11 +15,6 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
-});
-
-// Test route
-app.get("/", (req, res) => {
-  res.send("Backend is running and connected!");
 });
 
 // Menu route
@@ -157,6 +153,88 @@ app.delete("/api/employees/:id", async (req, res) => {
   }
 });
 
+// Get entire inventory
+app.get("/api/inventory", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT inventoryitem as id, inventoryitem as item, itemstatus as status, amountremaining as amount, TO_CHAR(datenext, 'YYYY-MM-DD') as datenext, TO_CHAR(datelast, 'YYYY-MM-DD') as datelast FROM inventory ORDER BY inventoryitem ASC"
+    );
+    res.json(result.rows);
+  }
+  catch (err) {
+    console.error("Error fetching inventory:", err);
+    res.status(500).json({ error: "Failed to fetch inventory" });
+  }
+});
+
+// Add new inventory item
+app.post("/api/inventory", async (req, res) => {
+  const { item, amount, dateNext, dateLast } = req.body;
+  
+  try {
+    const result = await pool.query(
+      "INSERT INTO inventory (inventoryitem, itemstatus, amountremaining, datenext, datelast) VALUES ($1, $2, $3, $4, $5) RETURNING inventoryitem as item, itemstatus as status, amountremaining as amount, datenext as dateNext, datelast as dateLast",
+      [item, 1, amount, dateNext, dateLast]
+    );
+    res.status(201).json(result.rows[0]);
+  }
+  catch (err) {
+    console.error("Error creating inventory item:", err);
+    res.status(500).json({ error: "Failed to create inventory item" });
+  }
+});
+
+// Update inventory
+app.put("/api/inventory/:item", async (req, res) => {
+  const { item } = req.params;
+  const { amount, dateNext, dateLast } = req.body;
+  
+  try {
+    const result = await pool.query(
+      "UPDATE inventory SET amountremaining = $1, datenext = $2, datelast = $3 WHERE inventoryitem = $4 RETURNING inventoryitem as item, itemstatus as status, amountremaining as amount, datenext as dateNext, datelast as dateLast",
+      [amount, dateNext, dateLast, item]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Inventory item not found" });
+    }
+    
+    res.json(result.rows[0]);
+  }
+  catch (err) {
+    console.error("Error updating inventory item:", err);
+    res.status(500).json({ error: "Failed to update inventory item" });
+  }
+});
+
+// Remove item from inventory
+app.delete("/api/inventory/:item", async (req, res) => {
+  const { item } = req.params;
+  
+  try {
+    const result = await pool.query(
+      "DELETE FROM inventory WHERE inventoryitem = $1 RETURNING inventoryitem",
+      [item]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Inventory item not found" });
+    }
+    
+    res.json({ message: "Inventory item deleted successfully" });
+  }
+  catch (err) {
+    console.error("Error deleting inventory item:", err);
+    res.status(500).json({ error: "Failed to delete inventory item" });
+  }
+});
+
+//production stuff
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+app.get('/{*splat}', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
