@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -14,11 +15,6 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
-});
-
-// Test route
-app.get("/", (req, res) => {
-  res.send("Backend is running and connected!");
 });
 
 // Menu route
@@ -157,6 +153,11 @@ app.delete("/api/employees/:id", async (req, res) => {
   }
 });
 
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
