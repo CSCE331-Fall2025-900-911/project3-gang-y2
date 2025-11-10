@@ -77,22 +77,20 @@ function InventoryView() {
         <table className="inventory-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Item</th>
               <th>Amount</th>
               <th>Date of Next Shipment</th>
               <th>Date of Last Shipment</th>
-
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {inventory.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
+              <tr key={item.item}>  
                 <td>{item.item}</td>
                 <td>{item.amount}</td>
-                <td>{item.dateNext}</td>
-                <td>{item.dateLast}</td>
+                <td>{item.datenext}</td>
+                <td>{item.datelast}</td>
                 <td>
                   <button className="edit-btn" onClick={() => handleEdit(item)}>✏️ Edit</button>
                   <button className="delete-btn" onClick={() => handleDelete(item.id)}>🗑 Delete</button>
@@ -107,13 +105,6 @@ function InventoryView() {
             <div className="modal-content">
               <h3>{isEditing ? "Edit Inventory" : "Add Inventory"}</h3>
               <form onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  placeholder="ID"
-                  value={formData.id}
-                  onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                  required
-                />
                 <input
                   type="text"
                   placeholder="Item"
@@ -142,7 +133,6 @@ function InventoryView() {
                   onChange={(e) => setFormData({ ...formData, dateLast: e.target.value })}
                   required
                 />
-              
                 <div className="modal-buttons">
                   <button type="submit">{isEditing ? "Update" : "Add"}</button>
                   <button type="button" onClick={() => setShowForm(false)}>Cancel</button>

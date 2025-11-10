@@ -1,6 +1,14 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .inventory-page {
   background-color: white;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   color: #333;
   font-family: Arial, sans-serif;
 }
@@ -9,6 +17,7 @@
   background-color: #7bb661;
   padding: 1rem 2rem;
   color: white;
+  flex-shrink: 0;
 }
 
 .nav-container {
@@ -21,6 +30,8 @@
   display: flex;
   list-style: none;
   gap: 1.5rem;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-links a {
@@ -32,6 +43,8 @@
 .content {
   padding: 2rem;
   text-align: center;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .inventory-table {
@@ -43,6 +56,7 @@
 .inventory-table th, .inventory-table td {
   border: 1px solid #ccc;
   padding: 0.75rem;
+  text-align: center;
 }
 
 .inventory-table th {
@@ -56,6 +70,7 @@
   padding: 0.75rem 1.25rem;
   border-radius: 5px;
   cursor: pointer;
+  margin-bottom: 1rem;
 }
 
 .add-btn:hover {
@@ -80,7 +95,6 @@
   color: white;
 }
 
-/* Modal styling */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -88,6 +102,8 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  overflow-y: auto;
 }
 
 .modal-content {
@@ -95,6 +111,8 @@
   padding: 2rem;
   border-radius: 10px;
   width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-content form {
