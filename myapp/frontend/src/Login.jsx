@@ -1,13 +1,47 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); 
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Login attempted with:", username, password);
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Login successful:', data);
+        
+        if (data.isManager) {
+          navigate('/manager');
+        } 
+        else {
+          navigate('/');
+        }
+      } 
+      else {
+        console.error('Login failed:', data.error);
+      }
+    } 
+    catch (error) {
+      console.error('Error during login:', error);
+    }
   };
 
   return (
@@ -31,6 +65,10 @@ function Login() {
           />
           <button type="submit">Login</button>
         </form>
+
+        <button className="back-button" onClick={() => navigate("/")}>
+          ← Back to Dashboard
+        </button>
       </div>
     </div>
   );
