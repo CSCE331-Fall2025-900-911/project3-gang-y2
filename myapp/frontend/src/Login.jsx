@@ -7,11 +7,41 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); 
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Login attempted with:", username, password);
-    navigate("/manager");
 
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Login successful:', data);
+        
+        if (data.isManager) {
+          navigate('/manager');
+        } 
+        else {
+          navigate('/');
+        }
+      } 
+      else {
+        console.error('Login failed:', data.error);
+      }
+    } 
+    catch (error) {
+      console.error('Error during login:', error);
+    }
   };
 
   return (

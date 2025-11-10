@@ -32,5 +32,39 @@ app.get("/api/menu", async (req, res) => {
   }
 });
 
+// Login route
+app.post("/api/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM employees WHERE username = $1", [username]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({error: 'Invalid credentials'});
+    }
+
+    const user = result.rows[0];
+
+    if (password == user.password) {
+      res.json({
+        success: true,
+        message: 'Login Successful',
+        userId: user.employeeid,
+        username: user.username,
+        isManager: user.ismanager
+      })
+    }
+    else {
+      res.status(401).json({error: 'Invalid Credentials'});
+    }
+  }
+  catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({error: 'Error logging in'});
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
