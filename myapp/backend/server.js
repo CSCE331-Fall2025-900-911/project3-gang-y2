@@ -229,6 +229,79 @@ app.delete("/api/inventory/:item", async (req, res) => {
   }
 });
 
+//Get entire menu
+/*app.get("/api/menu", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT itemid, name, description, price, calories FROM menuitems ORDER BY itemid ASC"
+    );
+    res.json(result.rows);
+  }
+  catch (err) {
+    console.error("Error fetching menu:", err);
+    res.status(500).json({ error: "Failed to fetch menu" });
+  }
+});*/
+
+// Add new menu item
+app.post("/api/menu", async (req, res) => {
+  const { itemid, name, description, price, calories } = req.body;
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO menuitems (itemid, name, description, price, calories) VALUES ($1, $2, $3, $4, $5) RETURNING itemid, name, description, price, calories",
+      [itemid, name, description, price, calories]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error creating menu item:", err);
+    res.status(500).json({ error: "Failed to create menu item" });
+  }
+});
+
+// Update menu item
+app.put("/api/menu/:itemid", async (req, res) => {
+  const { itemid } = req.params;
+  const { name, description, price, calories } = req.body;
+
+  try {
+    const result = await pool.query(
+      "UPDATE menuitems SET name = $1, description = $2, price = $3, calories = $4 WHERE itemid = $5 RETURNING itemid, name, description, price, calories",
+      [name, description, price, calories, itemid]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Menu item not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating menu item:", err);
+    res.status(500).json({ error: "Failed to update menu item" });
+  }
+});
+
+// Delete menu item
+app.delete("/api/menu/:itemid", async (req, res) => {
+  const { itemid } = req.params;
+
+  try {
+    const result = await pool.query(
+      "DELETE FROM menuitems WHERE itemid = $1 RETURNING itemid",
+      [itemid]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Menu item not found" });
+    }
+
+    res.json({ message: "Menu item deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting menu item:", err);
+    res.status(500).json({ error: "Failed to delete menu item" });
+  }
+});
+
 //production stuff
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
