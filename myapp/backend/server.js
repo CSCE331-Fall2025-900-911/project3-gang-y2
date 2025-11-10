@@ -70,7 +70,7 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/employees", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT employeeid as id, name, username as role FROM employees ORDER BY employeeid ASC"
+      "SELECT employeeid as id, name, username, CASE WHEN ismanager = true THEN true ELSE false END as ismanager FROM employees ORDER BY employeeid ASC"
     );
     res.json(result.rows);
   } 
@@ -80,33 +80,48 @@ app.get("/api/employees", async (req, res) => {
   }
 });
 
+
 // Add employee
 app.post("/api/employees", async (req, res) => {
-  const { name, role } = req.body;
+  const { name, username, password, ismanager } = req.body;
   
-  try {
+  try {    
     const result = await pool.query(
-      "INSERT INTO employees (name, username) VALUES ($1, $2) RETURNING employeeid as id, name, username as role",
-      [name, role]
+      "INSERT INTO employees (name, username, password, ismanager) VALUES ($1, $2, $3, $4) RETURNING employeeid as id, name, username, ismanager",
+      [name, username, password, ismanager || false]
     );
+    
     res.status(201).json(result.rows[0]);
-  } 
+  }
   catch (err) {
     console.error("Error creating employee:", err);
+    
+    if (err.code === '23505') {
+      return res.status(400).json({ error: "Username already exists" });
+    }
+    
     res.status(500).json({ error: "Failed to create employee" });
   }
 });
 
-// Update employee
 app.put("/api/employees/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, role } = req.body;
+  const { name, username, password, ismanager } = req.body;
   
   try {
-    const result = await pool.query(
-      "UPDATE employees SET name = $1, username = $2 WHERE employeeid = $3 RETURNING employeeid as id, name, username as role",
-      [name, role, id]
-    );
+    let query;
+    let params;
+    
+    if (password) {
+      query = "UPDATE employees SET name = $1, username = $2, password = $3, ismanager = $4 WHERE employeeid = $5 RETURNING employeeid as id, name, username, ismanager";
+      params = [name, username, password, ismanager, id];
+    }
+    else {
+      query = "UPDATE employees SET name = $1, username = $2, ismanager = $3 WHERE employeeid = $4 RETURNING employeeid as id, name, username, ismanager";
+      params = [name, username, ismanager, id];
+    }
+    
+    const result = await pool.query(query, params);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Employee not found" });

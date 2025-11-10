@@ -5,7 +5,7 @@ import "./EmployeesView.css";
 function EmployeesView() {
   const [employees, setEmployees] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", role: ""});
+  const [formData, setFormData] = useState({ id: null, name: "", username: "", password: "", ismanager: false });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ function EmployeesView() {
     if (res.ok) {
       setShowForm(false);
       setIsEditing(false);
-      setFormData({ id: null, name: "", role: ""});
+      setFormData({ id: null, name: "", username: "", password: "", ismanager: false });
       // Refresh table
       const data = await (await fetch("/api/employees")).json();
       setEmployees(data);
@@ -42,7 +42,7 @@ function EmployeesView() {
   // Edit Employee
   const handleEdit = (emp) => {
     setIsEditing(true);
-    setFormData(emp);
+    setFormData({ ...emp, password: "" }); // Don't pre-fill password
     setShowForm(true);
   };
 
@@ -79,6 +79,7 @@ function EmployeesView() {
             <tr>
               <th>ID</th>
               <th>Name</th>
+              <th>Username</th>
               <th>Role</th>
               <th>Actions</th>
             </tr>
@@ -88,7 +89,8 @@ function EmployeesView() {
               <tr key={emp.id}>
                 <td>{emp.id}</td>
                 <td>{emp.name}</td>
-                <td>{emp.role}</td>
+                <td>{emp.username}</td>
+                <td>{emp.ismanager ? "Manager" : "Cashier"}</td>
                 <td>
                   <button className="edit-btn" onClick={() => handleEdit(emp)}>✏️ Edit</button>
                   <button className="delete-btn" onClick={() => handleDelete(emp.id)}>🗑 Delete</button>
@@ -112,9 +114,23 @@ function EmployeesView() {
                 />
                 <input
                   type="text"
-                  placeholder="Role"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Manager? (t/f)"
+                  value={formData.ismanager}
+                  onChange={(e) => setFormData({ ...formData, ismanager: e.target.value })}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
                 />
               
