@@ -19,7 +19,7 @@ function Kiosk() {
   const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
 
   // sub total for order
-  const[subtotal, setSubtotal] = useState([]);
+  const[subtotal, setSubtotal] = useState(0.0);
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -40,6 +40,7 @@ function Kiosk() {
     const modifiedItem = {
         ...currentItem, modifiers: {...currentModifiers}, // copies the state of modifiers and adds it to list
     };
+    setSubtotal(subtotal + parseFloat(currentItem.price));
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
     setCurrentItem(null);
   };
@@ -99,7 +100,11 @@ function Kiosk() {
                     <br/>
                 </li>))}
             </ul>
+
             )}
+        </div>
+        <div className="subtotal-container">
+          <strong>SubTotal : </strong>${subtotal}
         </div>
         <div className="order-button-container">
             <button className="order-button" onClick={() => placeOrder()}>Place Order</button>

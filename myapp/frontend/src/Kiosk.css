@@ -76,12 +76,22 @@ body {
   left: 0px;
   margin: 0px;
 }
-
 .sidebar {
   display: grid;
   grid-template-columns: 1;
   padding: 25px 50px;
   margin: 10px;
+}
+
+.subtotal-container {
+  position: fixed;
+  bottom: 125px;
+  left: 50px;
+  width: 300px;
+  border: white;
+  align-items: center;
+  text-align: center;
+  font-size: 1.4rem;
 }
 
 .order-button-container {
@@ -115,12 +125,18 @@ body {
   border-radius: 4px;
   padding: 0.2rem;
 }
+.modify-button:hover {
+  background-color: #274916;
+}
 .cancel-button{
   background-color: #a90f07; 
   color: white;
   border: 1px solid black;
   border-radius: 4px;
   padding: 0.2rem;
+}
+.cancel-button:hover {
+  background-color: #5f0804;
 }
 
 .menu-container {
