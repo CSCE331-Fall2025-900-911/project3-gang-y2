@@ -25,7 +25,7 @@ function XReport() {
             <li><Link to="/employees">Employees</Link></li>
             <li><Link to="/inventory">Inventory</Link></li>
             <li><Link to="/menu-items">Menu Items</Link></li>
-            <li><Link to="/reports">Reports</Link></li>
+            <li id="current-item"><Link to="/reports">Reports</Link></li>
           </ul>
         </div>
       </nav>

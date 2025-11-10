@@ -48,3 +48,8 @@
 .x-report-table th {
   background-color: #f3f3f3;
 }
+
+#current-item a {
+  color: black;
+  text-decoration: underline;
+}

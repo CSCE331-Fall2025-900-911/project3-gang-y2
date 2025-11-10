@@ -9,6 +9,9 @@ import EmployeesView from "./EmployeesView.jsx";
 import InventoryView from "./InventoryView.jsx";
 import Reports from "./Reports.jsx";
 import XReport from "./XReport.jsx";
+import ZReport from "./ZReport.jsx";
+import ProdChart from "./ProdChart.jsx";
+import SalesReport from "./SalesReport.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -23,6 +26,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/inventory" element={<InventoryView />} />
         <Route path="/reports" element={<Reports />} /> 
         <Route path="/XReport" element={<XReport />} />
+        <Route path="/ZReport" element={<ZReport />} />
+        <Route path="/ProdChart" element={<ProdChart />} />
+        <Route path="/SalesReport" element={<SalesReport />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
