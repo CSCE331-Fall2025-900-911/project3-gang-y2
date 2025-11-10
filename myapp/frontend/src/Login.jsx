@@ -10,6 +10,8 @@ function Login() {
   const handleLogin = (e) => {
     e.preventDefault();
     console.log("Login attempted with:", username, password);
+    navigate("/manager");
+
   };
 
   return (
