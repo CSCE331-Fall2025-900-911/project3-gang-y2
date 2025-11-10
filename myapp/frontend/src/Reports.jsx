@@ -17,7 +17,7 @@ function Reports() {
             <li><Link to="/employees">Employees</Link></li>
             <li><Link to="/inventory">Inventory</Link></li>
             <li><Link to="/menu-items">Menu Items</Link></li>
-            <li><Link to="/reports">Reports</Link></li>
+            <li id="current-item"><Link to="/reports">Reports</Link></li>
           </ul>
         </div>
       </nav>
@@ -27,13 +27,13 @@ function Reports() {
             <button className="report-button" onClick={() => navigate("/XReport")}>
             X Report
             </button>
-            <button className="report-button" onClick={() => navigate("/")}>
+            <button className="report-button" onClick={() => navigate("/ZReport")}>
             Z Report
             </button>
-            <button className="report-button" onClick={() => navigate("/")}>
+            <button className="report-button" onClick={() => navigate("/SalesReport")}>
             Sales Report
             </button>
-            <button className="report-button" onClick={() => navigate("/")}>
+            <button className="report-button" onClick={() => navigate("/ProdChart")}>
             Product Usage Chart
             </button>
             <button className="back-button" onClick={() => navigate("/manager")}>

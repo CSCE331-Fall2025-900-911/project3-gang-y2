@@ -89,3 +89,8 @@ body {
   background-color: var(--matcha-green);
   color: var(--white);
 }
+
+#current-item a {
+  color: black;
+  text-decoration: underline;
+}

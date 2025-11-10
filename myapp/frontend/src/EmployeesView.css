@@ -107,3 +107,8 @@
   display: flex;
   justify-content: space-between;
 }
+
+#current-item a {
+  color: black;
+  text-decoration: underline;
+}

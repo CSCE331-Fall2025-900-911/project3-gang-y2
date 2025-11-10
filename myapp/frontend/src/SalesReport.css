@@ -1,0 +1,55 @@
+.sales-report-page {
+  background-color: white;
+  min-height: 100vh;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.navbar {
+  background-color: #7bb661;
+  padding: 1rem 2rem;
+  color: white;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.content {
+  padding: 2rem;
+  text-align: center;
+}
+
+.sales-report-table {
+  width: 90%;
+  margin: 2rem auto;
+  border-collapse: collapse;
+}
+
+.sales-report-table th, .sales-report-table td {
+  border: 1px solid #ccc;
+  padding: 0.75rem;
+}
+
+.sales-report-table th {
+  background-color: #f3f3f3;
+}
+
+#current-item a {
+  color: black;
+  text-decoration: underline;
+}
