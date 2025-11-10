@@ -80,8 +80,40 @@ body {
 .sidebar {
   display: grid;
   grid-template-columns: 1;
-  padding: 0 20px;
+  padding: 25px 50px;
   margin: 10px;
+}
+
+.order-button-container {
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+  width: 300px;
+  border: white;
+}
+.order-button {
+  background-color: #086d32; 
+  color: white;
+  border: 1px solid white;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  width: 300px;           
+  height: 70px;           
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+.order-button:hover{
+  background-color: #03411c;
+}
+
+.modify-button {
+  background-color: #4C8C2B; 
+  color: white;
+  border: 1px solid white;
+  border-radius: 4px;
+  padding: 0.2rem;
 }
 
 .menu-container {

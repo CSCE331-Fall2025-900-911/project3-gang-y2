@@ -9,6 +9,30 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
+.navbar {
+  background-color: #7bb661;
+  padding: 1rem 2rem;
+  color: white;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
 .reports-page {
   display: flex;
   justify-content: center;

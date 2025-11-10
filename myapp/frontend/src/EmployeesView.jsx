@@ -60,6 +60,7 @@ function EmployeesView() {
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
             <li><Link to="/manager">Back to Manager Menu</Link></li>
+            <li><Link to="/employees">Employees</Link></li>
             <li><Link to="/inventory">Inventory</Link></li>
             <li><Link to="/menu-items">Menu Items</Link></li>
             <li><Link to="/reports">Reports</Link></li>
