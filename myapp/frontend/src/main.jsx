@@ -6,6 +6,7 @@ import Login from "./Login.jsx";
 import Kiosk from "./Kiosk.jsx";
 import ManagerDashboard from "./ManagerDash.jsx";
 import EmployeesView from "./EmployeesView.jsx";
+import InventoryView from "./InventoryView.jsx";
 import Reports from "./Reports.jsx";
 import XReport from "./XReport.jsx";
 import "./index.css";
@@ -19,6 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/kiosk" element={<Kiosk />} />
         <Route path="/manager" element={<ManagerDashboard />} />
         <Route path="/employees" element={<EmployeesView />} />
+        <Route path="/inventory" element={<InventoryView />} />
         <Route path="/reports" element={<Reports />} /> 
         <Route path="/XReport" element={<XReport />} />
       </Routes>

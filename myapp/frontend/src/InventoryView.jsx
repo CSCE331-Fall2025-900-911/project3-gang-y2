@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./EmployeesView.css";
+import "./InventoryView.css";
 
-function EmployeesView() {
-  const [employees, setEmployees] = useState([]);
+function InventoryView() {
+  const [inventory, setInventory] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", role: "",});
+  const [formData, setFormData] = useState({ id: null, item: "", amount: "", dateNext: "", dateLast: ""});
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    fetch("/api/employees")
+    fetch("/api/inventory")
       .then((res) => res.json())
-      .then((data) => setEmployees(data))
-      .catch((err) => console.error("Error fetching employees:", err));
+      .then((data) => setInventory(data))
+      .catch((err) => console.error("Error fetching inventory:", err));
   }, []);
 
-  // Add or Update Employee
+  // Add or Update Item
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
-      ? `/api/employees/${formData.id}`
-      : "/api/employees";
+      ? `/api/inventory/${formData.id}`
+      : "/api/inventory";
 
     const res = await fetch(url, {
       method,
@@ -32,35 +32,35 @@ function EmployeesView() {
     if (res.ok) {
       setShowForm(false);
       setIsEditing(false);
-      setFormData({ id: null, name: "", role: ""});
+      setFormData({ id: null, item: "", amount: "", dateNext: "", dateLast: ""});
       // Refresh table
-      const data = await (await fetch("/api/employees")).json();
-      setEmployees(data);
+      const data = await (await fetch("/api/inventory")).json();
+      setInventory(data);
     }
   };
 
-  // Edit Employee
-  const handleEdit = (emp) => {
+  // Edit Item
+  const handleEdit = (item) => {
     setIsEditing(true);
-    setFormData(emp);
+    setFormData(item);
     setShowForm(true);
   };
 
-  // Delete Employee
+  // Delete Item
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this employee?")) return;
-    await fetch(`/api/employees/${id}`, { method: "DELETE" });
-    setEmployees(employees.filter((e) => e.id !== id));
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    await fetch(`/api/item/${id}`, { method: "DELETE" });
+    setEmployees(inventory.filter((e) => e.id !== id));
   };
 
   return (
-    <div className="employees-page">
+    <div className="inventory-page">
       <nav className="navbar">
         <div className="nav-container">
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
             <li><Link to="/manager">Back to Manager Menu</Link></li>
-            <li><Link to="/inventory">Inventory</Link></li>
+            <li><Link to="/employees">Employees</Link></li>
             <li><Link to="/menu-items">Menu Items</Link></li>
             <li><Link to="/reports">Reports</Link></li>
           </ul>
@@ -68,30 +68,34 @@ function EmployeesView() {
       </nav>
 
       <main className="content">
-        <h2>Employee Management</h2>
+        <h2>Inventory Management</h2>
 
         <button className="add-btn" onClick={() => setShowForm(true)}>
-          ➕ Add Employee
+          ➕ Add Inventory
         </button>
 
-        <table className="employee-table">
+        <table className="inventory-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Actions</th>
+              <th>Item</th>
+              <th>Amount</th>
+              <th>Date of Next Shipment</th>
+              <th>Date of Last Shipment</th>
+
             </tr>
           </thead>
           <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.id}>
-                <td>{emp.id}</td>
-                <td>{emp.name}</td>
-                <td>{emp.role}</td>
+            {inventory.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.item}</td>
+                <td>{item.amount}</td>
+                <td>{item.dateNext}</td>
+                <td>{item.dateLast}</td>
                 <td>
-                  <button className="edit-btn" onClick={() => handleEdit(emp)}>✏️ Edit</button>
-                  <button className="delete-btn" onClick={() => handleDelete(emp.id)}>🗑 Delete</button>
+                  <button className="edit-btn" onClick={() => handleEdit(item)}>✏️ Edit</button>
+                  <button className="delete-btn" onClick={() => handleDelete(item.id)}>🗑 Delete</button>
                 </td>
               </tr>
             ))}
@@ -101,23 +105,44 @@ function EmployeesView() {
         {showForm && (
           <div className="modal">
             <div className="modal-content">
-              <h3>{isEditing ? "Edit Employee" : "Add Employee"}</h3>
+              <h3>{isEditing ? "Edit Inventory" : "Add Inventory"}</h3>
               <form onSubmit={handleSubmit}>
                 <input
                   type="text"
-                  placeholder="Name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="ID"
+                  value={formData.id}
+                  onChange={(e) => setFormData({ ...formData, id: e.target.value })}
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Role"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  placeholder="Item"
+                  value={formData.item}
+                  onChange={(e) => setFormData({ ...formData, item: e.target.value })}
                   required
                 />
-
+                <input
+                  type="text"
+                  placeholder="Amount"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Date of Next Shipment"
+                  value={formData.dateNext}
+                  onChange={(e) => setFormData({ ...formData, dateNext: e.target.value })}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Date of Last Shipment"
+                  value={formData.dateLast}
+                  onChange={(e) => setFormData({ ...formData, dateLast: e.target.value })}
+                  required
+                />
+              
                 <div className="modal-buttons">
                   <button type="submit">{isEditing ? "Update" : "Add"}</button>
                   <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
@@ -131,4 +156,4 @@ function EmployeesView() {
   );
 }
 
-export default EmployeesView;
+export default InventoryView;
