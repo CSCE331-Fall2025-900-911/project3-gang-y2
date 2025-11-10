@@ -6,6 +6,7 @@ import Login from "./Login.jsx";
 import Kiosk from "./Kiosk.jsx";
 import ManagerDashboard from "./ManagerDash.jsx";
 import EmployeesView from "./EmployeesView.jsx";
+import Reports from "./Reports.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/manager" element={<ManagerDashboard />} />
         <Route path="/employees" element={<EmployeesView />} />
 
+        <Route path="/reports" element={<Reports />} /> 
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
