@@ -47,10 +47,10 @@ function InventoryView() {
   };
 
   // Delete Item
-  const handleDelete = async (id) => {
+  const handleDelete = async (inventoryitem) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
-    await fetch(`/api/item/${id}`, { method: "DELETE" });
-    setEmployees(inventory.filter((e) => e.id !== id));
+    await fetch(`/api/item/${inventoryitem}`, { method: "DELETE" });
+    setInventory(inventory.filter((item) => item.item !== inventoryitem));
   };
 
   return (
@@ -94,7 +94,7 @@ function InventoryView() {
                 <td>{item.datelast}</td>
                 <td>
                   <button className="edit-btn" onClick={() => handleEdit(item)}>✏️ Edit</button>
-                  <button className="delete-btn" onClick={() => handleDelete(item.id)}>🗑 Delete</button>
+                  <button className="delete-btn" onClick={() => handleDelete(item.item)}>🗑 Delete</button>
                 </td>
               </tr>
             ))}

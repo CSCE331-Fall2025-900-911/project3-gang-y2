@@ -5,7 +5,7 @@ import "./MenuItemView.css";
 function MenuItemView() {
   const [menuItems, setMenuItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ itemid: null, name: "", description: "", price: "", calories: ""});
+  const [formData, setFormData] = useState({ name: "", description: "", price: "", calories: ""});
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -128,13 +128,6 @@ function MenuItemView() {
             <div className="modal-content">
               <h3>{isEditing ? "Edit Menu Item" : "Add Menu Item"}</h3>
               <form onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  placeholder="ID"
-                  value={formData.itemid}
-                  onChange={(e) => setFormData({ ...formData, itemid: e.target.value })}
-                  required
-                />
                 <input
                   type="text"
                   placeholder="Name"
