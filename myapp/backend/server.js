@@ -249,8 +249,8 @@ app.post("/api/menu", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO menuitems (itemid, name, description, price, calories) VALUES ($1, $2, $3, $4, $5) RETURNING itemid, name, description, price, calories",
-      [itemid, name, description, price, calories]
+      "INSERT INTO menuitems (name, description, price, calories) VALUES ($1, $2, $3, $4) RETURNING itemid, name, description, price, calories",
+      [name, description, price, calories]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -288,7 +288,7 @@ app.delete("/api/menu/:itemid", async (req, res) => {
   try {
     const result = await pool.query(
       "DELETE FROM menuitems WHERE itemid = $1 RETURNING itemid",
-      [itemid]
+      [parseInt(itemid)]
     );
 
     if (result.rows.length === 0) {
