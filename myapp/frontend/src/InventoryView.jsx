@@ -5,7 +5,7 @@ import "./EmployeesView.css";
 function EmployeesView() {
   const [employees, setEmployees] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", role: ""});
+  const [formData, setFormData] = useState({ id: null, name: "", role: "",});
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -60,7 +60,6 @@ function EmployeesView() {
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
             <li><Link to="/manager">Back to Manager Menu</Link></li>
-            <li><Link to="/employees">Employees</Link></li>
             <li><Link to="/inventory">Inventory</Link></li>
             <li><Link to="/menu-items">Menu Items</Link></li>
             <li><Link to="/reports">Reports</Link></li>
@@ -118,7 +117,7 @@ function EmployeesView() {
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   required
                 />
-              
+
                 <div className="modal-buttons">
                   <button type="submit">{isEditing ? "Update" : "Add"}</button>
                   <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
