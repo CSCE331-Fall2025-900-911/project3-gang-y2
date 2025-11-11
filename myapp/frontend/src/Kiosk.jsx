@@ -52,7 +52,7 @@ function Kiosk() {
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
-    fetch("http://localhost:3000/api/menu") // replace with real backend URL
+    fetch("/api/menu") // replace with real backend URL
       .then((res) => res.json())
       .then((data) => {
         setMenuItems(data);   // store the menu data from backend
