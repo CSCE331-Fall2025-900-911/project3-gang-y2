@@ -52,7 +52,7 @@ function Cashier() {
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
-    fetch("http://localhost:3000/api/menu") // replace with real backend URL
+    fetch("/api/menu") // replace with real backend URL
       .then((res) => res.json())
       .then((data) => {
         setMenuItems(data);   // store the menu data from backend
@@ -75,7 +75,6 @@ function Cashier() {
       <nav className="navbar">
         <div className="nav-container">
           <h1 className="logo">MatchaBoba POS</h1>
-          <h2 className="employee-name">{employee.name}</h2>
           <ul className="nav-links">
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/kiosk">Customer Kiosk</Link></li>
