@@ -98,5 +98,7 @@
   "mod.topping.aiyu_jelly": "gelatina aiyu",
   "mod.topping.lychee_jelly": "gelatina de lychee",
   "mod.topping.crema": "crema",
-  "mod.topping.ice_cream": "helado"
+  "mod.topping.ice_cream": "helado",
+  "manager.title": "Vista de gerente",
+  "manager.body": "Usa la navegacion de arriba para administrar las operaciones de la tienda."
 }

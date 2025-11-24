@@ -98,5 +98,7 @@
   "mod.topping.aiyu_jelly": "aiyu jelly",
   "mod.topping.lychee_jelly": "lychee jelly",
   "mod.topping.crema": "crema",
-  "mod.topping.ice_cream": "ice cream"
+  "mod.topping.ice_cream": "ice cream",
+  "manager.title": "Manager View",
+  "manager.body": "Use the navigation above to manage store operations."
 }
