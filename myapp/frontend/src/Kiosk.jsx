@@ -4,6 +4,7 @@ import "./Kiosk.css";
 import TextToSpeechButton from "./TextToSpeechButton.jsx";
 import { getOrderSpeech } from "./utils/speechHelpers.js";
 import { useTextToSpeech } from "./hooks/useTextToSpeech.js";
+import { useTtsSettings } from "./TtsSettingsContext.jsx";
 
 function Kiosk() {
   // Holds menu items fetched from the backend
@@ -25,6 +26,7 @@ function Kiosk() {
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
   const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
+  const { ttsEnabled } = useTtsSettings();
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -38,7 +40,7 @@ function Kiosk() {
   const changeModifiers = (e) => {
     const {name, value} = e.target;
     setCurrentModifiers((prev) => ({...prev, [name]:value }));
-    if (canSpeakSelection) {
+    if (canSpeakSelection && ttsEnabled) {
       const labelMap = {
         iceLevel: {
           none: "No ice",
@@ -79,7 +81,7 @@ function Kiosk() {
     };
     setSubtotal(subtotal + parseFloat(currentItem.price));
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
-    if (canSpeakSelection && modifiedItem) {
+    if (canSpeakSelection && modifiedItem && ttsEnabled) {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
         ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
         : modifiedItem.price;

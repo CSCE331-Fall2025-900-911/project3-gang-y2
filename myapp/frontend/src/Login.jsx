@@ -1,80 +1,50 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 import "./Login.css";
 
-function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate(); 
+const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    console.log("Login attempted with:", username, password);
+  const handleSuccess = async (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    const email = decoded.email;
 
     try {
-      const response = await fetch('/api/login', {
+      const res = await fetch('/api/auth/google', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (response.ok) {
-        console.log('Login successful:', data);
-        
-        if (data.isManager) {
+      if (data.success) {
+        login(data.user);
+        if (data.user.role === 'manager') {
           navigate('/manager');
-        } 
+        }
         else {
           navigate('/cashier');
         }
-      } 
-      else {
-        alert("login failed! check username & password");
-        console.error('Login failed:', data.error);
+      } else {
+        alert("Access Denied: Email not found in system.");
       }
-    } 
-    catch (error) {
-      console.error('Error during login:', error);
+    } catch (err) {
+      console.error(err);
+      alert("Login failed");
     }
   };
 
   return (
-    <div className="login-page">
-      <div className="login-box">
-        <h2>Employee Login</h2>
-        <form onSubmit={handleLogin}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            aria-label="Username"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            aria-label="Password"
-            required
-          />
-          <button type="submit" aria-label="Login">Login</button>
-        </form>
-
-        <button className="back-button" onClick={() => navigate("/")} aria-label="Back to Dashboard">
-          ← Back to Dashboard
-        </button>
-      </div>
+    <div className="login-container">
+      <h2>Sign In</h2>
+      <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('Failed')} />
     </div>
   );
-}
+};
 
 export default Login;

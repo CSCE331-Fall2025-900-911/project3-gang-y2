@@ -17,6 +17,41 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
+// get a token for user login 
+// token stores their permission so we don't need to repeatedly query for their role
+app.post("/api/auth/google", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM employees WHERE email = $1", 
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      // email not found, they are not an employee
+      return res.status(401).json({ error: "Email not authorized" });
+    }
+
+    const user = result.rows[0];
+  
+    // create token and return to fe
+    res.json({
+      success: true,
+      user: {
+        id: user.employeeid,
+        name: user.name,
+        email: user.email,
+        role: user.ismanager ? 'manager' : 'employee'
+      }
+    });
+
+  } catch (err) {
+    console.error("Auth error:", err);
+    res.status(500).json({ error: "Server error during auth" });
+  }
+});
+
 // Menu route
 app.get("/api/menu", async (req, res) => {
   try {

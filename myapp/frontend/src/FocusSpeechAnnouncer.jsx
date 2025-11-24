@@ -1,14 +1,16 @@
 import { useEffect } from "react";
 import { useTextToSpeech } from "./hooks/useTextToSpeech";
+import { useTtsSettings } from "./TtsSettingsContext.jsx";
 function FocusSpeechAnnouncer({ rate = 1, pitch = 1 }) {
+  const { ttsEnabled } = useTtsSettings();
   const { canSpeak, startTalking, stopTalking } = useTextToSpeech({ rate, pitch });
   useEffect(() => {
-    if (!canSpeak) return;
+    if (!canSpeak || !ttsEnabled) return;
     const handleFocus = (event) => {
       const target = event.target;
       if (!target) return;
-      const attrText = target.getAttribute?.("data-tts") || target.getAttribute?.("aria-label");
-      const textToRead = attrText || target.innerText;
+      const textAttr = target.getAttribute?.("data-tts") || target.getAttribute?.("aria-label");
+      const textToRead = textAttr || target.innerText;
       if (!textToRead) return;
       const cleanText = textToRead.replace(/\s+/g, " ").trim();
       if (!cleanText) return;
@@ -21,7 +23,7 @@ function FocusSpeechAnnouncer({ rate = 1, pitch = 1 }) {
       window.removeEventListener("focusin", handleFocus);
       window.removeEventListener("focusout", handleBlur);
     };
-  }, [startTalking, stopTalking, canSpeak]);
+  }, [startTalking, stopTalking, canSpeak, ttsEnabled]);
   return null;
 }
 export default FocusSpeechAnnouncer;
