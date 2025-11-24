@@ -264,6 +264,22 @@ app.delete("/api/inventory/:item", async (req, res) => {
   }
 });
 
+// place order
+app.post("/api/orders", async (req, res) => {
+  const { orderID, orderDate, orderTime, orderCost } = req.body;
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO orders (orderid, orderdate, ordertime, ordercost) VALUES ($1, $2, $3, $4) RETURNING orderid as orderID, orderdate as orderDate, ordertime as orderTime, ordercost as orderCost",
+      [orderID, orderDate, orderTime, orderCost]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error creating order:", err);
+    res.status(500).json({ error: "Failed to create order" });
+  }
+});
+
 // Add new menu item
 app.post("/api/menu", async (req, res) => {
   const { itemid, name, description, price, calories } = req.body;

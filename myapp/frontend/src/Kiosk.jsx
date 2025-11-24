@@ -9,6 +9,7 @@ import { useTextToSpeech } from "./hooks/useTextToSpeech.js";
 import { useTtsSettings } from "./TtsSettingsContext.jsx";
 
 function Kiosk() {
+  const [currentTime, setCurrentTime] = useState(new Date());
   // Holds menu items fetched from the backend
   const [menuItems, setMenuItems] = useState([]);
 
@@ -26,9 +27,18 @@ function Kiosk() {
   const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
 
   // sub total for order
-  const[subtotal, setSubtotal] = useState(0.0);
+  const [subtotal, setSubtotal] = useState(0.0);
   const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
   const { ttsEnabled } = useTtsSettings();
+
+  // orders table in db? stuff for API
+  const [orders, setOrders] = useState([]);
+  const [formData, setFormData] = useState([{ orderid: 1, 
+      orderdate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      ordertime: currentTime.getTime(), 
+      ordercost: subtotal}]);
+  
+  const [isEditing, setIsEditing] = useState(false);
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -76,12 +86,14 @@ function Kiosk() {
     }
   };
 
+
   // function to add the pressed item to the order
   const addToOrder = () => {
     const modifiedItem = {
         ...currentItem, modifiers: {...currentModifiers}, // copies the state of modifiers and adds it to list
     };
-    setSubtotal(subtotal + parseFloat(currentItem.price));
+    setSubtotal(subtotal + parseFloat(modifiedItem.price));
+    
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
     if (canSpeakSelection && modifiedItem && ttsEnabled) {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
@@ -91,12 +103,57 @@ function Kiosk() {
         `Added ${modifiedItem.name}. ${price}. Ice ${modifiedItem.modifiers.iceLevel}. Sugar ${modifiedItem.modifiers.sugarLevel}. Topping ${modifiedItem.modifiers.topping}.`
       );
     }
+    console.log("current subtotal: ", subtotal);
     setCurrentItem(null);
   };
 
   // submit order & get payment
-  function placeOrder() {
+  // function placeOrder() {
+  //   alert("Present payment");
+  //   {handleSubmit};
+  // };
+
+
+  // useEffect(() => {
+  //     fetch("/api/orders")
+  //       .then((res) => res.json())
+  //       .then((data) => setOrders(data))
+  //       .catch((err) => console.error("Error fetching orders:", err));
+  //   }, []);
+
+  // Add order to DB
+  const handleSubmit = async (e) => {
+    setCurrentTime(new Date());
+    setSubtotal(subtotal);
+    setFormData({ orderid: 6, 
+      orderdate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      ordertime: currentTime.getTime(), 
+      ordercost: subtotal});
     alert("Present payment");
+    console.log("submitting: ", formData);
+    e.preventDefault();
+    const method = isEditing ? "PUT" : "POST";
+    const url = isEditing
+      ? `/api/orders/${formData.id}`
+      : "/api/orders";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    if (res.ok) {
+      setShowForm(false);
+      setIsEditing(false);
+      setFormData({ orderid: 6, 
+      orderdate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      ordertime: currentTime.getTime(), 
+      ordercost: subtotal});
+      // Refresh table
+      // const data = await (await fetch("/api/orders")).json();
+      setOrders(data);
+    }
   };
 
   useEffect(() => {
@@ -182,7 +239,7 @@ function Kiosk() {
         <div className="order-button-container">
             <button
               className="order-button"
-              onClick={() => placeOrder()}
+              onClick={handleSubmit}
               data-tts="Place order and present payment."
               aria-label="Place order and present payment."
             >
