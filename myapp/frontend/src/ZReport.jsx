@@ -3,16 +3,19 @@ import { Link } from "react-router-dom";
 import "./ZReport.css";
 
 function ZReport() {
-  const [employees, setEmployees] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", role: "", wage: "" });
-  const [isEditing, setIsEditing] = useState(false);
+  const [report, setReport] = useState(null)
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/employees")
+    fetch("http://localhost:3000/api/reports/zreport")
       .then((res) => res.json())
-      .then((data) => setEmployees(data))
-      .catch((err) => console.error("Error fetching employees:", err));
+      .then((data) => {
+        if (data.zReportGenerated){
+          alert(data.message);
+        } else {
+          setReport(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching Z Report:", err));
   }, []);
 
   return (
@@ -41,6 +44,34 @@ function ZReport() {
             </tr>
           </thead>
           <tbody>
+            {report ? (
+              <>
+                <tr>
+                  <td>Date</td>
+                  <td>{report.date}</td>
+                </tr>
+                <tr>
+                  <td>Total Revenue</td>
+                  <td>${report.totalSales.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td>Sales Tax (6.25%)</td>
+                  <td>${report.salesTax.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td>Subtotal (Net Sales)</td>
+                  <td>${report.subtotal.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td>Number of Orders</td>
+                  <td>{report.numSales}</td>
+                </tr>
+              </>
+            ) : (
+              <tr>
+                <td colSpan="2">Loading...</td>
+              </tr>
+            )}
           </tbody>
         </table>
 

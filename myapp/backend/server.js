@@ -289,7 +289,7 @@ app.delete("/api/menu/:itemid", async (req, res) => {
 });
 
 //get X Report Data
-app.get("/api/sales", async (req, res) => {
+app.get("/api/reports/xreport", async (req, res) => {
     try {
         const date = new Date();
         const year = date.getFullYear();
@@ -311,6 +311,56 @@ app.get("/api/sales", async (req, res) => {
         [today]);
 
         res.json(result.rows);
+
+    } catch (err) {
+        console.error("Error fetching sales data:", err);
+        res.status(500).json({ error: "Failed to fetch sales data" });
+    }
+});
+
+//get Z Report Data
+
+let zReportGenerated = false;
+
+app.get("/api/reports/zreport", async (req, res) => {
+    try {
+        
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getDate()).padStart(2, '0');
+
+        const today = `${year}-${month}-${day}`;  
+
+        if (zReportGenerated) {
+          return res.json({ zReportGenerated: true, message: "Z Report can only be generated once per day." });
+        }
+
+        const result = await pool.query(`
+            SELECT
+              COALESCE(SUM("ordercost"), 0) AS total_sales,
+              COUNT(*) AS num_sales
+            FROM orders
+            WHERE "orderdate" = $1;
+        `, 
+        [today]);
+
+        const row = result.rows[0];
+        const totalSales = parseFloat(row.total_sales);
+        const numSales = parseInt(row.num_sales);
+        const salesTax = totalSales * 0.0625;
+        const subtotal = totalSales - salesTax;
+
+        zReportGenerated = true;
+
+        res.json(
+        {
+          date: today,
+          totalSales,
+          salesTax,
+          subtotal,
+          numSales
+        });
 
     } catch (err) {
         console.error("Error fetching sales data:", err);
