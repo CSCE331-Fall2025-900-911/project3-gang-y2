@@ -26,6 +26,7 @@ export function useTextToSpeech(baseSettings = {}) {
       const speech = new SpeechSynthesisUtterance(text);
       speech.rate = settings.rate ?? baseSettings.rate ?? 1;
       speech.pitch = settings.pitch ?? baseSettings.pitch ?? 1;
+      speech.lang = settings.lang ?? baseSettings.lang ?? "en-US";
       speech.onend = () => setIsTalking(false);
       speech.onerror = () => setIsTalking(false);
       speechRef.current.speak(speech);

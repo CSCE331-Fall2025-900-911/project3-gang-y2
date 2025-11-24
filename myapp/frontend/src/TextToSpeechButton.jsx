@@ -5,8 +5,9 @@ import { useTranslation } from "./i18n/TranslationContext.jsx";
 import "./TextToSpeechButton.css";
 function TextToSpeechButton({ text, label, className = "", rate, pitch }) {
   const { ttsEnabled } = useTtsSettings();
-  const { translate } = useTranslation();
-  const { canSpeak, isTalking, startTalking, stopTalking } = useTextToSpeech({ rate, pitch });
+  const { language, translate } = useTranslation();
+  const langCode = language === "es" ? "es-ES" : "en-US";
+  const { canSpeak, isTalking, startTalking, stopTalking } = useTextToSpeech({ rate, pitch, lang: langCode });
   if (!canSpeak) return null;
   const hasText = Boolean(text && text.trim());
   const buttonLabel = label || translate("tts.button.read");

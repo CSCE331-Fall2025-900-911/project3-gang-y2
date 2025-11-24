@@ -28,9 +28,10 @@ function Kiosk() {
 
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
-  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
+  const { language, translate } = useTranslation();
+  const langCode = language === "es" ? "es-ES" : "en-US";
+  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1, lang: langCode });
   const { ttsEnabled } = useTtsSettings();
-  const { translate } = useTranslation();
 
   const openModification = (item) => {
     setCurrentItem(item);
