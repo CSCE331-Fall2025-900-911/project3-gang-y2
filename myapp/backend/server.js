@@ -17,6 +17,41 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
+// get a token for user login 
+// token stores their permission so we don't need to repeatedly query for their role
+app.post("/api/auth/google", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM employees WHERE email = $1", 
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      // email not found, they are not an employee
+      return res.status(401).json({ error: "Email not authorized" });
+    }
+
+    const user = result.rows[0];
+  
+    // create token and return to fe
+    res.json({
+      success: true,
+      user: {
+        id: user.employeeid,
+        name: user.name,
+        email: user.email,
+        role: user.ismanager ? 'manager' : 'employee'
+      }
+    });
+
+  } catch (err) {
+    console.error("Auth error:", err);
+    res.status(500).json({ error: "Server error during auth" });
+  }
+});
+
 // Menu route
 app.get("/api/menu", async (req, res) => {
   try {
@@ -229,20 +264,6 @@ app.delete("/api/inventory/:item", async (req, res) => {
   }
 });
 
-//Get entire menu
-/*app.get("/api/menu", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT itemid, name, description, price, calories FROM menuitems ORDER BY itemid ASC"
-    );
-    res.json(result.rows);
-  }
-  catch (err) {
-    console.error("Error fetching menu:", err);
-    res.status(500).json({ error: "Failed to fetch menu" });
-  }
-});*/
-
 // Add new menu item
 app.post("/api/menu", async (req, res) => {
   const { itemid, name, description, price, calories } = req.body;
@@ -301,6 +322,169 @@ app.delete("/api/menu/:itemid", async (req, res) => {
     res.status(500).json({ error: "Failed to delete menu item" });
   }
 });
+
+//get X Report Data
+app.get("/api/reports/xreport", async (req, res) => {
+    try {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getDate()).padStart(2, '0');
+
+        const today = `${year}-${month}-${day}`;  
+
+        const result = await pool.query(`
+            SELECT
+            TO_CHAR(date_trunc('hour', (orderdate + ordertime)::timestamp), 'HH24:MI') AS hour_bucket,
+            COALESCE(SUM(ordercost), 0) AS total_sales,
+            COUNT(*) AS num_sales
+            FROM orders
+            WHERE orderdate = $1
+            GROUP BY hour_bucket
+            ORDER BY hour_bucket;
+        `, 
+        [today]);
+
+        res.json(result.rows);
+
+    } catch (err) {
+        console.error("Error fetching sales data:", err);
+        res.status(500).json({ error: "Failed to fetch sales data" });
+    }
+});
+
+//get Z Report Data
+let zReportGenerated = false;
+
+app.get("/api/reports/zreport", async (req, res) => {
+    try {
+        
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getDate()).padStart(2, '0');
+
+        const today = `${year}-${month}-${day}`;  
+
+        if (zReportGenerated) {
+          return res.json({ zReportGenerated: true, message: "Z Report can only be generated once per day." });
+        }
+
+        const result = await pool.query(`
+            SELECT
+              COALESCE(SUM("ordercost"), 0) AS total_sales,
+              COUNT(*) AS num_sales
+            FROM orders
+            WHERE "orderdate" = $1;
+        `, 
+        [today]);
+
+        const row = result.rows[0];
+        const totalSales = parseFloat(row.total_sales);
+        const numSales = parseInt(row.num_sales);
+        const salesTax = totalSales * 0.0625;
+        const subtotal = totalSales - salesTax;
+
+        zReportGenerated = true;
+
+        res.json(
+        {
+          date: today,
+          totalSales,
+          salesTax,
+          subtotal,
+          numSales
+        });
+
+    } catch (err) {
+        console.error("Error fetching sales data:", err);
+        res.status(500).json({ error: "Failed to fetch sales data" });
+    }
+});
+
+//get sales report data
+app.get("/api/reports/salesReport", async (req, res) => {
+    try {
+        const { fromDate, toDate } = req.query;
+
+        if (!fromDate || !toDate) {
+            return res.status(400).json({ error: "fromDate and toDate are required" });
+        }
+
+        const result = await pool.query(`
+            SELECT 
+                mi.name AS itemName,
+                COUNT(oi.orderDetailID) AS salesCount
+            FROM orders o
+            JOIN orderItems oi ON o.orderID = oi.orderID
+            JOIN menuItems mi ON oi.itemID = mi.itemID
+            WHERE o.orderDate BETWEEN $1 AND $2
+            GROUP BY mi.name
+            ORDER BY salesCount DESC;
+        `, [fromDate, toDate]);
+
+        res.json(result.rows);
+
+    } catch (err) {
+        console.error("Error fetching sales report:", err);
+        res.status(500).json({ error: "Failed to fetch sales report" });
+    }
+});
+
+//get product usage chart data
+app.get("/api/reports/productUsage", async (req, res) => {
+  try {
+    const { fromDate, toDate } = req.query;
+    if (!fromDate || !toDate) {
+      return res.status(400).json({ error: "fromDate and toDate are required" });
+    }
+
+    const orderRes = await pool.query(
+      `SELECT orderID FROM orders WHERE orderDate BETWEEN $1 AND $2`,
+      [fromDate, toDate]
+    );
+    const orderIds = orderRes.rows.map(row => row.orderid);
+    if (orderIds.length === 0) return res.json([]);
+
+    const itemRes = await pool.query(
+      `SELECT itemID, COUNT(*) AS count
+       FROM orderItems
+       WHERE orderID = ANY($1)
+       GROUP BY itemID`,
+      [orderIds]
+    );
+
+    let usedIngredients = {};
+    for (let item of itemRes.rows) {
+      const { itemid, count } = item;
+
+      const ingRes = await pool.query(
+        `SELECT inventoryItem, qtyPerDrink
+         FROM menuItemInventory
+         WHERE itemID = $1`,
+        [itemid]
+      );
+
+      ingRes.rows.forEach(ing => {
+        const totalQty = ing.qtyperdrink * count;
+        usedIngredients[ing.inventoryitem] =
+          (usedIngredients[ing.inventoryitem] || 0) + totalQty;
+      });
+    }
+
+    const result = Object.entries(usedIngredients).map(([ingredient, qty]) => ({
+      ingredient,
+      quantity: qty
+    }));
+
+    res.json(result);
+
+  } catch (err) {
+    console.error("Error fetching product usage:", err);
+    res.status(500).json({ error: "Failed to fetch product usage" });
+  }
+});
+
 
 //production stuff
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

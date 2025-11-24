@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Kiosk.css";
 import Navbar from "./Navbar";
 import { ZoomProvider } from "./ZoomContext";
+import TextToSpeechButton from "./TextToSpeechButton.jsx";
+import { getOrderSpeech } from "./utils/speechHelpers.js";
+import { useTextToSpeech } from "./hooks/useTextToSpeech.js";
+import { useTtsSettings } from "./TtsSettingsContext.jsx";
 
 function Kiosk() {
   // Holds menu items fetched from the backend
@@ -16,12 +20,15 @@ function Kiosk() {
 
   // currentItem holds the item currently being modified
   const [currentItem, setCurrentItem] = useState(null);
+  const firstOptionRef = useRef(null);
 
   // holds a value for modifiers 
   const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
 
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
+  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
+  const { ttsEnabled } = useTtsSettings();
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -35,6 +42,38 @@ function Kiosk() {
   const changeModifiers = (e) => {
     const {name, value} = e.target;
     setCurrentModifiers((prev) => ({...prev, [name]:value }));
+    if (canSpeakSelection && ttsEnabled) {
+      const labelMap = {
+        iceLevel: {
+          none: "No ice",
+          low: "Low ice",
+          medium: "Medium ice",
+          high: "High ice",
+        },
+        sugarLevel: {
+          none: "No sugar",
+          low: "Low sugar",
+          medium: "Medium sugar",
+          high: "High sugar",
+        },
+        topping: {
+          none: "No topping",
+          pearl: "Pearl",
+          mini_pearl: "Mini pearl",
+          crystal_boba: "Crystal boba",
+          pudding: "Pudding",
+          aloe_vera: "Aloe vera",
+          red_bean: "Red bean",
+          herb_jelly: "Herb jelly",
+          aiyu_jelly: "Aiyu jelly",
+          lychee_jelly: "Lychee jelly",
+          crema: "Crema",
+          ice_cream: "Ice cream",
+        },
+      };
+      const spoken = labelMap[name]?.[value] || value;
+      saySelection(`Set ${name} to ${spoken}`);
+    }
   };
 
   // function to add the pressed item to the order
@@ -44,6 +83,14 @@ function Kiosk() {
     };
     setSubtotal(subtotal + parseFloat(currentItem.price));
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
+    if (canSpeakSelection && modifiedItem && ttsEnabled) {
+      const price = Number.isFinite(parseFloat(modifiedItem.price))
+        ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
+        : modifiedItem.price;
+      saySelection(
+        `Added ${modifiedItem.name}. ${price}. Ice ${modifiedItem.modifiers.iceLevel}. Sugar ${modifiedItem.modifiers.sugarLevel}. Topping ${modifiedItem.modifiers.topping}.`
+      );
+    }
     setCurrentItem(null);
   };
 
@@ -51,6 +98,27 @@ function Kiosk() {
   function placeOrder() {
     alert("Present payment");
   };
+
+  useEffect(() => {
+    if (currentItem && firstOptionRef.current) {
+      firstOptionRef.current.focus();
+    }
+  }, [currentItem]);
+
+  const kioskSpeechText = useMemo(() => {
+    const orderDescription = getOrderSpeech(currentOrder, subtotal);
+    return `Welcome to the MatchaBoba self-service kiosk. Tap a drink to customize ice, sugar, and toppings before adding it to your order. ${orderDescription}`;
+  }, [currentOrder, subtotal]);
+
+  const menuButtonLabel = useCallback((item) => {
+    const numericPrice = parseFloat(item.price);
+    const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
+    return `Drink ${item.name}. ${priceText} dollars. Press enter to customize ice, sugar, and toppings.`;
+  }, []);
+
+  const orderLineLabel = useCallback((item, index) => {
+    return `Order item ${index + 1}. ${item.name}. Price ${item.price} dollars. Ice ${item.modifiers.iceLevel}, sugar ${item.modifiers.sugarLevel}, topping ${item.modifiers.topping}.`;
+  }, []);
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
@@ -80,10 +148,21 @@ function Kiosk() {
       <div className="sidebar-container">
         <div className="sidebar">
             <h2>Order</h2>
+            <div className="tts-stack">
+              <p className="tts-helper">Need it read aloud? Use the speaker.</p>
+              <TextToSpeechButton
+                text={kioskSpeechText}
+                label="Read kiosk instructions and current order"
+              />
+            </div>
             {currentOrder.length === 0 ? ( <p>no items yet</p>) : 
             (<ul>
                 {currentOrder.map((item, index) => 
-                ( <li key={index}>
+                ( <li
+                    key={index}
+                    tabIndex="0"
+                    data-tts={orderLineLabel(item, index)}
+                  >
                     ${item.price} : <strong>{item.name} :</strong>   
                     <small>
                         <br/>
@@ -101,7 +180,14 @@ function Kiosk() {
           <strong>SubTotal : </strong>${subtotal}
         </div>
         <div className="order-button-container">
-            <button className="order-button" onClick={() => placeOrder()}>Place Order</button>
+            <button
+              className="order-button"
+              onClick={() => placeOrder()}
+              data-tts="Place order and present payment."
+              aria-label="Place order and present payment."
+            >
+              Place Order
+            </button>
         </div>
       </div>
 
@@ -112,6 +198,8 @@ function Kiosk() {
               key={item.id} // unique key for React
               className="menu-button"
               onClick={() => openModification(item)}
+              data-tts={menuButtonLabel(item)}
+              aria-label={menuButtonLabel(item)}
             >
               ${item.price} : <strong>{item.name}</strong>
             </button>
@@ -143,6 +231,9 @@ function Kiosk() {
               width: "300px",
               textAlign: "center",
             }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Customize ${currentItem.name}`}
           >
             <h3>Customize {currentItem.name}</h3>
 
@@ -153,12 +244,14 @@ function Kiosk() {
                   name="iceLevel"
                   value={currentModifiers.iceLevel}
                   onChange={changeModifiers}
+                  ref={firstOptionRef}
+                  aria-label="Select ice level"
                   style={{ marginLeft: "0.5rem" }}
                 >
                   <option value="none">None</option>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  <option value="low" data-tts="Low ice">Low</option>
+                  <option value="medium" data-tts="Medium ice">Medium</option>
+                  <option value="high" data-tts="High ice">High</option>
                 </select>
               </label>
             </div>
@@ -170,12 +263,13 @@ function Kiosk() {
                   name="sugarLevel"
                   value={currentModifiers.sugarLevel}
                   onChange={changeModifiers}
+                  aria-label="Select sugar level"
                   style={{ marginLeft: "0.5rem" }}
                 >
                   <option value="none">None</option>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
+                  <option value="low" data-tts="Low sugar">Low</option>
+                  <option value="medium" data-tts="Medium sugar">Medium</option>
+                  <option value="high" data-tts="High sugar">High</option>
                 </select>
               </label>
             </div>
@@ -187,20 +281,21 @@ function Kiosk() {
                   name="topping"
                   value={currentModifiers.topping}
                   onChange={changeModifiers}
+                  aria-label="Select topping"
                   style={{ marginLeft: "0.5rem" }}
                 >
                   <option value="none">None</option>
-                  <option value="pearl">Pearl</option>
-                  <option value="mini_pearl">Mini Pearl</option>
-                  <option value="crystal_boba">Crystal Boba</option>
-                  <option value="pudding">Pudding</option>
-                  <option value="aloe_vera">Aloe Vera</option>
-                  <option value="red_bean">Red Bean</option>
-                  <option value="herb_jelly">Herb Jelly</option>
-                  <option value="aiyu_jelly">Aiyu Jelly</option>
-                  <option value="lychee_jelly">Lychee Jelly</option>
-                  <option value="crema">Crema</option>
-                  <option value="ice_cream">Ice Cream</option>
+                  <option value="pearl" data-tts="Pearl">Pearl</option>
+                  <option value="mini_pearl" data-tts="Mini pearl">Mini Pearl</option>
+                  <option value="crystal_boba" data-tts="Crystal boba">Crystal Boba</option>
+                  <option value="pudding" data-tts="Pudding">Pudding</option>
+                  <option value="aloe_vera" data-tts="Aloe vera">Aloe Vera</option>
+                  <option value="red_bean" data-tts="Red bean">Red Bean</option>
+                  <option value="herb_jelly" data-tts="Herb jelly">Herb Jelly</option>
+                  <option value="aiyu_jelly" data-tts="Aiyu jelly">Aiyu Jelly</option>
+                  <option value="lychee_jelly" data-tts="Lychee jelly">Lychee Jelly</option>
+                  <option value="crema" data-tts="Crema topping">Crema</option>
+                  <option value="ice_cream" data-tts="Ice cream">Ice Cream</option>
                 </select>
               </label>
             </div>
