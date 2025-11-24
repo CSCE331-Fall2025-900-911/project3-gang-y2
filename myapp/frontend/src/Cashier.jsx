@@ -109,7 +109,7 @@ function Cashier() {
       const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
       const sugar = translate(`mod.sugar.${item.modifiers.sugarLevel}`);
       const topping = translate(`mod.topping.${item.modifiers.topping}`);
-      const priceText = item.price;
+      const priceText = Number.parseFloat(item.price).toFixed(2);
       return translate("tts.orderLine", {
         num: index + 1,
         name: item.name,
@@ -173,7 +173,7 @@ function Cashier() {
                     tabIndex="0"
                     data-tts={orderLineLabel(item, index)}
                   >
-                    ${item.price} : <strong>{item.name} :</strong>   
+                    ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
                     <small>
                         <br/>
                         {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
@@ -211,7 +211,7 @@ function Cashier() {
               data-tts={menuButtonLabel(item)}
               aria-label={menuButtonLabel(item)}
             >
-              ${item.price} : <strong>{item.name}</strong>
+              ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
             </button>
           ))}
         </div>

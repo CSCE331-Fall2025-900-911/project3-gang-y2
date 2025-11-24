@@ -96,11 +96,12 @@ function MenuItemView() {
 
   const rowLabel = useCallback(
     (item) => {
+      const priceText = Number.parseFloat(item.price).toFixed(2);
       return translate("menu.row", {
         id: item.itemid,
         name: item.name,
         description: item.description,
-        price: item.price,
+        price: priceText,
         calories: item.calories,
       });
     },
@@ -138,11 +139,11 @@ function MenuItemView() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Price</th>
-              <th>Calories</th>
-              <th>Actions</th>
+              <th>{translate("menu.table.name") || "Name"}</th>
+              <th>{translate("menu.table.description") || "Description"}</th>
+              <th>{translate("menu.table.price") || "Price"}</th>
+              <th>{translate("menu.table.calories") || "Calories"}</th>
+              <th>{translate("menu.table.actions") || "Actions"}</th>
             </tr>
           </thead>
           <tbody>
@@ -151,22 +152,22 @@ function MenuItemView() {
                 <td>{item.itemid}</td>
                 <td>{item.name}</td>
                 <td>{item.description}</td>
-                <td>{item.price}</td>
+                <td>{Number.parseFloat(item.price).toFixed(2)}</td>
                 <td>{item.calories}</td>
                 <td>
                   <button
                     className="edit-btn"
                     onClick={() => handleEdit(item)}
-                    data-tts={`${translate("menu.table.edit")} ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
-                    aria-label={`${translate("menu.table.edit")} ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
+                    data-tts={`${translate("menu.table.edit")} ${item.name}. Price ${Number.parseFloat(item.price).toFixed(2)} dollars, calories ${item.calories}.`}
+                    aria-label={`${translate("menu.table.edit")} ${item.name}. Price ${Number.parseFloat(item.price).toFixed(2)} dollars, calories ${item.calories}.`}
                   >
                     ✏️ {translate("menu.table.edit")}
                   </button>
                   <button
                     className="delete-btn"
                     onClick={() => handleDelete(item.itemid)}
-                    data-tts={`${translate("menu.table.delete")} ${item.name}. Price ${item.price} dollars.`}
-                    aria-label={`${translate("menu.table.delete")} ${item.name}. Price ${item.price} dollars.`}
+                    data-tts={`${translate("menu.table.delete")} ${item.name}. Price ${Number.parseFloat(item.price).toFixed(2)} dollars.`}
+                    aria-label={`${translate("menu.table.delete")} ${item.name}. Price ${Number.parseFloat(item.price).toFixed(2)} dollars.`}
                   >
                     🗑 {translate("menu.table.delete")}
                   </button>
@@ -179,32 +180,32 @@ function MenuItemView() {
         {showForm && (
           <div className="modal">
             <div className="modal-content">
-              <h3>{isEditing ? "Edit Menu Item" : "Add Menu Item"}</h3>
+              <h3>{isEditing ? translate("menu.table.edit") : translate("menu.add")}</h3>
               <form onSubmit={handleSubmit}>
                 <input
                   type="text"
-                  placeholder="Name"
+                  placeholder={translate("menu.table.name") || "Name"}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Description"
+                  placeholder={translate("menu.table.description") || "Description"}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Price"
+                  placeholder={translate("menu.table.price") || "Price"}
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Calories"
+                  placeholder={translate("menu.table.calories") || "Calories"}
                   value={formData.calories}
                   onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
                   required
