@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./MenuItemView.css";
+import TextToSpeechButton from "./TextToSpeechButton.jsx";
 
 function MenuItemView() {
   const [menuItems, setMenuItems] = useState([]);
@@ -73,6 +74,22 @@ function MenuItemView() {
         }
   };
 
+  const menuSpeechText = useMemo(() => {
+    if (menuItems.length === 0) {
+      return "Menu item management. There are no menu items yet. Use the add menu item button to create one.";
+    }
+
+    const highlight = menuItems
+      .slice(0, 3)
+      .map((item) => `${item.name} priced at ${item.price} dollars`)
+      .join(", ");
+
+    return `Menu item management. There are ${menuItems.length} items. ${highlight ? `Highlights include ${highlight}.` : ""} Use the add menu item button to create an item, or the edit and delete buttons in the Actions column to update existing ones.`;
+  }, [menuItems]);
+  const rowLabel = useCallback((item) => {
+    return `Menu item ${item.itemid}. ${item.name}. ${item.description}. Price ${item.price} dollars. Calories ${item.calories}. Use edit or delete to change.`;
+  }, []);
+
   return (
     <div className="menu-item-page">
       <nav className="navbar">
@@ -90,8 +107,20 @@ function MenuItemView() {
 
       <main className="content">
         <h2>Menu Item Management</h2>
+        <div className="menu-tts tts-stack">
+          <p className="tts-helper">Have this page read aloud.</p>
+          <TextToSpeechButton
+            text={menuSpeechText}
+            label="Read menu item management summary"
+          />
+        </div>
 
-        <button className="add-btn" onClick={() => setShowForm(true)}>
+        <button
+          className="add-btn"
+          onClick={() => setShowForm(true)}
+          data-tts="Add a new menu item. Opens a form to enter name, description, price, and calories."
+          aria-label="Add a new menu item. Opens a form to enter name, description, price, and calories."
+        >
           ➕ Add Menu Item
         </button>
 
@@ -108,15 +137,29 @@ function MenuItemView() {
           </thead>
           <tbody>
             {menuItems.map((item) => (
-              <tr key={item.itemid}>  
+              <tr key={item.itemid} tabIndex="0" data-tts={rowLabel(item)}>  
                 <td>{item.itemid}</td>
                 <td>{item.name}</td>
                 <td>{item.description}</td>
                 <td>{item.price}</td>
                 <td>{item.calories}</td>
                 <td>
-                  <button className="edit-btn" onClick={() => handleEdit(item)}>✏️ Edit</button>
-                  <button className="delete-btn" onClick={() => handleDelete(item.itemid)}>🗑 Delete</button>
+                  <button
+                    className="edit-btn"
+                    onClick={() => handleEdit(item)}
+                    data-tts={`Edit ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
+                    aria-label={`Edit ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(item.itemid)}
+                    data-tts={`Delete ${item.name}. Price ${item.price} dollars.`}
+                    aria-label={`Delete ${item.name}. Price ${item.price} dollars.`}
+                  >
+                    🗑 Delete
+                  </button>
                 </td>
               </tr>
             ))}
