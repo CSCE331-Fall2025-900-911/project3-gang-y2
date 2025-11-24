@@ -17,7 +17,7 @@ function App() {
           <ul className="nav-links">
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/kiosk">Customer Kiosk</Link></li>
-            <li><Link to="/menu">Menu Board</Link></li>
+            <li><Link to="/menuboard">Menu Board</Link></li>
           </ul>
           <div className="zoom-controls">
             Zoom Level: 

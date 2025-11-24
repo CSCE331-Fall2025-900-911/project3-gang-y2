@@ -13,6 +13,8 @@ import ManagerDashboard from "./ManagerDash.jsx";
 import EmployeesView from "./EmployeesView.jsx";
 import InventoryView from "./InventoryView.jsx";
 import Reports from "./Reports.jsx";
+import MenuBoard from "./MenuBoard.jsx";
+
 import XReport from "./XReport.jsx";
 import ZReport from "./ZReport.jsx";
 import ProdChart from "./ProdChart.jsx";
@@ -39,6 +41,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <Route path="/" element={<App />} />
               <Route path="/login" element={<Login />} />
               <Route path="/kiosk" element={<Kiosk />} />
+              <Route path="/menuboard" element={<MenuBoard />} />
 
               {/* Protected: Employees & Managers */}
               <Route 
