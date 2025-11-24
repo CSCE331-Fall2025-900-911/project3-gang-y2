@@ -2,9 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./App.css";
 import WeatherWidget from "./WeatherWidget";
+import { useZoom } from "./ZoomContext";
+import { ZoomProvider } from "./ZoomContext";
 
 function App() {
+  const updateZoom = useZoom();
   return (
+
+    <ZoomProvider>
     <div className="homepage">
       <nav className="navbar">
         <div className="nav-container">
@@ -14,7 +19,14 @@ function App() {
             <li><Link to="/kiosk">Customer Kiosk</Link></li>
             <li><Link to="/menu">Menu Board</Link></li>
           </ul>
+          <div className="zoom-controls">
+            Zoom Level: 
+            <button onClick={() => updateZoom(1)}>100%</button>
+            <button onClick={() => updateZoom(1.25)}>125%</button>
+            <button onClick={() => updateZoom(1.5)}>150%</button>
+          </div>
         </div>
+        
       </nav>
 
       <main className="content">
@@ -30,6 +42,7 @@ function App() {
 
       </main>
     </div>
+    </ZoomProvider>
   );
 }
 

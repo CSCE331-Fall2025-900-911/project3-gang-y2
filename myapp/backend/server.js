@@ -264,20 +264,6 @@ app.delete("/api/inventory/:item", async (req, res) => {
   }
 });
 
-//Get entire menu
-/*app.get("/api/menu", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT itemid, name, description, price, calories FROM menuitems ORDER BY itemid ASC"
-    );
-    res.json(result.rows);
-  }
-  catch (err) {
-    console.error("Error fetching menu:", err);
-    res.status(500).json({ error: "Failed to fetch menu" });
-  }
-});*/
-
 // Add new menu item
 app.post("/api/menu", async (req, res) => {
   const { itemid, name, description, price, calories } = req.body;
@@ -335,6 +321,36 @@ app.delete("/api/menu/:itemid", async (req, res) => {
     console.error("Error deleting menu item:", err);
     res.status(500).json({ error: "Failed to delete menu item" });
   }
+});
+
+//get X Report Data
+app.get("/api/sales", async (req, res) => {
+    try {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getDate()).padStart(2, '0');
+
+        const today = `${year}-${month}-${day}`;  
+
+        const result = await pool.query(`
+            SELECT
+            TO_CHAR(date_trunc('hour', (orderdate + ordertime)::timestamp), 'HH24:MI') AS hour_bucket,
+            COALESCE(SUM(ordercost), 0) AS total_sales,
+            COUNT(*) AS num_sales
+            FROM orders
+            WHERE orderdate = $1
+            GROUP BY hour_bucket
+            ORDER BY hour_bucket;
+        `, 
+        [today]);
+
+        res.json(result.rows);
+
+    } catch (err) {
+        console.error("Error fetching sales data:", err);
+        res.status(500).json({ error: "Failed to fetch sales data" });
+    }
 });
 
 //production stuff
