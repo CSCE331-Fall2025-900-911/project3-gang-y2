@@ -55,6 +55,7 @@ function Login() {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            aria-label="Username"
             required
           />
           <input
@@ -62,12 +63,13 @@ function Login() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-label="Password"
             required
           />
-          <button type="submit">Login</button>
+          <button type="submit" aria-label="Login">Login</button>
         </form>
 
-        <button className="back-button" onClick={() => navigate("/")}>
+        <button className="back-button" onClick={() => navigate("/")} aria-label="Back to Dashboard">
           ← Back to Dashboard
         </button>
       </div>
