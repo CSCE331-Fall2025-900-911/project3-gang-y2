@@ -1,13 +1,21 @@
 :root {
   --matcha-green: #7cb342;
   --white: #ffffff;
+
+  --zoom-scale: 1;
+
+  /* Use variables for sizing */
+  --font-size-base: calc(16px * var(--zoom-scale));
+  --spacing-base: calc(1rem * var(--zoom-scale));
+  --button-padding: calc(0.5rem * var(--zoom-scale))
+                     calc(1rem * var(--zoom-scale));
 }
 
-* {
+/* * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
+} */
 
 body {
   font-family: "Poppins", sans-serif;
@@ -24,7 +32,7 @@ body {
 .navbar {
   background-color: var(--matcha-green);
   color: var(--white);
-  padding: 15px 0;
+  padding: calc(0.75rem * var(--zoom-scale)) calc(1rem * var(--zoom-scale)) 0;
   width: 100%;
   position: fixed;
   top: 0;
@@ -42,7 +50,7 @@ body {
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: calc(1.5 * --font-size-base);
   font-weight: 600;
 }
 

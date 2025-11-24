@@ -15,10 +15,12 @@ import ProdChart from "./ProdChart.jsx";
 import SalesReport from "./SalesReport.jsx";
 import MenuItemView from "./MenuItemView.jsx";
 import "./index.css";
+import FocusSpeechAnnouncer from "./FocusSpeechAnnouncer.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
+      <FocusSpeechAnnouncer />
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
