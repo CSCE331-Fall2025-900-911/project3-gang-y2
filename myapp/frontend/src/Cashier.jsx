@@ -95,15 +95,32 @@ function Cashier() {
     }
   }, [currentItem]);
 
-  const menuButtonLabel = useCallback((item) => {
-    const numericPrice = parseFloat(item.price);
-    const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
-    return `Drink ${item.name}. ${priceText} dollars. Press enter to customize ice, sugar, and toppings.`;
-  }, []);
+  const menuButtonLabel = useCallback(
+    (item) => {
+      const numericPrice = parseFloat(item.price);
+      const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
+      return translate("tts.menuButton", { name: item.name, price: priceText });
+    },
+    [translate]
+  );
 
-  const orderLineLabel = useCallback((item, index) => {
-    return `Order item ${index + 1}. ${item.name}. Price ${item.price} dollars. Ice ${item.modifiers.iceLevel}, sugar ${item.modifiers.sugarLevel}, topping ${item.modifiers.topping}.`;
-  }, []);
+  const orderLineLabel = useCallback(
+    (item, index) => {
+      const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
+      const sugar = translate(`mod.sugar.${item.modifiers.sugarLevel}`);
+      const topping = translate(`mod.topping.${item.modifiers.topping}`);
+      const priceText = item.price;
+      return translate("tts.orderLine", {
+        num: index + 1,
+        name: item.name,
+        price: priceText,
+        ice,
+        sugar,
+        topping,
+      });
+    },
+    [translate]
+  );
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {

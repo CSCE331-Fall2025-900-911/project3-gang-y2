@@ -2,12 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./MenuItemView.css";
 import TextToSpeechButton from "./TextToSpeechButton.jsx";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function MenuItemView() {
   const [menuItems, setMenuItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: "", description: "", price: "", calories: ""});
   const [isEditing, setIsEditing] = useState(false);
+  const { translate } = useTranslation();
 
   useEffect(() => {
     fetch("/api/menu")
@@ -76,19 +78,34 @@ function MenuItemView() {
 
   const menuSpeechText = useMemo(() => {
     if (menuItems.length === 0) {
-      return "Menu item management. There are no menu items yet. Use the add menu item button to create one.";
+      return translate("menu.summary.empty");
     }
 
-    const highlight = menuItems
+    const highlightList = menuItems
       .slice(0, 3)
-      .map((item) => `${item.name} priced at ${item.price} dollars`)
+      .map((item) => `${item.name} ${item.price} dollars`)
       .join(", ");
 
-    return `Menu item management. There are ${menuItems.length} items. ${highlight ? `Highlights include ${highlight}.` : ""} Use the add menu item button to create an item, or the edit and delete buttons in the Actions column to update existing ones.`;
-  }, [menuItems]);
-  const rowLabel = useCallback((item) => {
-    return `Menu item ${item.itemid}. ${item.name}. ${item.description}. Price ${item.price} dollars. Calories ${item.calories}. Use edit or delete to change.`;
-  }, []);
+    const highlight = highlightList ? translate("menu.highlight", { list: highlightList }) : "";
+
+    return translate("menu.summary", {
+      count: menuItems.length,
+      highlights: highlight,
+    });
+  }, [menuItems, translate]);
+
+  const rowLabel = useCallback(
+    (item) => {
+      return translate("menu.row", {
+        id: item.itemid,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        calories: item.calories,
+      });
+    },
+    [translate]
+  );
 
   return (
     <div className="menu-item-page">
@@ -96,32 +113,32 @@ function MenuItemView() {
         <div className="nav-container">
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
-            <li><Link to="/manager">Back to Manager Menu</Link></li>
-            <li><Link to="/employees">Employees</Link></li>
-            <li><Link to="/inventory">Inventory</Link></li>
-            <li id="current-item"><Link to="/menu-items">Menu Items</Link></li>
-            <li><Link to="/reports">Reports</Link></li>
+            <li><Link to="/manager">{translate("nav.managerBack")}</Link></li>
+            <li><Link to="/employees">{translate("nav.employees")}</Link></li>
+            <li><Link to="/inventory">{translate("nav.inventory")}</Link></li>
+            <li id="current-item"><Link to="/menu-items">{translate("nav.menuItems")}</Link></li>
+            <li><Link to="/reports">{translate("nav.reports")}</Link></li>
           </ul>
         </div>
       </nav>
 
       <main className="content">
-        <h2>Menu Item Management</h2>
+        <h2>{translate("menu.header")}</h2>
         <div className="menu-tts tts-stack">
-          <p className="tts-helper">Have this page read aloud.</p>
+          <p className="tts-helper">{translate("menu.read")}</p>
           <TextToSpeechButton
             text={menuSpeechText}
-            label="Read menu item management summary"
+            label={translate("menu.read")}
           />
         </div>
 
         <button
           className="add-btn"
           onClick={() => setShowForm(true)}
-          data-tts="Add a new menu item. Opens a form to enter name, description, price, and calories."
-          aria-label="Add a new menu item. Opens a form to enter name, description, price, and calories."
+          data-tts={translate("menu.add")}
+          aria-label={translate("menu.add")}
         >
-          ➕ Add Menu Item
+          ➕ {translate("menu.add")}
         </button>
 
         <table className="menu-item-table">
@@ -147,18 +164,18 @@ function MenuItemView() {
                   <button
                     className="edit-btn"
                     onClick={() => handleEdit(item)}
-                    data-tts={`Edit ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
-                    aria-label={`Edit ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
+                    data-tts={`${translate("menu.table.edit")} ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
+                    aria-label={`${translate("menu.table.edit")} ${item.name}. Price ${item.price} dollars, calories ${item.calories}.`}
                   >
-                    ✏️ Edit
+                    ✏️ {translate("menu.table.edit")}
                   </button>
                   <button
                     className="delete-btn"
                     onClick={() => handleDelete(item.itemid)}
-                    data-tts={`Delete ${item.name}. Price ${item.price} dollars.`}
-                    aria-label={`Delete ${item.name}. Price ${item.price} dollars.`}
+                    data-tts={`${translate("menu.table.delete")} ${item.name}. Price ${item.price} dollars.`}
+                    aria-label={`${translate("menu.table.delete")} ${item.name}. Price ${item.price} dollars.`}
                   >
-                    🗑 Delete
+                    🗑 {translate("menu.table.delete")}
                   </button>
                 </td>
               </tr>
