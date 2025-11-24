@@ -106,5 +106,8 @@
   "modal.cancel": "Cancel",
   "modal.selectIce": "Select ice level",
   "modal.selectSugar": "Select sugar level",
-  "modal.selectTopping": "Select topping"
+  "modal.selectTopping": "Select topping",
+  "tts.toggle.on": "TTS On",
+  "tts.toggle.off": "TTS Off",
+  "tts.toggle.aria": "Turn text to speech {state}"
 }
