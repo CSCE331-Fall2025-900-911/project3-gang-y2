@@ -7,6 +7,7 @@ import TextToSpeechButton from "./TextToSpeechButton.jsx";
 import { getOrderSpeech } from "./utils/speechHelpers.js";
 import { useTextToSpeech } from "./hooks/useTextToSpeech.js";
 import { useTtsSettings } from "./TtsSettingsContext.jsx";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function Kiosk() {
   // Holds menu items fetched from the backend
@@ -29,6 +30,7 @@ function Kiosk() {
   const[subtotal, setSubtotal] = useState(0.0);
   const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
   const { ttsEnabled } = useTtsSettings();
+  const { translate } = useTranslation();
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -147,15 +149,15 @@ function Kiosk() {
 
       <div className="sidebar-container">
         <div className="sidebar">
-            <h2>Order</h2>
+            <h2>{translate("order.title")}</h2>
             <div className="tts-stack">
-              <p className="tts-helper">Need it read aloud? Use the speaker.</p>
+              <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
               <TextToSpeechButton
                 text={kioskSpeechText}
-                label="Read kiosk instructions and current order"
+                label={translate("tts.helper.kiosk")}
               />
             </div>
-            {currentOrder.length === 0 ? ( <p>no items yet</p>) : 
+            {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
             (<ul>
                 {currentOrder.map((item, index) => 
                 ( <li
@@ -177,16 +179,16 @@ function Kiosk() {
             )}
         </div>
         <div className="subtotal-container">
-          <strong>SubTotal : </strong>${subtotal}
+          <strong>{translate("order.subtotal")} : </strong>${subtotal}
         </div>
         <div className="order-button-container">
             <button
               className="order-button"
               onClick={() => placeOrder()}
-              data-tts="Place order and present payment."
-              aria-label="Place order and present payment."
+              data-tts={translate("order.place")}
+              aria-label={translate("order.place")}
             >
-              Place Order
+              {translate("order.place")}
             </button>
         </div>
       </div>

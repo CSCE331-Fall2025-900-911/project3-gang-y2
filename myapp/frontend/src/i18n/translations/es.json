@@ -1,4 +1,25 @@
 {
   "language.english": "English",
-  "language.spanish": "Espanol"
+  "language.spanish": "Espanol",
+  "nav.managerBack": "Volver al menu de gerente",
+  "nav.login": "Iniciar sesion",
+  "nav.kiosk": "Kiosco",
+  "nav.menuBoard": "Menu",
+  "nav.employees": "Empleados",
+  "nav.inventory": "Inventario",
+  "nav.menuItems": "Articulos del menu",
+  "nav.reports": "Reportes",
+  "order.title": "Pedido",
+  "order.empty": "sin articulos",
+  "order.subtotal": "Subtotal",
+  "order.place": "Realizar pedido",
+  "tts.helper.kiosk": "Necesitas que se lea en voz alta? Usa el altavoz.",
+  "tts.helper.cashier": "Repite el pedido en voz alta.",
+  "tts.button.read": "Leer en voz alta",
+  "tts.button.stop": "Detener",
+  "menu.header": "Gestion de articulos del menu",
+  "menu.read": "Escucha esta pagina en voz alta.",
+  "menu.add": "Agregar articulo",
+  "menu.table.edit": "Editar",
+  "menu.table.delete": "Eliminar"
 }

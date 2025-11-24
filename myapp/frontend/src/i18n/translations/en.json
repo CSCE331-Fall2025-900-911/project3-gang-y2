@@ -1,4 +1,25 @@
 {
   "language.english": "English",
-  "language.spanish": "Espanol"
+  "language.spanish": "Espanol",
+  "nav.managerBack": "Back to Manager Menu",
+  "nav.login": "Login",
+  "nav.kiosk": "Customer Kiosk",
+  "nav.menuBoard": "Menu Board",
+  "nav.employees": "Employees",
+  "nav.inventory": "Inventory",
+  "nav.menuItems": "Menu Items",
+  "nav.reports": "Reports",
+  "order.title": "Order",
+  "order.empty": "no items yet",
+  "order.subtotal": "SubTotal",
+  "order.place": "Place Order",
+  "tts.helper.kiosk": "Need it read aloud? Use the speaker.",
+  "tts.helper.cashier": "Read back the order aloud.",
+  "tts.button.read": "Read Aloud",
+  "tts.button.stop": "Stop",
+  "menu.header": "Menu Item Management",
+  "menu.read": "Have this page read aloud.",
+  "menu.add": "Add Menu Item",
+  "menu.table.edit": "Edit",
+  "menu.table.delete": "Delete"
 }
