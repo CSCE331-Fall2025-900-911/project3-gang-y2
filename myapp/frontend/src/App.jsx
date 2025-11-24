@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./App.css";
+import WeatherWidget from "./WeatherWidget";
 
 function App() {
   return (
@@ -22,6 +23,11 @@ function App() {
           Tap in with us by logging in if you are an employee. Take a look at
           our menu board! Or visit our self-service kiosk to order it yourself.
         </p>
+        <br></br>
+        <p>Local Weather:</p>
+
+        <WeatherWidget/>
+
       </main>
     </div>
   );
