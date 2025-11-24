@@ -354,7 +354,6 @@ app.get("/api/reports/xreport", async (req, res) => {
 });
 
 //get Z Report Data
-
 let zReportGenerated = false;
 
 app.get("/api/reports/zreport", async (req, res) => {
@@ -402,6 +401,36 @@ app.get("/api/reports/zreport", async (req, res) => {
         res.status(500).json({ error: "Failed to fetch sales data" });
     }
 });
+
+//get sales report data
+app.get("/api/reports/salesReport", async (req, res) => {
+    try {
+        const { fromDate, toDate } = req.query;
+
+        if (!fromDate || !toDate) {
+            return res.status(400).json({ error: "fromDate and toDate are required" });
+        }
+
+        const result = await pool.query(`
+            SELECT 
+                mi.name AS itemName,
+                COUNT(oi.orderDetailID) AS salesCount
+            FROM orders o
+            JOIN orderItems oi ON o.orderID = oi.orderID
+            JOIN menuItems mi ON oi.itemID = mi.itemID
+            WHERE o.orderDate BETWEEN $1 AND $2
+            GROUP BY mi.name
+            ORDER BY salesCount DESC;
+        `, [fromDate, toDate]);
+
+        res.json(result.rows);
+
+    } catch (err) {
+        console.error("Error fetching sales report:", err);
+        res.status(500).json({ error: "Failed to fetch sales report" });
+    }
+});
+
 
 //production stuff
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
