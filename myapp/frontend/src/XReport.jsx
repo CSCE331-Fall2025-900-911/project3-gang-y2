@@ -3,16 +3,14 @@ import { Link } from "react-router-dom";
 import "./XReport.css";
 
 function XReport() {
-  const [employees, setEmployees] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", role: "", wage: "" });
-  const [isEditing, setIsEditing] = useState(false);
+
+  const [sales, setSales] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/employees")
+    fetch("http://localhost:3000/api/sales")
       .then((res) => res.json())
-      .then((data) => setEmployees(data))
-      .catch((err) => console.error("Error fetching employees:", err));
+      .then((data) => setSales(data))
+      .catch((err) => console.error("Error fetching sales:", err));
   }, []);
 
   return (
@@ -37,15 +35,18 @@ function XReport() {
           <thead>
             <tr>
               <th>Hour</th>
-              <th>Sales</th>
-              <th>Returns</th>
-              <th>Voids</th>
-              <th>Discards</th>
-              <th>Cash</th>
-              <th>Card</th>
+              <th>Revenue</th>
+              <th>Number of Sales</th>
             </tr>
           </thead>
           <tbody>
+            {sales.map((row, idx) => (
+              <tr key={idx}>
+                <td>{row.hour_bucket}</td>
+                <td>${row.total_sales}</td>
+                <td>{row.num_sales}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
