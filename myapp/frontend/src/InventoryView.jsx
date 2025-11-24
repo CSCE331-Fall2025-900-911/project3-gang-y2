@@ -49,7 +49,7 @@ function InventoryView() {
   // Delete Item
   const handleDelete = async (inventoryitem) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
-    await fetch(`/api/item/${inventoryitem}`, { method: "DELETE" });
+    await fetch(`/api/inventory/${inventoryitem}`, { method: "DELETE" });
     setInventory(inventory.filter((item) => item.item !== inventoryitem));
   };
 
