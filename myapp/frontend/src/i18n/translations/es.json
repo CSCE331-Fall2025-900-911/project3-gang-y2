@@ -100,5 +100,11 @@
   "mod.topping.crema": "crema",
   "mod.topping.ice_cream": "helado",
   "manager.title": "Vista de gerente",
-  "manager.body": "Usa la navegacion de arriba para administrar las operaciones de la tienda."
+  "manager.body": "Usa la navegacion de arriba para administrar las operaciones de la tienda.",
+  "modal.customize": "Personalizar {name}",
+  "modal.add": "Agregar al pedido",
+  "modal.cancel": "Cancelar",
+  "modal.selectIce": "Selecciona el nivel de hielo",
+  "modal.selectSugar": "Selecciona el nivel de azucar",
+  "modal.selectTopping": "Selecciona el topping"
 }
