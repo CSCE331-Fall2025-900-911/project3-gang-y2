@@ -1,0 +1,42 @@
+.tts-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid #33661a;
+  background: #4c8c2b;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.tts-button:hover:not(:disabled) {
+  background: #3c7021;
+  transform: translateY(-1px);
+}
+
+.tts-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tts-button--active {
+  background: #cc413b;
+  border-color: #a5322d;
+}
+
+.tts-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+  margin: 0.5rem 0 1rem;
+}
+
+.tts-helper {
+  margin: 0;
+  font-size: 0.95rem;
+  color: inherit;
+}
