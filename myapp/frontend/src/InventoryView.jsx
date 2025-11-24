@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./InventoryView.css";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function InventoryView() {
   const [inventory, setInventory] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ id: null, item: "", amount: "", dateNext: "", dateLast: ""});
   const [isEditing, setIsEditing] = useState(false);
+  const { translate } = useTranslation();
 
   useEffect(() => {
     fetch("/api/inventory")
@@ -48,7 +50,7 @@ function InventoryView() {
 
   // Delete Item
   const handleDelete = async (inventoryitem) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    if (!window.confirm(translate("inventory.deleteConfirm"))) return;
     await fetch(`/api/inventory/${inventoryitem}`, { method: "DELETE" });
     setInventory(inventory.filter((item) => item.item !== inventoryitem));
   };
@@ -59,30 +61,30 @@ function InventoryView() {
         <div className="nav-container">
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
-            <li><Link to="/manager">Back to Manager Menu</Link></li>
-            <li><Link to="/employees">Employees</Link></li>
-            <li id="current-item"><Link to="/inventory">Inventory</Link></li>
-            <li><Link to="/menu-items">Menu Items</Link></li>
-            <li><Link to="/reports">Reports</Link></li>
+            <li><Link to="/manager">{translate("nav.managerBack")}</Link></li>
+            <li><Link to="/employees">{translate("nav.employees")}</Link></li>
+            <li id="current-item"><Link to="/inventory">{translate("inventory.title")}</Link></li>
+            <li><Link to="/menu-items">{translate("nav.menuItems")}</Link></li>
+            <li><Link to="/reports">{translate("nav.reports")}</Link></li>
           </ul>
         </div>
       </nav>
 
       <main className="content">
-        <h2>Inventory Management</h2>
+        <h2>{translate("inventory.title")}</h2>
 
         <button className="add-btn" onClick={() => setShowForm(true)}>
-          ➕ Add Inventory
+          ➕ {translate("inventory.add")}
         </button>
 
         <table className="inventory-table">
           <thead>
             <tr>
-              <th>Item</th>
-              <th>Amount</th>
-              <th>Date of Next Shipment</th>
-              <th>Date of Last Shipment</th>
-              <th>Actions</th>
+              <th>{translate("inventory.table.item")}</th>
+              <th>{translate("inventory.table.amount")}</th>
+              <th>{translate("inventory.table.next")}</th>
+              <th>{translate("inventory.table.last")}</th>
+              <th>{translate("inventory.table.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -93,8 +95,8 @@ function InventoryView() {
                 <td>{item.datenext}</td>
                 <td>{item.datelast}</td>
                 <td>
-                  <button className="edit-btn" onClick={() => handleEdit(item)}>✏️ Edit</button>
-                  <button className="delete-btn" onClick={() => handleDelete(item.item)}>🗑 Delete</button>
+                  <button className="edit-btn" onClick={() => handleEdit(item)}>✏️ {translate("menu.table.edit")}</button>
+                  <button className="delete-btn" onClick={() => handleDelete(item.item)}>🗑 {translate("menu.table.delete")}</button>
                 </td>
               </tr>
             ))}
@@ -104,32 +106,32 @@ function InventoryView() {
         {showForm && (
           <div className="modal">
             <div className="modal-content">
-              <h3>{isEditing ? "Edit Inventory" : "Add Inventory"}</h3>
+              <h3>{isEditing ? translate("inventory.edit") : translate("inventory.addModal")}</h3>
               <form onSubmit={handleSubmit}>
                 <input
                   type="text"
-                  placeholder="Item"
+                  placeholder={translate("inventory.table.item")}
                   value={formData.item}
                   onChange={(e) => setFormData({ ...formData, item: e.target.value })}
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Amount"
+                  placeholder={translate("inventory.table.amount")}
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Date of Next Shipment"
+                  placeholder={translate("inventory.table.next")}
                   value={formData.dateNext}
                   onChange={(e) => setFormData({ ...formData, dateNext: e.target.value })}
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Date of Last Shipment"
+                  placeholder={translate("inventory.table.last")}
                   value={formData.dateLast}
                   onChange={(e) => setFormData({ ...formData, dateLast: e.target.value })}
                   required

@@ -124,13 +124,6 @@ function MenuItemView() {
 
       <main className="content">
         <h2>{translate("menu.header")}</h2>
-        <div className="menu-tts tts-stack">
-          <p className="tts-helper">{translate("menu.read")}</p>
-          <TextToSpeechButton
-            text={menuSpeechText}
-            label={translate("menu.read")}
-          />
-        </div>
 
         <button
           className="add-btn"
