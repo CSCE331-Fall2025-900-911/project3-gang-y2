@@ -28,7 +28,7 @@ const WeatherWidget = () => {
           href="https://oneweather.org/new_york_city/30_days/" 
           id="ww_fffe431e829ff_u" 
           target="_blank"
-          rel="noreferrer" // Added for security
+          rel="noreferrer"
         >
           NYC weather forecast 30 days
         </a>
