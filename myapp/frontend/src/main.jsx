@@ -16,26 +16,31 @@ import SalesReport from "./SalesReport.jsx";
 import MenuItemView from "./MenuItemView.jsx";
 import "./index.css";
 import FocusSpeechAnnouncer from "./FocusSpeechAnnouncer.jsx";
+import { TtsSettingsProvider } from "./TtsSettingsContext.jsx";
+import TtsToggle from "./TtsToggle.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <FocusSpeechAnnouncer />
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/kiosk" element={<Kiosk />} />
-        <Route path="/cashier" element={<Cashier />} />
-        <Route path="/manager" element={<ManagerDashboard />} />
-        <Route path="/employees" element={<EmployeesView />} />
-        <Route path="/inventory" element={<InventoryView />} />
-        <Route path="/reports" element={<Reports />} /> 
-        <Route path="/XReport" element={<XReport />} />
-        <Route path="/ZReport" element={<ZReport />} />
-        <Route path="/ProdChart" element={<ProdChart />} />
-        <Route path="/SalesReport" element={<SalesReport />} />
-        <Route path="/menu-items" element={<MenuItemView />} />
-      </Routes>
-    </BrowserRouter>
+    <TtsSettingsProvider>
+      <BrowserRouter>
+        <FocusSpeechAnnouncer />
+        <TtsToggle />
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/kiosk" element={<Kiosk />} />
+          <Route path="/cashier" element={<Cashier />} />
+          <Route path="/manager" element={<ManagerDashboard />} />
+          <Route path="/employees" element={<EmployeesView />} />
+          <Route path="/inventory" element={<InventoryView />} />
+          <Route path="/reports" element={<Reports />} /> 
+          <Route path="/XReport" element={<XReport />} />
+          <Route path="/ZReport" element={<ZReport />} />
+          <Route path="/ProdChart" element={<ProdChart />} />
+          <Route path="/SalesReport" element={<SalesReport />} />
+          <Route path="/menu-items" element={<MenuItemView />} />
+        </Routes>
+      </BrowserRouter>
+    </TtsSettingsProvider>
   </React.StrictMode>
 );
