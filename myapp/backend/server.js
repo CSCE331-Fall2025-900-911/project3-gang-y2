@@ -431,6 +431,60 @@ app.get("/api/reports/salesReport", async (req, res) => {
     }
 });
 
+//get product usage chart data
+app.get("/api/reports/productUsage", async (req, res) => {
+  try {
+    const { fromDate, toDate } = req.query;
+    if (!fromDate || !toDate) {
+      return res.status(400).json({ error: "fromDate and toDate are required" });
+    }
+
+    const orderRes = await pool.query(
+      `SELECT orderID FROM orders WHERE orderDate BETWEEN $1 AND $2`,
+      [fromDate, toDate]
+    );
+    const orderIds = orderRes.rows.map(row => row.orderid);
+    if (orderIds.length === 0) return res.json([]);
+
+    const itemRes = await pool.query(
+      `SELECT itemID, COUNT(*) AS count
+       FROM orderItems
+       WHERE orderID = ANY($1)
+       GROUP BY itemID`,
+      [orderIds]
+    );
+
+    let usedIngredients = {};
+    for (let item of itemRes.rows) {
+      const { itemid, count } = item;
+
+      const ingRes = await pool.query(
+        `SELECT inventoryItem, qtyPerDrink
+         FROM menuItemInventory
+         WHERE itemID = $1`,
+        [itemid]
+      );
+
+      ingRes.rows.forEach(ing => {
+        const totalQty = ing.qtyperdrink * count;
+        usedIngredients[ing.inventoryitem] =
+          (usedIngredients[ing.inventoryitem] || 0) + totalQty;
+      });
+    }
+
+    const result = Object.entries(usedIngredients).map(([ingredient, qty]) => ({
+      ingredient,
+      quantity: qty
+    }));
+
+    res.json(result);
+
+  } catch (err) {
+    console.error("Error fetching product usage:", err);
+    res.status(500).json({ error: "Failed to fetch product usage" });
+  }
+});
+
 
 //production stuff
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
