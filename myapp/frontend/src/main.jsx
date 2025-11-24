@@ -25,121 +25,103 @@ import TtsToggle from "./TtsToggle.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="914823058994-bnhcq5hre73bj2fnt89m0u3bmkqlnvts.apps.googleusercontent.com">
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<App />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/kiosk" element={<Kiosk />} />
+    <TtsSettingsProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <FocusSpeechAnnouncer />
+          <TtsToggle />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<App />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/kiosk" element={<Kiosk />} />
 
-          {/* Protected: Employees & Managers */}
-          <Route 
-            path="/cashier" 
-            element={
-              <ProtectedRoute>
-                <Cashier />
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* Protected: Managers Only */}
-          <Route 
-            path="/manager" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <ManagerDashboard />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/employees" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <EmployeesView />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/inventory" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <InventoryView />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/reports" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <Reports />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/XReport" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <XReport />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/ZReport" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <ZReport />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/ProdChart" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <ProdChart />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/SalesReport" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <SalesReport />
-              </ProtectedRoute>
-            } 
-          />
-           <Route 
-            path="/menu-items" 
-            element={
-              <ProtectedRoute requiredRole="manager">
-                <MenuItemView />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            {/* Protected: Employees & Managers */}
+            <Route 
+              path="/cashier" 
+              element={
+                <ProtectedRoute>
+                  <Cashier />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Protected: Managers Only */}
+            <Route 
+              path="/manager" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <ManagerDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/employees" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <EmployeesView />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/inventory" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <InventoryView />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/reports" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <Reports />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/XReport" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <XReport />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ZReport" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <ZReport />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ProdChart" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <ProdChart />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/SalesReport" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <SalesReport />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/menu-items" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <MenuItemView />
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </TtsSettingsProvider>
   </GoogleOAuthProvider>
 );
-
-// ReactDOM.createRoot(document.getElementById("root")).render(
-//   <React.StrictMode>
-//     <BrowserRouter>
-//       <Routes>
-//         <Route path="/" element={<App />} />
-//         <Route path="/login" element={<Login />} />
-//         <Route path="/kiosk" element={<Kiosk />} />
-//         <Route path="/cashier" element={<Cashier />} />
-//         <Route path="/manager" element={<ManagerDashboard />} />
-//         <Route path="/employees" element={<EmployeesView />} />
-//         <Route path="/inventory" element={<InventoryView />} />
-//         <Route path="/reports" element={<Reports />} /> 
-//         <Route path="/XReport" element={<XReport />} />
-//         <Route path="/ZReport" element={<ZReport />} />
-//         <Route path="/ProdChart" element={<ProdChart />} />
-//         <Route path="/SalesReport" element={<SalesReport />} />
-//         <Route path="/menu-items" element={<MenuItemView />} />
-//       </Routes>
-//     </BrowserRouter>
-//   </React.StrictMode>
-// );
