@@ -7,6 +7,7 @@ import TextToSpeechButton from "./TextToSpeechButton.jsx";
 import { getOrderSpeech } from "./utils/speechHelpers.js";
 import { useTextToSpeech } from "./hooks/useTextToSpeech.js";
 import { useTtsSettings } from "./TtsSettingsContext.jsx";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function Kiosk() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -27,8 +28,15 @@ function Kiosk() {
   const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
 
   // sub total for order
+<<<<<<< HEAD
   const [subtotal, setSubtotal] = useState(0);
   const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
+=======
+  const[subtotal, setSubtotal] = useState(0.0);
+  const { language, translate } = useTranslation();
+  const langCode = language === "es" ? "es-ES" : "en-US";
+  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1, lang: langCode });
+>>>>>>> fa9720b267121103cc9a0d78bdf5bb099077d28c
   const { ttsEnabled } = useTtsSettings();
 
   // orders table in db? stuff for API
@@ -52,36 +60,11 @@ function Kiosk() {
     const {name, value} = e.target;
     setCurrentModifiers((prev) => ({...prev, [name]:value }));
     if (canSpeakSelection && ttsEnabled) {
-      const labelMap = {
-        iceLevel: {
-          none: "No ice",
-          low: "Low ice",
-          medium: "Medium ice",
-          high: "High ice",
-        },
-        sugarLevel: {
-          none: "No sugar",
-          low: "Low sugar",
-          medium: "Medium sugar",
-          high: "High sugar",
-        },
-        topping: {
-          none: "No topping",
-          pearl: "Pearl",
-          mini_pearl: "Mini pearl",
-          crystal_boba: "Crystal boba",
-          pudding: "Pudding",
-          aloe_vera: "Aloe vera",
-          red_bean: "Red bean",
-          herb_jelly: "Herb jelly",
-          aiyu_jelly: "Aiyu jelly",
-          lychee_jelly: "Lychee jelly",
-          crema: "Crema",
-          ice_cream: "Ice cream",
-        },
-      };
-      const spoken = labelMap[name]?.[value] || value;
-      saySelection(`Set ${name} to ${spoken}`);
+      const fieldKey = name === "iceLevel" ? "mod.field.ice" : name === "sugarLevel" ? "mod.field.sugar" : "mod.field.topping";
+      const valueKey = name === "iceLevel" ? `mod.ice.${value}` : name === "sugarLevel" ? `mod.sugar.${value}` : `mod.topping.${value}`;
+      const fieldText = translate(fieldKey, {});
+      const valueText = translate(valueKey, {});
+      saySelection(translate("tts.setModifier", { field: fieldText, value: valueText }));
     }
   };
 
@@ -99,8 +82,17 @@ function Kiosk() {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
         ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
         : modifiedItem.price;
+      const ice = translate(`mod.ice.${modifiedItem.modifiers.iceLevel}`);
+      const sugar = translate(`mod.sugar.${modifiedItem.modifiers.sugarLevel}`);
+      const topping = translate(`mod.topping.${modifiedItem.modifiers.topping}`);
       saySelection(
-        `Added ${modifiedItem.name}. ${price}. Ice ${modifiedItem.modifiers.iceLevel}. Sugar ${modifiedItem.modifiers.sugarLevel}. Topping ${modifiedItem.modifiers.topping}.`
+        translate("order.added", {
+          name: modifiedItem.name,
+          price,
+          ice,
+          sugar,
+          topping,
+        })
       );
     }
     
@@ -160,19 +152,36 @@ function Kiosk() {
   }, [currentItem]);
 
   const kioskSpeechText = useMemo(() => {
-    const orderDescription = getOrderSpeech(currentOrder, subtotal);
-    return `Welcome to the MatchaBoba self-service kiosk. Tap a drink to customize ice, sugar, and toppings before adding it to your order. ${orderDescription}`;
-  }, [currentOrder, subtotal]);
+    const orderDescription = getOrderSpeech(currentOrder, subtotal, translate);
+    return `${translate("tts.intro.kiosk")} ${orderDescription}`;
+  }, [currentOrder, subtotal, translate]);
 
-  const menuButtonLabel = useCallback((item) => {
-    const numericPrice = parseFloat(item.price);
-    const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
-    return `Drink ${item.name}. ${priceText} dollars. Press enter to customize ice, sugar, and toppings.`;
-  }, []);
+  const menuButtonLabel = useCallback(
+    (item) => {
+      const numericPrice = parseFloat(item.price);
+      const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
+      return translate("tts.menuButton", { name: item.name, price: priceText });
+    },
+    [translate]
+  );
 
-  const orderLineLabel = useCallback((item, index) => {
-    return `Order item ${index + 1}. ${item.name}. Price ${item.price} dollars. Ice ${item.modifiers.iceLevel}, sugar ${item.modifiers.sugarLevel}, topping ${item.modifiers.topping}.`;
-  }, []);
+  const orderLineLabel = useCallback(
+    (item, index) => {
+      const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
+      const sugar = translate(`mod.sugar.${item.modifiers.sugarLevel}`);
+      const topping = translate(`mod.topping.${item.modifiers.topping}`);
+      const priceText = Number.parseFloat(item.price).toFixed(2);
+      return translate("tts.orderLine", {
+        num: index + 1,
+        name: item.name,
+        price: priceText,
+        ice,
+        sugar,
+        topping,
+      });
+    },
+    [translate]
+  );
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
@@ -201,15 +210,15 @@ function Kiosk() {
 
       <div className="sidebar-container">
         <div className="sidebar">
-            <h2>Order</h2>
+            <h2>{translate("order.title")}</h2>
             <div className="tts-stack">
-              <p className="tts-helper">Need it read aloud? Use the speaker.</p>
+              <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
               <TextToSpeechButton
                 text={kioskSpeechText}
-                label="Read kiosk instructions and current order"
+                label={translate("tts.helper.kiosk")}
               />
             </div>
-            {currentOrder.length === 0 ? ( <p>no items yet</p>) : 
+            {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
             (<ul>
                 {currentOrder.map((item, index) => 
                 ( <li
@@ -217,12 +226,12 @@ function Kiosk() {
                     tabIndex="0"
                     data-tts={orderLineLabel(item, index)}
                   >
-                    ${item.price} : <strong>{item.name} :</strong>   
+                    ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
                     <small>
                         <br/>
-                        Ice:     {item.modifiers.iceLevel}<br/>
-                        Sugar:   {item.modifiers.sugarLevel}<br/>
-                        Topping: {item.modifiers.topping}<br/>
+                        {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
+                        {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
+                        {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
                     </small>
                     <br/>
                 </li>))}
@@ -231,16 +240,22 @@ function Kiosk() {
             )}
         </div>
         <div className="subtotal-container">
-          <strong>SubTotal : </strong>${subtotal}
+          <strong>{translate("order.subtotal")} : </strong>${subtotal}
         </div>
         <div className="order-button-container">
             <button
               className="order-button"
+<<<<<<< HEAD
               onClick={handleSubmit}
               data-tts="Place order and present payment."
               aria-label="Place order and present payment."
+=======
+              onClick={() => placeOrder()}
+              data-tts={translate("order.place")}
+              aria-label={translate("order.place")}
+>>>>>>> fa9720b267121103cc9a0d78bdf5bb099077d28c
             >
-              Place Order
+              {translate("order.place")}
             </button>
         </div>
       </div>
@@ -255,7 +270,7 @@ function Kiosk() {
               data-tts={menuButtonLabel(item)}
               aria-label={menuButtonLabel(item)}
             >
-              ${item.price} : <strong>{item.name}</strong>
+              ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
             </button>
           ))}
         </div>

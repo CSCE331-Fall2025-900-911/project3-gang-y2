@@ -1,44 +1,46 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./Reports.css";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function Reports() {
-
   const navigate = useNavigate();
+  const { translate } = useTranslation();
 
   return (
     <div className="reports-page">
-
-        <nav className="navbar">
+      <nav className="navbar">
         <div className="nav-container">
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
-            <li><Link to="/manager">Back to Manager Menu</Link></li>
-            <li><Link to="/employees">Employees</Link></li>
-            <li><Link to="/inventory">Inventory</Link></li>
-            <li><Link to="/menu-items">Menu Items</Link></li>
-            <li id="current-item"><Link to="/reports">Reports</Link></li>
+            <li><Link to="/manager">{translate("nav.managerBack")}</Link></li>
+            <li><Link to="/employees">{translate("nav.employees")}</Link></li>
+            <li><Link to="/inventory">{translate("nav.inventory")}</Link></li>
+            <li><Link to="/menu-items">{translate("nav.menuItems")}</Link></li>
+            <li id="current-item"><Link to="/reports">{translate("nav.reports")}</Link></li>
           </ul>
         </div>
       </nav>
 
       <div className="reports">
-        <h2>Generate Reports</h2>
-            <button className="report-button" onClick={() => navigate("/XReport")}>
-            X Report
-            </button>
-            <button className="report-button" onClick={() => navigate("/ZReport")}>
-            Z Report
-            </button>
-            <button className="report-button" onClick={() => navigate("/SalesReport")}>
-            Sales Report
-            </button>
-            <button className="report-button" onClick={() => navigate("/ProdChart")}>
-            Product Usage Chart
-            </button>
-            <button className="back-button" onClick={() => navigate("/manager")}>
-            ← Back to Manager Dashboard
-            </button>
+        <h2>{translate("reports.title")}</h2>
+        <div className="button-list">
+          <button className="report-button" onClick={() => navigate("/XReport")}>
+            {translate("reports.x")}
+          </button>
+          <button className="report-button" onClick={() => navigate("/ZReport")}>
+            {translate("reports.z")}
+          </button>
+          <button className="report-button" onClick={() => navigate("/SalesReport")}>
+            {translate("reports.sales")}
+          </button>
+          <button className="report-button" onClick={() => navigate("/ProdChart")}>
+            {translate("reports.prod")}
+          </button>
+        </div>
+        <button className="back-button" onClick={() => navigate("/manager")}>
+          ← {translate("reports.back")}
+        </button>
       </div>
     </div>
   );

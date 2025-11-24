@@ -112,3 +112,39 @@
   color: black;
   text-decoration: underline;
 }
+
+@media (max-width: 900px) {
+  .nav-container {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .nav-links {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .content {
+    padding: 1rem;
+  }
+  .employee-table {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+  .modal-content {
+    width: 90vw;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .employee-table th,
+  .employee-table td {
+    padding: 0.5rem;
+  }
+  .add-btn,
+  .edit-btn,
+  .delete-btn {
+    padding: 0.6rem 0.9rem;
+  }
+}
