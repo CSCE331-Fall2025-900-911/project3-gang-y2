@@ -27,18 +27,17 @@ function Kiosk() {
   const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
 
   // sub total for order
-  const [subtotal, setSubtotal] = useState(0.0);
+  const [subtotal, setSubtotal] = useState(0);
   const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
   const { ttsEnabled } = useTtsSettings();
 
   // orders table in db? stuff for API
   const [orders, setOrders] = useState([]);
-  const [formData, setFormData] = useState([{ orderid: 1, 
-      orderdate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
-      ordertime: currentTime.getTime(), 
-      ordercost: subtotal}]);
+  const [formData, setFormData] = useState({ orderID: currentTime.getTime() % 262144, 
+      orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
+      orderCost: subtotal});
   
-  const [isEditing, setIsEditing] = useState(false);
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -92,9 +91,10 @@ function Kiosk() {
     const modifiedItem = {
         ...currentItem, modifiers: {...currentModifiers}, // copies the state of modifiers and adds it to list
     };
-    setSubtotal(subtotal + parseFloat(modifiedItem.price));
+    
     
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
+    setSubtotal(prev => prev + parseFloat(modifiedItem.price));
     if (canSpeakSelection && modifiedItem && ttsEnabled) {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
         ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
@@ -103,15 +103,20 @@ function Kiosk() {
         `Added ${modifiedItem.name}. ${price}. Ice ${modifiedItem.modifiers.iceLevel}. Sugar ${modifiedItem.modifiers.sugarLevel}. Topping ${modifiedItem.modifiers.topping}.`
       );
     }
+    
     console.log("current subtotal: ", subtotal);
     setCurrentItem(null);
   };
 
   // submit order & get payment
-  // function placeOrder() {
-  //   alert("Present payment");
-  //   {handleSubmit};
-  // };
+  function placeOrder() {
+    setCurrentTime(new Date());
+    setFormData({ orderID: currentTime % 262144, 
+      orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
+      orderCost: subtotal});
+    
+  };
 
 
   // useEffect(() => {
@@ -123,19 +128,13 @@ function Kiosk() {
 
   // Add order to DB
   const handleSubmit = async (e) => {
-    setCurrentTime(new Date());
-    setSubtotal(subtotal);
-    setFormData({ orderid: 6, 
-      orderdate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
-      ordertime: currentTime.getTime(), 
-      ordercost: subtotal});
+    placeOrder();
     alert("Present payment");
+    
     console.log("submitting: ", formData);
     e.preventDefault();
-    const method = isEditing ? "PUT" : "POST";
-    const url = isEditing
-      ? `/api/orders/${formData.id}`
-      : "/api/orders";
+    const method = "POST";
+    const url = `/api/orders/`;
 
     const res = await fetch(url, {
       method,
@@ -144,15 +143,13 @@ function Kiosk() {
     });
 
     if (res.ok) {
-      setShowForm(false);
-      setIsEditing(false);
-      setFormData({ orderid: 6, 
-      orderdate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
-      ordertime: currentTime.getTime(), 
-      ordercost: subtotal});
+      setFormData({ orderID: 0, 
+      orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
+      orderCost: 0.0});
       // Refresh table
       // const data = await (await fetch("/api/orders")).json();
-      setOrders(data);
+      // setOrders(data);
     }
   };
 
