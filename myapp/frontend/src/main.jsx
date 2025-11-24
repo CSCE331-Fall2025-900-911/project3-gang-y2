@@ -24,7 +24,6 @@ import { TtsSettingsProvider } from "./TtsSettingsContext.jsx";
 import TtsToggle from "./TtsToggle.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-<<<<<<< HEAD
   <GoogleOAuthProvider clientId="914823058994-bnhcq5hre73bj2fnt89m0u3bmkqlnvts.apps.googleusercontent.com">
     <BrowserRouter>
       <AuthProvider>
@@ -121,31 +120,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       </AuthProvider>
     </BrowserRouter>
   </GoogleOAuthProvider>
-=======
-  <React.StrictMode>
-    <TtsSettingsProvider>
-      <BrowserRouter>
-        <FocusSpeechAnnouncer />
-        <TtsToggle />
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/kiosk" element={<Kiosk />} />
-          <Route path="/cashier" element={<Cashier />} />
-          <Route path="/manager" element={<ManagerDashboard />} />
-          <Route path="/employees" element={<EmployeesView />} />
-          <Route path="/inventory" element={<InventoryView />} />
-          <Route path="/reports" element={<Reports />} /> 
-          <Route path="/XReport" element={<XReport />} />
-          <Route path="/ZReport" element={<ZReport />} />
-          <Route path="/ProdChart" element={<ProdChart />} />
-          <Route path="/SalesReport" element={<SalesReport />} />
-          <Route path="/menu-items" element={<MenuItemView />} />
-        </Routes>
-      </BrowserRouter>
-    </TtsSettingsProvider>
-  </React.StrictMode>
->>>>>>> 28674b8b3479ef81cdf3c6066da40765b816402c
 );
 
 // ReactDOM.createRoot(document.getElementById("root")).render(
