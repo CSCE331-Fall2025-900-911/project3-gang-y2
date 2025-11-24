@@ -2,9 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./App.css";
 import WeatherWidget from "./WeatherWidget";
+import { useZoom } from "./ZoomContext";
+import { ZoomProvider } from "./ZoomContext";
 
 function App() {
+  const updateZoom = useZoom();
   return (
+
+    <ZoomProvider>
     <div className="homepage">
       <nav className="navbar">
         <div className="nav-container">
@@ -37,6 +42,7 @@ function App() {
 
       </main>
     </div>
+    </ZoomProvider>
   );
 }
 
