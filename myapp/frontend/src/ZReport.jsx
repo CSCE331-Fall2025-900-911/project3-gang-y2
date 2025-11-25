@@ -6,7 +6,7 @@ function ZReport() {
   const [report, setReport] = useState(null)
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/reports/zreport")
+    fetch("/api/reports/zreport")
       .then((res) => res.json())
       .then((data) => {
         if (data.zReportGenerated){

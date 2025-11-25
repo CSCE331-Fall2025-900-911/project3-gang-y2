@@ -9,7 +9,7 @@ function ProdChart() {
 
   const fetchData = () => {
     if (!fromDate || !toDate) return;
-    fetch(`http://localhost:3000/api/reports/productUsage?fromDate=${fromDate}&toDate=${toDate}`)
+    fetch(`/api/reports/productUsage?fromDate=${fromDate}&toDate=${toDate}`)
       .then(res => res.json())
       .then(setData)
       .catch(err => console.error("Error fetching product usage:", err));
