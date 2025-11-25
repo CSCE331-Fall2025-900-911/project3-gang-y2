@@ -14,7 +14,7 @@ export default function Navbar() {
         <ul className="nav-links">
           <li><Link to="/login">{translate("nav.login")}</Link></li>
           <li><Link to="/kiosk">{translate("nav.kiosk")}</Link></li>
-          <li><Link to="/menu">{translate("nav.menuBoard")}</Link></li>
+          <li><Link to="/menuboard">{translate("nav.menuBoard")}</Link></li>
         </ul>
         <div className="zoom-controls">
           Zoom: 
