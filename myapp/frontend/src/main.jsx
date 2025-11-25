@@ -13,6 +13,8 @@ import ManagerDashboard from "./ManagerDash.jsx";
 import EmployeesView from "./EmployeesView.jsx";
 import InventoryView from "./InventoryView.jsx";
 import Reports from "./Reports.jsx";
+import MenuBoard from "./MenuBoard.jsx";
+
 import XReport from "./XReport.jsx";
 import ZReport from "./ZReport.jsx";
 import ProdChart from "./ProdChart.jsx";
@@ -22,106 +24,112 @@ import "./index.css";
 import FocusSpeechAnnouncer from "./FocusSpeechAnnouncer.jsx";
 import { TtsSettingsProvider } from "./TtsSettingsContext.jsx";
 import TtsToggle from "./TtsToggle.jsx";
+import { TranslationProvider } from "./i18n/TranslationContext.jsx";
+import LanguageToggle from "./LanguageToggle.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="914823058994-bnhcq5hre73bj2fnt89m0u3bmkqlnvts.apps.googleusercontent.com">
-    <TtsSettingsProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <FocusSpeechAnnouncer />
-          <TtsToggle />
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<App />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/kiosk" element={<Kiosk />} />
+    <TranslationProvider>
+      <TtsSettingsProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <FocusSpeechAnnouncer />
+            <TtsToggle />
+            <LanguageToggle />
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<App />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/kiosk" element={<Kiosk />} />
+              <Route path="/menuboard" element={<MenuBoard />} />
 
-            {/* Protected: Employees & Managers */}
-            <Route 
-              path="/cashier" 
-              element={
-                <ProtectedRoute>
-                  <Cashier />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Protected: Managers Only */}
-            <Route 
-              path="/manager" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <ManagerDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/employees" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <EmployeesView />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/inventory" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <InventoryView />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/reports" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <Reports />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/XReport" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <XReport />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/ZReport" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <ZReport />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/ProdChart" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <ProdChart />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/SalesReport" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <SalesReport />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/menu-items" 
-              element={
-                <ProtectedRoute requiredRole="manager">
-                  <MenuItemView />
-                </ProtectedRoute>
-              } 
-            />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TtsSettingsProvider>
+              {/* Protected: Employees & Managers */}
+              <Route 
+                path="/cashier" 
+                element={
+                  <ProtectedRoute>
+                    <Cashier />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Protected: Managers Only */}
+              <Route 
+                path="/manager" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <ManagerDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/employees" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <EmployeesView />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/inventory" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <InventoryView />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/reports" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <Reports />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/XReport" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <XReport />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/ZReport" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <ZReport />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/ProdChart" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <ProdChart />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/SalesReport" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <SalesReport />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/menu-items" 
+                element={
+                  <ProtectedRoute requiredRole="manager">
+                    <MenuItemView />
+                  </ProtectedRoute>
+                } 
+              />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TtsSettingsProvider>
+    </TranslationProvider>
   </GoogleOAuthProvider>
 );

@@ -2,41 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./App.css";
 import WeatherWidget from "./WeatherWidget";
-import { useZoom } from "./ZoomContext";
 import { ZoomProvider } from "./ZoomContext";
+import Navbar from "./Navbar";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function App() {
-  const updateZoom = useZoom();
+  const { translate } = useTranslation();
   return (
 
     <ZoomProvider>
     <div className="homepage">
-      <nav className="navbar">
-        <div className="nav-container">
-          <h1 className="logo">MatchaBoba POS</h1>
-          <ul className="nav-links">
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/kiosk">Customer Kiosk</Link></li>
-            <li><Link to="/menu">Menu Board</Link></li>
-          </ul>
-          <div className="zoom-controls">
-            Zoom Level: 
-            <button onClick={() => updateZoom(1)}>100%</button>
-            <button onClick={() => updateZoom(1.25)}>125%</button>
-            <button onClick={() => updateZoom(1.5)}>150%</button>
-          </div>
-        </div>
-        
-      </nav>
-
+      <Navbar /> 
       <main className="content">
-        <h2>Welcome to MatchaBoba POS</h2>
-        <p>
-          Tap in with us by logging in if you are an employee. Take a look at
-          our menu board! Or visit our self-service kiosk to order it yourself.
-        </p>
-        <br></br>
-        <p>Local Weather:</p>
+        <h2>{translate("home.title")}</h2>
+        <p>{translate("home.body")}</p>
+        <br />
+        <p>{translate("home.weather")}</p>
 
         <WeatherWidget/>
 

@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { useTextToSpeech } from "./hooks/useTextToSpeech";
 import { useTtsSettings } from "./TtsSettingsContext.jsx";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 function FocusSpeechAnnouncer({ rate = 1, pitch = 1 }) {
   const { ttsEnabled } = useTtsSettings();
-  const { canSpeak, startTalking, stopTalking } = useTextToSpeech({ rate, pitch });
+  const { language } = useTranslation();
+  const langCode = language === "es" ? "es-ES" : "en-US";
+  const { canSpeak, startTalking, stopTalking } = useTextToSpeech({ rate, pitch, lang: langCode });
   useEffect(() => {
     if (!canSpeak || !ttsEnabled) return;
     const handleFocus = (event) => {

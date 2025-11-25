@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./ProdChart.css";
 
 function ProdChart() {
-  const [employees, setEmployees] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", role: "", wage: "" });
-  const [isEditing, setIsEditing] = useState(false);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [data, setData] = useState([]);
 
-  useEffect(() => {
-    fetch("http://localhost:3000/api/employees")
-      .then((res) => res.json())
-      .then((data) => setEmployees(data))
-      .catch((err) => console.error("Error fetching employees:", err));
-  }, []);
+  const fetchData = () => {
+    if (!fromDate || !toDate) return;
+    fetch(`http://localhost:3000/api/reports/productUsage?fromDate=${fromDate}&toDate=${toDate}`)
+      .then(res => res.json())
+      .then(setData)
+      .catch(err => console.error("Error fetching product usage:", err));
+  };
 
   return (
     <div className="prod-chart-page">
@@ -33,17 +33,38 @@ function ProdChart() {
       <main className="content">
         <h2>Product Usage Chart</h2>
 
+        <div className="date-filters">
+          <label>
+            From: <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} />
+          </label>
+          <label>
+            To: <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} />
+          </label>
+          <button onClick={fetchData}>Generate</button>
+        </div>
+
         <table className="prod-chart-table">
           <thead>
             <tr>
-              <th>Item</th>
-              <th>Sales</th>
+              <th>Ingredient</th>
+              <th>Quantity Used</th>
             </tr>
           </thead>
           <tbody>
+            {data.length > 0 ? (
+              data.map((row, idx) => (
+                <tr key={idx}>
+                  <td>{row.ingredient}</td>
+                  <td>{row.quantity}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2">No data</td>
+              </tr>
+            )}
           </tbody>
         </table>
-
       </main>
     </div>
   );

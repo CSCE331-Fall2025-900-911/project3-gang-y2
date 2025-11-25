@@ -5,6 +5,7 @@ import TextToSpeechButton from "./TextToSpeechButton.jsx";
 import { getOrderSpeech } from "./utils/speechHelpers.js";
 import { useTextToSpeech } from "./hooks/useTextToSpeech.js";
 import { useTtsSettings } from "./TtsSettingsContext.jsx";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function Cashier() {
   // Holds menu items fetched from the backend
@@ -25,7 +26,9 @@ function Cashier() {
 
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
-  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
+  const { language, translate } = useTranslation();
+  const langCode = language === "es" ? "es-ES" : "en-US";
+  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1, lang: langCode });
   const { ttsEnabled } = useTtsSettings();
 
   const openModification = (item) => {
@@ -41,36 +44,11 @@ function Cashier() {
     const {name, value} = e.target;
     setCurrentModifiers((prev) => ({...prev, [name]:value }));
     if (canSpeakSelection && ttsEnabled) {
-      const labelMap = {
-        iceLevel: {
-          none: "No ice",
-          low: "Low ice",
-          medium: "Medium ice",
-          high: "High ice",
-        },
-        sugarLevel: {
-          none: "No sugar",
-          low: "Low sugar",
-          medium: "Medium sugar",
-          high: "High sugar",
-        },
-        topping: {
-          none: "No topping",
-          pearl: "Pearl",
-          mini_pearl: "Mini pearl",
-          crystal_boba: "Crystal boba",
-          pudding: "Pudding",
-          aloe_vera: "Aloe vera",
-          red_bean: "Red bean",
-          herb_jelly: "Herb jelly",
-          aiyu_jelly: "Aiyu jelly",
-          lychee_jelly: "Lychee jelly",
-          crema: "Crema",
-          ice_cream: "Ice cream",
-        },
-      };
-      const spoken = labelMap[name]?.[value] || value;
-      saySelection(`Set ${name} to ${spoken}`);
+      const fieldKey = name === "iceLevel" ? "mod.field.ice" : name === "sugarLevel" ? "mod.field.sugar" : "mod.field.topping";
+      const valueKey = name === "iceLevel" ? `mod.ice.${value}` : name === "sugarLevel" ? `mod.sugar.${value}` : `mod.topping.${value}`;
+      const fieldText = translate(fieldKey, {});
+      const valueText = translate(valueKey, {});
+      saySelection(translate("tts.setModifier", { field: fieldText, value: valueText }));
     }
   };
 
@@ -85,8 +63,17 @@ function Cashier() {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
         ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
         : modifiedItem.price;
+      const ice = translate(`mod.ice.${modifiedItem.modifiers.iceLevel}`);
+      const sugar = translate(`mod.sugar.${modifiedItem.modifiers.sugarLevel}`);
+      const topping = translate(`mod.topping.${modifiedItem.modifiers.topping}`);
       saySelection(
-        `Added ${modifiedItem.name}. ${price}. Ice ${modifiedItem.modifiers.iceLevel}. Sugar ${modifiedItem.modifiers.sugarLevel}. Topping ${modifiedItem.modifiers.topping}.`
+        translate("order.added", {
+          name: modifiedItem.name,
+          price,
+          ice,
+          sugar,
+          topping,
+        })
       );
     }
     setCurrentItem(null);
@@ -98,9 +85,9 @@ function Cashier() {
   };
 
   const cashierSpeechText = useMemo(() => {
-    const orderDescription = getOrderSpeech(currentOrder, subtotal);
-    return `Cashier ordering screen. Select a drink, adjust ice, sugar, or toppings, and add it to the order. ${orderDescription}`;
-  }, [currentOrder, subtotal]);
+    const orderDescription = getOrderSpeech(currentOrder, subtotal, translate);
+    return `${translate("tts.intro.cashier")} ${orderDescription}`;
+  }, [currentOrder, subtotal, translate]);
 
   useEffect(() => {
     if (currentItem && firstOptionRef.current) {
@@ -108,15 +95,32 @@ function Cashier() {
     }
   }, [currentItem]);
 
-  const menuButtonLabel = useCallback((item) => {
-    const numericPrice = parseFloat(item.price);
-    const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
-    return `Drink ${item.name}. ${priceText} dollars. Press enter to customize ice, sugar, and toppings.`;
-  }, []);
+  const menuButtonLabel = useCallback(
+    (item) => {
+      const numericPrice = parseFloat(item.price);
+      const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
+      return translate("tts.menuButton", { name: item.name, price: priceText });
+    },
+    [translate]
+  );
 
-  const orderLineLabel = useCallback((item, index) => {
-    return `Order item ${index + 1}. ${item.name}. Price ${item.price} dollars. Ice ${item.modifiers.iceLevel}, sugar ${item.modifiers.sugarLevel}, topping ${item.modifiers.topping}.`;
-  }, []);
+  const orderLineLabel = useCallback(
+    (item, index) => {
+      const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
+      const sugar = translate(`mod.sugar.${item.modifiers.sugarLevel}`);
+      const topping = translate(`mod.topping.${item.modifiers.topping}`);
+      const priceText = Number.parseFloat(item.price).toFixed(2);
+      return translate("tts.orderLine", {
+        num: index + 1,
+        name: item.name,
+        price: priceText,
+        ice,
+        sugar,
+        topping,
+      });
+    },
+    [translate]
+  );
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
@@ -144,24 +148,24 @@ function Cashier() {
         <div className="nav-container">
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/kiosk">Customer Kiosk</Link></li>
-            <li><Link to="/menu">Menu Board</Link></li>
+            <li><Link to="/login">{translate("nav.login")}</Link></li>
+            <li><Link to="/kiosk">{translate("nav.kiosk")}</Link></li>
+            <li><Link to="/menu">{translate("nav.menuBoard")}</Link></li>
           </ul>
         </div>
       </nav>
 
       <div className="sidebar-container">
         <div className="sidebar">
-            <h2>Order</h2>
+            <h2>{translate("order.title")}</h2>
             <div className="tts-stack">
-              <p className="tts-helper">Read back the order aloud.</p>
+              <p className="tts-helper">{translate("tts.helper.cashier")}</p>
               <TextToSpeechButton
                 text={cashierSpeechText}
-                label="Read cashier order and instructions"
+                label={translate("tts.helper.cashier")}
               />
             </div>
-            {currentOrder.length === 0 ? ( <p>no items yet</p>) : 
+            {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
             (<ul>
                 {currentOrder.map((item, index) => 
                 ( <li
@@ -169,12 +173,12 @@ function Cashier() {
                     tabIndex="0"
                     data-tts={orderLineLabel(item, index)}
                   >
-                    ${item.price} : <strong>{item.name} :</strong>   
+                    ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
                     <small>
                         <br/>
-                        Ice:     {item.modifiers.iceLevel}<br/>
-                        Sugar:   {item.modifiers.sugarLevel}<br/>
-                        Topping: {item.modifiers.topping}<br/>
+                        {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
+                        {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
+                        {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
                     </small>
                     <br/>
                 </li>))}
@@ -183,16 +187,16 @@ function Cashier() {
             )}
         </div>
         <div className="subtotal-container">
-          <strong>SubTotal : </strong>${subtotal}
+          <strong>{translate("order.subtotal")} : </strong>${subtotal}
         </div>
         <div className="order-button-container">
             <button
               className="order-button"
               onClick={() => placeOrder()}
-              data-tts="Place order and present payment."
-              aria-label="Place order and present payment."
+              data-tts={translate("order.place")}
+              aria-label={translate("order.place")}
             >
-              Place Order
+              {translate("order.place")}
             </button>
         </div>
       </div>
@@ -207,7 +211,7 @@ function Cashier() {
               data-tts={menuButtonLabel(item)}
               aria-label={menuButtonLabel(item)}
             >
-              ${item.price} : <strong>{item.name}</strong>
+              ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
             </button>
           ))}
         </div>

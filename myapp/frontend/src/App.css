@@ -32,7 +32,7 @@ body {
 .navbar {
   background-color: var(--matcha-green);
   color: var(--white);
-  padding: calc(0.75rem * var(--zoom-scale)) calc(1rem * var(--zoom-scale)) 0;
+  padding: calc(0.75rem * var(--zoom-scale)) calc(1rem * var(--zoom-scale));
   width: 100%;
   position: fixed;
   top: 0;
@@ -44,9 +44,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1000px;
+  max-width: 90%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 calc(0.75rem * var(--zoom-scale)) calc(1rem * var(--zoom-scale));
 }
 
 .logo {
@@ -82,12 +82,12 @@ body {
 }
 
 .content h2 {
-  font-size: 2rem;
+  font-size: calc(2rem * var(--zoom-scale));
   margin-bottom: 10px;
 }
 
 .content p {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--zoom-scale));
   color: #555;
   max-width: 600px;
 }

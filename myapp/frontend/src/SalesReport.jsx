@@ -3,17 +3,17 @@ import { Link } from "react-router-dom";
 import "./SalesReport.css";
 
 function SalesReport() {
-  const [employees, setEmployees] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", role: "", wage: "" });
-  const [isEditing, setIsEditing] = useState(false);
+  const [report, setReport] = useState([]);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");     
 
-  useEffect(() => {
-    fetch("http://localhost:3000/api/employees")
+  const fetchReport = () => {
+    if (!fromDate || !toDate) return;
+    fetch(`http://localhost:3000/api/reports/salesReport?fromDate=${fromDate}&toDate=${toDate}`)
       .then((res) => res.json())
-      .then((data) => setEmployees(data))
-      .catch((err) => console.error("Error fetching employees:", err));
-  }, []);
+      .then((data) => setReport(data))
+      .catch((err) => console.error("Error fetching sales report:", err));
+  };
 
   return (
     <div className="sales-report-page">
@@ -33,6 +33,16 @@ function SalesReport() {
       <main className="content">
         <h2>Sales Report</h2>
 
+        <div className="date-filters">
+          <label>
+            From: <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+          </label>
+          <label>
+            To: <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+          </label>
+          <button onClick={fetchReport}>Generate Report</button>
+        </div>
+
         <table className="sales-report-table">
           <thead>
             <tr>
@@ -41,9 +51,20 @@ function SalesReport() {
             </tr>
           </thead>
           <tbody>
+            {report.length > 0 ? (
+              report.map((row, idx) => (
+                <tr key={idx}>
+                  <td>{row.itemName}</td>
+                  <td>{row.salesCount}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2">No data</td>
+              </tr>
+            )}
           </tbody>
         </table>
-
       </main>
     </div>
   );

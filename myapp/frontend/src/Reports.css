@@ -38,16 +38,21 @@ body {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 80px); /* accounts for navbar height */
+  padding: 1.5rem;
+  box-sizing: border-box;
 }
 
 .reports {
   background-color: var(--white);
   border: 2px solid var(--matcha-green);
   border-radius: 10px;
-  padding: 40px;
-  width: 320px;
+  padding: 32px;
+  width: 360px;
+  max-width: 420px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
+  box-sizing: border-box;
+  margin-top: 1.5rem;
 }
 
 .reports h2 {
@@ -55,9 +60,15 @@ body {
   color: #333;
 }
 
+.reports .button-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .reports button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background-color: var(--matcha-green);
   color: var(--white);
   font-weight: 600;
@@ -65,7 +76,6 @@ body {
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  margin-bottom: 10px;
 }
 
 .reports button:hover {
@@ -73,9 +83,9 @@ body {
 }
 
 .back-button {
-  margin-top: 35px;
+  margin-top: 20px;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background-color: transparent;
   color: var(--matcha-green);
   font-weight: 600;
@@ -93,4 +103,53 @@ body {
 #current-item a {
   color: black;
   text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .reports-page {
+    flex-direction: column;
+    padding: 1rem;
+    min-height: auto;
+    justify-content: center;
+    align-items: center;
+  }
+  .nav-container {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .nav-links {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .reports {
+    width: 100%;
+    max-width: 500px;
+    padding: 24px;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  .reports .button-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports {
+    padding: 16px;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    margin: 0;
+  }
+  .reports button,
+  .back-button {
+    font-size: 0.95rem;
+    padding: 12px;
+    width: 100%;
+  }
+  .reports-page {
+    padding: 12px;
+  }
 }

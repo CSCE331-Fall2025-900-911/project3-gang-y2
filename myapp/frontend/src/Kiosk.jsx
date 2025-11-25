@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Kiosk.css";
+import Navbar from "./Navbar";
+import { ZoomProvider } from "./ZoomContext";
 import TextToSpeechButton from "./TextToSpeechButton.jsx";
 import { getOrderSpeech } from "./utils/speechHelpers.js";
 import { useTextToSpeech } from "./hooks/useTextToSpeech.js";
 import { useTtsSettings } from "./TtsSettingsContext.jsx";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function Kiosk() {
+  const [currentTime, setCurrentTime] = useState(new Date());
   // Holds menu items fetched from the backend
   const [menuItems, setMenuItems] = useState([]);
 
@@ -25,8 +29,26 @@ function Kiosk() {
 
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
-  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
+  const { language, translate } = useTranslation();
+  const langCode = language === "es" ? "es-ES" : "en-US";
+  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1, lang: langCode });
   const { ttsEnabled } = useTtsSettings();
+
+  // orders table in db? stuff for API
+  const [formData, setFormData] = useState({ orderID: currentTime.getTime() % 1048576, 
+      orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
+      orderCost: subtotal});
+
+  const [itemData, setItemData] = useState({
+    orderDetailID: currentTime.getTime() % 1048576, 
+    orderID:formData.orderID,
+    itemID:0,
+    iceLevel:"MEDIUM",
+    sugarLevel:"MEDIUM",
+    toppings:"NONE",
+    itemPrice:0.0
+  });
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -41,61 +63,132 @@ function Kiosk() {
     const {name, value} = e.target;
     setCurrentModifiers((prev) => ({...prev, [name]:value }));
     if (canSpeakSelection && ttsEnabled) {
-      const labelMap = {
-        iceLevel: {
-          none: "No ice",
-          low: "Low ice",
-          medium: "Medium ice",
-          high: "High ice",
-        },
-        sugarLevel: {
-          none: "No sugar",
-          low: "Low sugar",
-          medium: "Medium sugar",
-          high: "High sugar",
-        },
-        topping: {
-          none: "No topping",
-          pearl: "Pearl",
-          mini_pearl: "Mini pearl",
-          crystal_boba: "Crystal boba",
-          pudding: "Pudding",
-          aloe_vera: "Aloe vera",
-          red_bean: "Red bean",
-          herb_jelly: "Herb jelly",
-          aiyu_jelly: "Aiyu jelly",
-          lychee_jelly: "Lychee jelly",
-          crema: "Crema",
-          ice_cream: "Ice cream",
-        },
-      };
-      const spoken = labelMap[name]?.[value] || value;
-      saySelection(`Set ${name} to ${spoken}`);
+      const fieldKey = name === "iceLevel" ? "mod.field.ice" : name === "sugarLevel" ? "mod.field.sugar" : "mod.field.topping";
+      const valueKey = name === "iceLevel" ? `mod.ice.${value}` : name === "sugarLevel" ? `mod.sugar.${value}` : `mod.topping.${value}`;
+      const fieldText = translate(fieldKey, {});
+      const valueText = translate(valueKey, {});
+      saySelection(translate("tts.setModifier", { field: fieldText, value: valueText }));
     }
   };
+
 
   // function to add the pressed item to the order
   const addToOrder = () => {
     const modifiedItem = {
         ...currentItem, modifiers: {...currentModifiers}, // copies the state of modifiers and adds it to list
     };
-    setSubtotal(subtotal + parseFloat(currentItem.price));
+    
+    
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
+    setSubtotal(prev => prev + parseFloat(modifiedItem.price));
+    setItemData({orderDetailID: currentTime.getTime() % 1048576, 
+      orderID: formData.orderID, 
+      itemID: modifiedItem.itemID,
+      iceLevel: (currentModifiers.iceLevel).toUpperCase(),
+      sugarLevel: (currentModifiers.sugarLevel).toUpperCase(),
+      toppings: (currentModifiers.toppings).toUpperCase(),
+      itemPrice: currentModifiers.price
+    });
     if (canSpeakSelection && modifiedItem && ttsEnabled) {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
         ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
         : modifiedItem.price;
+      const ice = translate(`mod.ice.${modifiedItem.modifiers.iceLevel}`);
+      const sugar = translate(`mod.sugar.${modifiedItem.modifiers.sugarLevel}`);
+      const topping = translate(`mod.topping.${modifiedItem.modifiers.topping}`);
       saySelection(
-        `Added ${modifiedItem.name}. ${price}. Ice ${modifiedItem.modifiers.iceLevel}. Sugar ${modifiedItem.modifiers.sugarLevel}. Topping ${modifiedItem.modifiers.topping}.`
+        translate("order.added", {
+          name: modifiedItem.name,
+          price,
+          ice,
+          sugar,
+          topping,
+        })
       );
     }
-    setCurrentItem(null);
+    
+    console.log("current subtotal: ", subtotal);
+    closeModification;
   };
 
   // submit order & get payment
   function placeOrder() {
-    alert("Present payment");
+    setCurrentTime;
+    setFormData({ orderID: currentTime % 262144, 
+      orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
+      orderCost: subtotal});
+    
+    // reset order & subtotal
+    setCurrentOrder([]);
+    setSubtotal(0.0);
+    
   };
+
+  // function prepareItemData() {
+  //   map
+  // }
+
+
+  // useEffect(() => {
+  //     fetch("/api/orders")
+  //       .then((res) => res.json())
+  //       .then((data) => setOrders(data))
+  //       .catch((err) => console.error("Error fetching orders:", err));
+  //   }, []);
+
+  // Add order to DB
+  const handleSubmit = async (e) => {
+    
+    alert("Present payment");
+    
+    console.log("submitting: ", formData);
+    e.preventDefault();
+    const method = "POST";
+    const url = `/api/orders/`;
+    const itemUrl = `/api/orderitems/`;
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+    
+    const itemRes = await fetch(itemUrl, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(itemData),
+    });
+
+
+    if (res.ok && itemRes.ok) {
+      setFormData({ orderID: 0, 
+      orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
+      orderCost: 0.0});
+      // Refresh table
+      // const data = await (await fetch("/api/orders")).json();
+      // setOrders(data);
+      placeOrder();
+    }
+  };
+
+  // const itemSubmit = async (e) => {
+    
+  //   e.preventDefault();
+  //   const methodItems = "POST";
+  //   const urlItems = `/api/orderitems/`;
+
+  //   const resItems = await fetch(urlItems, {
+  //     methodItems,
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify(itemData),
+  //   });
+
+  //   if (resItems.ok) {
+
+  //   }
+  // };
 
   useEffect(() => {
     if (currentItem && firstOptionRef.current) {
@@ -104,19 +197,36 @@ function Kiosk() {
   }, [currentItem]);
 
   const kioskSpeechText = useMemo(() => {
-    const orderDescription = getOrderSpeech(currentOrder, subtotal);
-    return `Welcome to the MatchaBoba self-service kiosk. Tap a drink to customize ice, sugar, and toppings before adding it to your order. ${orderDescription}`;
-  }, [currentOrder, subtotal]);
+    const orderDescription = getOrderSpeech(currentOrder, subtotal, translate);
+    return `${translate("tts.intro.kiosk")} ${orderDescription}`;
+  }, [currentOrder, subtotal, translate]);
 
-  const menuButtonLabel = useCallback((item) => {
-    const numericPrice = parseFloat(item.price);
-    const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
-    return `Drink ${item.name}. ${priceText} dollars. Press enter to customize ice, sugar, and toppings.`;
-  }, []);
+  const menuButtonLabel = useCallback(
+    (item) => {
+      const numericPrice = parseFloat(item.price);
+      const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
+      return translate("tts.menuButton", { name: item.name, price: priceText });
+    },
+    [translate]
+  );
 
-  const orderLineLabel = useCallback((item, index) => {
-    return `Order item ${index + 1}. ${item.name}. Price ${item.price} dollars. Ice ${item.modifiers.iceLevel}, sugar ${item.modifiers.sugarLevel}, topping ${item.modifiers.topping}.`;
-  }, []);
+  const orderLineLabel = useCallback(
+    (item, index) => {
+      const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
+      const sugar = translate(`mod.sugar.${item.modifiers.sugarLevel}`);
+      const topping = translate(`mod.topping.${item.modifiers.topping}`);
+      const priceText = Number.parseFloat(item.price).toFixed(2);
+      return translate("tts.orderLine", {
+        num: index + 1,
+        name: item.name,
+        price: priceText,
+        ice,
+        sugar,
+        topping,
+      });
+    },
+    [translate]
+  );
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
@@ -139,29 +249,21 @@ function Kiosk() {
 
   // Render the actual page
   return (
+    <ZoomProvider>
     <div className="kioskpage">
-      <nav className="navbar">
-        <div className="nav-container">
-          <h1 className="logo">MatchaBoba POS</h1>
-          <ul className="nav-links">
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/kiosk">Customer Kiosk</Link></li>
-            <li><Link to="/menu">Menu Board</Link></li>
-          </ul>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="sidebar-container">
         <div className="sidebar">
-            <h2>Order</h2>
+            <h2>{translate("order.title")}</h2>
             <div className="tts-stack">
-              <p className="tts-helper">Need it read aloud? Use the speaker.</p>
+              <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
               <TextToSpeechButton
                 text={kioskSpeechText}
-                label="Read kiosk instructions and current order"
+                label={translate("tts.helper.kiosk")}
               />
             </div>
-            {currentOrder.length === 0 ? ( <p>no items yet</p>) : 
+            {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
             (<ul>
                 {currentOrder.map((item, index) => 
                 ( <li
@@ -169,12 +271,12 @@ function Kiosk() {
                     tabIndex="0"
                     data-tts={orderLineLabel(item, index)}
                   >
-                    ${item.price} : <strong>{item.name} :</strong>   
+                    ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
                     <small>
                         <br/>
-                        Ice:     {item.modifiers.iceLevel}<br/>
-                        Sugar:   {item.modifiers.sugarLevel}<br/>
-                        Topping: {item.modifiers.topping}<br/>
+                        {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
+                        {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
+                        {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
                     </small>
                     <br/>
                 </li>))}
@@ -183,16 +285,16 @@ function Kiosk() {
             )}
         </div>
         <div className="subtotal-container">
-          <strong>SubTotal : </strong>${subtotal}
+          <strong>{translate("order.subtotal")} : </strong>${subtotal}
         </div>
         <div className="order-button-container">
             <button
               className="order-button"
-              onClick={() => placeOrder()}
-              data-tts="Place order and present payment."
-              aria-label="Place order and present payment."
+              onClick={handleSubmit}
+              data-tts={translate("order.place")}
+              aria-label={translate("order.place")}
             >
-              Place Order
+              {translate("order.place")}
             </button>
         </div>
       </div>
@@ -207,7 +309,7 @@ function Kiosk() {
               data-tts={menuButtonLabel(item)}
               aria-label={menuButtonLabel(item)}
             >
-              ${item.price} : <strong>{item.name}</strong>
+              ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
             </button>
           ))}
         </div>
@@ -241,79 +343,82 @@ function Kiosk() {
             aria-modal="true"
             aria-label={`Customize ${currentItem.name}`}
           >
-            <h3>Customize {currentItem.name}</h3>
+            <h3>{translate("modal.customize", { name: currentItem.name })}</h3>
 
             <div style={{ margin: "1rem 0" }}>
               <label>
-                Ice:
+                {translate("order.list.ice")}:
                 <select
                   name="iceLevel"
                   value={currentModifiers.iceLevel}
                   onChange={changeModifiers}
                   ref={firstOptionRef}
-                  aria-label="Select ice level"
+                  aria-label={translate("modal.selectIce")}
                   style={{ marginLeft: "0.5rem" }}
                 >
-                  <option value="none">None</option>
-                  <option value="low" data-tts="Low ice">Low</option>
-                  <option value="medium" data-tts="Medium ice">Medium</option>
-                  <option value="high" data-tts="High ice">High</option>
+                  <option value="none">{translate("mod.ice.none")}</option>
+                  <option value="low" data-tts={translate("mod.ice.low")}>{translate("mod.ice.low")}</option>
+                  <option value="medium" data-tts={translate("mod.ice.medium")}>{translate("mod.ice.medium")}</option>
+                  <option value="high" data-tts={translate("mod.ice.high")}>{translate("mod.ice.high")}</option>
                 </select>
               </label>
             </div>
 
             <div style={{ margin: "1rem 0" }}>
               <label>
-                Sugar:
+                {translate("order.list.sugar")}:
                 <select
                   name="sugarLevel"
                   value={currentModifiers.sugarLevel}
                   onChange={changeModifiers}
-                  aria-label="Select sugar level"
+                  aria-label={translate("modal.selectSugar")}
                   style={{ marginLeft: "0.5rem" }}
                 >
-                  <option value="none">None</option>
-                  <option value="low" data-tts="Low sugar">Low</option>
-                  <option value="medium" data-tts="Medium sugar">Medium</option>
-                  <option value="high" data-tts="High sugar">High</option>
+                  <option value="none">{translate("mod.sugar.none")}</option>
+                  <option value="low" data-tts={translate("mod.sugar.low")}>{translate("mod.sugar.low")}</option>
+                  <option value="medium" data-tts={translate("mod.sugar.medium")}>{translate("mod.sugar.medium")}</option>
+                  <option value="high" data-tts={translate("mod.sugar.high")}>{translate("mod.sugar.high")}</option>
                 </select>
               </label>
             </div>
 
             <div style={{ margin: "1rem 0" }}>
               <label>
-                Topping:
+                {translate("order.list.topping")}:
                 <select
                   name="topping"
                   value={currentModifiers.topping}
                   onChange={changeModifiers}
-                  aria-label="Select topping"
+                  aria-label={translate("modal.selectTopping")}
                   style={{ marginLeft: "0.5rem" }}
                 >
-                  <option value="none">None</option>
-                  <option value="pearl" data-tts="Pearl">Pearl</option>
-                  <option value="mini_pearl" data-tts="Mini pearl">Mini Pearl</option>
-                  <option value="crystal_boba" data-tts="Crystal boba">Crystal Boba</option>
-                  <option value="pudding" data-tts="Pudding">Pudding</option>
-                  <option value="aloe_vera" data-tts="Aloe vera">Aloe Vera</option>
-                  <option value="red_bean" data-tts="Red bean">Red Bean</option>
-                  <option value="herb_jelly" data-tts="Herb jelly">Herb Jelly</option>
-                  <option value="aiyu_jelly" data-tts="Aiyu jelly">Aiyu Jelly</option>
-                  <option value="lychee_jelly" data-tts="Lychee jelly">Lychee Jelly</option>
-                  <option value="crema" data-tts="Crema topping">Crema</option>
-                  <option value="ice_cream" data-tts="Ice cream">Ice Cream</option>
+                  <option value="none">{translate("mod.topping.none")}</option>
+                  <option value="pearl" data-tts={translate("mod.topping.pearl")}>{translate("mod.topping.pearl")}</option>
+                  <option value="mini_pearl" data-tts={translate("mod.topping.mini_pearl")}>{translate("mod.topping.mini_pearl")}</option>
+                  <option value="crystal_boba" data-tts={translate("mod.topping.crystal_boba")}>{translate("mod.topping.crystal_boba")}</option>
+                  <option value="pudding" data-tts={translate("mod.topping.pudding")}>{translate("mod.topping.pudding")}</option>
+                  <option value="aloe_vera" data-tts={translate("mod.topping.aloe_vera")}>{translate("mod.topping.aloe_vera")}</option>
+                  <option value="red_bean" data-tts={translate("mod.topping.red_bean")}>{translate("mod.topping.red_bean")}</option>
+                  <option value="herb_jelly" data-tts={translate("mod.topping.herb_jelly")}>{translate("mod.topping.herb_jelly")}</option>
+                  <option value="aiyu_jelly" data-tts={translate("mod.topping.aiyu_jelly")}>{translate("mod.topping.aiyu_jelly")}</option>
+                  <option value="lychee_jelly" data-tts={translate("mod.topping.lychee_jelly")}>{translate("mod.topping.lychee_jelly")}</option>
+                  <option value="crema" data-tts={translate("mod.topping.crema")}>{translate("mod.topping.crema")}</option>
+                  <option value="ice_cream" data-tts={translate("mod.topping.ice_cream")}>{translate("mod.topping.ice_cream")}</option>
                 </select>
               </label>
             </div>
 
-            <button onClick={addToOrder} className="modify-button">
-              Add to Order
+            <button onClick={addToOrder} className="modify-button" data-tts={translate("modal.add")}>
+              {translate("modal.add")}
             </button>
-            <button onClick={closeModification} className="cancel-button">Cancel</button>
+            <button onClick={closeModification} className="cancel-button" data-tts={translate("modal.cancel")}>
+              {translate("modal.cancel")}
+            </button>
           </div>
         </div>
       )}
     </div>
+    </ZoomProvider>
   );
 }
 
