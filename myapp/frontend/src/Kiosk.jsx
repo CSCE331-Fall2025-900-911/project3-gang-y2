@@ -28,15 +28,10 @@ function Kiosk() {
   const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
 
   // sub total for order
-<<<<<<< HEAD
-  const [subtotal, setSubtotal] = useState(0);
-  const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1 });
-=======
   const[subtotal, setSubtotal] = useState(0.0);
   const { language, translate } = useTranslation();
   const langCode = language === "es" ? "es-ES" : "en-US";
   const { canSpeak: canSpeakSelection, startTalking: saySelection } = useTextToSpeech({ rate: 1, lang: langCode });
->>>>>>> fa9720b267121103cc9a0d78bdf5bb099077d28c
   const { ttsEnabled } = useTtsSettings();
 
   // orders table in db? stuff for API
@@ -245,15 +240,9 @@ function Kiosk() {
         <div className="order-button-container">
             <button
               className="order-button"
-<<<<<<< HEAD
               onClick={handleSubmit}
-              data-tts="Place order and present payment."
-              aria-label="Place order and present payment."
-=======
-              onClick={() => placeOrder()}
               data-tts={translate("order.place")}
               aria-label={translate("order.place")}
->>>>>>> fa9720b267121103cc9a0d78bdf5bb099077d28c
             >
               {translate("order.place")}
             </button>
