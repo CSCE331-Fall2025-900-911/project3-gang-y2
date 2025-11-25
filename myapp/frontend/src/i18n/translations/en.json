@@ -100,5 +100,14 @@
   "mod.topping.crema": "crema",
   "mod.topping.ice_cream": "ice cream",
   "manager.title": "Manager View",
-  "manager.body": "Use the navigation above to manage store operations."
+  "manager.body": "Use the navigation above to manage store operations.",
+  "modal.customize": "Customize {name}",
+  "modal.add": "Add to Order",
+  "modal.cancel": "Cancel",
+  "modal.selectIce": "Select ice level",
+  "modal.selectSugar": "Select sugar level",
+  "modal.selectTopping": "Select topping",
+  "tts.toggle.on": "TTS On",
+  "tts.toggle.off": "TTS Off",
+  "tts.toggle.aria": "Turn text to speech {state}"
 }

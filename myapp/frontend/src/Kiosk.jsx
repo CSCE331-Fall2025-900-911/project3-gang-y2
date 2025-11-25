@@ -304,75 +304,77 @@ function Kiosk() {
             aria-modal="true"
             aria-label={`Customize ${currentItem.name}`}
           >
-            <h3>Customize {currentItem.name}</h3>
+            <h3>{translate("modal.customize", { name: currentItem.name })}</h3>
 
             <div style={{ margin: "1rem 0" }}>
               <label>
-                Ice:
+                {translate("order.list.ice")}:
                 <select
                   name="iceLevel"
                   value={currentModifiers.iceLevel}
                   onChange={changeModifiers}
                   ref={firstOptionRef}
-                  aria-label="Select ice level"
+                  aria-label={translate("modal.selectIce")}
                   style={{ marginLeft: "0.5rem" }}
                 >
-                  <option value="none">None</option>
-                  <option value="low" data-tts="Low ice">Low</option>
-                  <option value="medium" data-tts="Medium ice">Medium</option>
-                  <option value="high" data-tts="High ice">High</option>
+                  <option value="none">{translate("mod.ice.none")}</option>
+                  <option value="low" data-tts={translate("mod.ice.low")}>{translate("mod.ice.low")}</option>
+                  <option value="medium" data-tts={translate("mod.ice.medium")}>{translate("mod.ice.medium")}</option>
+                  <option value="high" data-tts={translate("mod.ice.high")}>{translate("mod.ice.high")}</option>
                 </select>
               </label>
             </div>
 
             <div style={{ margin: "1rem 0" }}>
               <label>
-                Sugar:
+                {translate("order.list.sugar")}:
                 <select
                   name="sugarLevel"
                   value={currentModifiers.sugarLevel}
                   onChange={changeModifiers}
-                  aria-label="Select sugar level"
+                  aria-label={translate("modal.selectSugar")}
                   style={{ marginLeft: "0.5rem" }}
                 >
-                  <option value="none">None</option>
-                  <option value="low" data-tts="Low sugar">Low</option>
-                  <option value="medium" data-tts="Medium sugar">Medium</option>
-                  <option value="high" data-tts="High sugar">High</option>
+                  <option value="none">{translate("mod.sugar.none")}</option>
+                  <option value="low" data-tts={translate("mod.sugar.low")}>{translate("mod.sugar.low")}</option>
+                  <option value="medium" data-tts={translate("mod.sugar.medium")}>{translate("mod.sugar.medium")}</option>
+                  <option value="high" data-tts={translate("mod.sugar.high")}>{translate("mod.sugar.high")}</option>
                 </select>
               </label>
             </div>
 
             <div style={{ margin: "1rem 0" }}>
               <label>
-                Topping:
+                {translate("order.list.topping")}:
                 <select
                   name="topping"
                   value={currentModifiers.topping}
                   onChange={changeModifiers}
-                  aria-label="Select topping"
+                  aria-label={translate("modal.selectTopping")}
                   style={{ marginLeft: "0.5rem" }}
                 >
-                  <option value="none">None</option>
-                  <option value="pearl" data-tts="Pearl">Pearl</option>
-                  <option value="mini_pearl" data-tts="Mini pearl">Mini Pearl</option>
-                  <option value="crystal_boba" data-tts="Crystal boba">Crystal Boba</option>
-                  <option value="pudding" data-tts="Pudding">Pudding</option>
-                  <option value="aloe_vera" data-tts="Aloe vera">Aloe Vera</option>
-                  <option value="red_bean" data-tts="Red bean">Red Bean</option>
-                  <option value="herb_jelly" data-tts="Herb jelly">Herb Jelly</option>
-                  <option value="aiyu_jelly" data-tts="Aiyu jelly">Aiyu Jelly</option>
-                  <option value="lychee_jelly" data-tts="Lychee jelly">Lychee Jelly</option>
-                  <option value="crema" data-tts="Crema topping">Crema</option>
-                  <option value="ice_cream" data-tts="Ice cream">Ice Cream</option>
+                  <option value="none">{translate("mod.topping.none")}</option>
+                  <option value="pearl" data-tts={translate("mod.topping.pearl")}>{translate("mod.topping.pearl")}</option>
+                  <option value="mini_pearl" data-tts={translate("mod.topping.mini_pearl")}>{translate("mod.topping.mini_pearl")}</option>
+                  <option value="crystal_boba" data-tts={translate("mod.topping.crystal_boba")}>{translate("mod.topping.crystal_boba")}</option>
+                  <option value="pudding" data-tts={translate("mod.topping.pudding")}>{translate("mod.topping.pudding")}</option>
+                  <option value="aloe_vera" data-tts={translate("mod.topping.aloe_vera")}>{translate("mod.topping.aloe_vera")}</option>
+                  <option value="red_bean" data-tts={translate("mod.topping.red_bean")}>{translate("mod.topping.red_bean")}</option>
+                  <option value="herb_jelly" data-tts={translate("mod.topping.herb_jelly")}>{translate("mod.topping.herb_jelly")}</option>
+                  <option value="aiyu_jelly" data-tts={translate("mod.topping.aiyu_jelly")}>{translate("mod.topping.aiyu_jelly")}</option>
+                  <option value="lychee_jelly" data-tts={translate("mod.topping.lychee_jelly")}>{translate("mod.topping.lychee_jelly")}</option>
+                  <option value="crema" data-tts={translate("mod.topping.crema")}>{translate("mod.topping.crema")}</option>
+                  <option value="ice_cream" data-tts={translate("mod.topping.ice_cream")}>{translate("mod.topping.ice_cream")}</option>
                 </select>
               </label>
             </div>
 
-            <button onClick={addToOrder} className="modify-button">
-              Add to Order
+            <button onClick={addToOrder} className="modify-button" data-tts={translate("modal.add")}>
+              {translate("modal.add")}
             </button>
-            <button onClick={closeModification} className="cancel-button">Cancel</button>
+            <button onClick={closeModification} className="cancel-button" data-tts={translate("modal.cancel")}>
+              {translate("modal.cancel")}
+            </button>
           </div>
         </div>
       )}

@@ -1,15 +1,19 @@
 import React from "react";
 import { useTtsSettings } from "./TtsSettingsContext.jsx";
+import { useTranslation } from "./i18n/TranslationContext.jsx";
 
 function TtsToggle() {
   const { ttsEnabled, toggleTts } = useTtsSettings();
+  const { translate } = useTranslation();
+  const labelState = ttsEnabled ? translate("tts.toggle.off") : translate("tts.toggle.on");
+  const shortState = labelState.replace(/tts/gi, "").trim() || (ttsEnabled ? "Off" : "On");
 
   return (
     <button
       type="button"
       onClick={toggleTts}
       aria-pressed={ttsEnabled}
-      aria-label={`Turn text to speech ${ttsEnabled ? "off" : "on"}`}
+      aria-label={translate("tts.toggle.aria", { state: shortState })}
       style={{
         position: "fixed",
         right: "16px",
@@ -25,7 +29,7 @@ function TtsToggle() {
         boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
       }}
     >
-      {ttsEnabled ? "TTS On" : "TTS Off"}
+      {ttsEnabled ? translate("tts.toggle.on") : translate("tts.toggle.off")}
     </button>
   );
 }
