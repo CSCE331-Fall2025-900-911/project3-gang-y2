@@ -6,7 +6,7 @@ function MenuBoard() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/menu")
+    fetch("/api/menu")
       .then((res) => res.json())
       .then((data) => setItems(data))
       .catch((err) => console.error("Menu fetch error:", err));

@@ -7,7 +7,7 @@ function XReport() {
   const [sales, setSales] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/reports/xreport")
+    fetch("/api/reports/xreport")
       .then((res) => res.json())
       .then((data) => setSales(data))
       .catch((err) => console.error("Error fetching sales:", err));

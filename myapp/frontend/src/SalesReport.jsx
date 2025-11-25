@@ -9,7 +9,7 @@ function SalesReport() {
 
   const fetchReport = () => {
     if (!fromDate || !toDate) return;
-    fetch(`http://localhost:3000/api/reports/salesReport?fromDate=${fromDate}&toDate=${toDate}`)
+    fetch(`/api/reports/salesReport?fromDate=${fromDate}&toDate=${toDate}`)
       .then((res) => res.json())
       .then((data) => setReport(data))
       .catch((err) => console.error("Error fetching sales report:", err));
