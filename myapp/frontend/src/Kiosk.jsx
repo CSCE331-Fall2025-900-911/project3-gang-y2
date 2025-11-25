@@ -35,12 +35,20 @@ function Kiosk() {
   const { ttsEnabled } = useTtsSettings();
 
   // orders table in db? stuff for API
-  const [orders, setOrders] = useState([]);
-  const [formData, setFormData] = useState({ orderID: currentTime.getTime() % 262144, 
+  const [formData, setFormData] = useState({ orderID: currentTime.getTime() % 1048576, 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
       orderCost: subtotal});
-  
+
+  const [itemData, setItemData] = useState({
+    orderDetailID: currentTime.getTime() % 1048576, 
+    orderID:formData.orderID,
+    itemID:0,
+    iceLevel:"MEDIUM",
+    sugarLevel:"MEDIUM",
+    toppings:"NONE",
+    itemPrice:0.0
+  });
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -73,6 +81,14 @@ function Kiosk() {
     
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
     setSubtotal(prev => prev + parseFloat(modifiedItem.price));
+    setItemData({orderDetailID: currentTime.getTime() % 1048576, 
+      orderID: formData.orderID, 
+      itemID: modifiedItem.itemID,
+      iceLevel: (currentModifiers.iceLevel).toUpperCase(),
+      sugarLevel: (currentModifiers.sugarLevel).toUpperCase(),
+      toppings: (currentModifiers.toppings).toUpperCase(),
+      itemPrice: currentModifiers.price
+    });
     if (canSpeakSelection && modifiedItem && ttsEnabled) {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
         ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
@@ -92,18 +108,26 @@ function Kiosk() {
     }
     
     console.log("current subtotal: ", subtotal);
-    setCurrentItem(null);
+    closeModification;
   };
 
   // submit order & get payment
   function placeOrder() {
-    setCurrentTime(new Date());
+    setCurrentTime;
     setFormData({ orderID: currentTime % 262144, 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
       orderCost: subtotal});
     
+    // reset order & subtotal
+    setCurrentOrder([]);
+    setSubtotal(0.0);
+    
   };
+
+  // function prepareItemData() {
+  //   map
+  // }
 
 
   // useEffect(() => {
@@ -115,21 +139,29 @@ function Kiosk() {
 
   // Add order to DB
   const handleSubmit = async (e) => {
-    placeOrder();
+    
     alert("Present payment");
     
     console.log("submitting: ", formData);
     e.preventDefault();
     const method = "POST";
     const url = `/api/orders/`;
+    const itemUrl = `/api/orderitems/`;
 
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
+    
+    const itemRes = await fetch(itemUrl, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(itemData),
+    });
 
-    if (res.ok) {
+
+    if (res.ok && itemRes.ok) {
       setFormData({ orderID: 0, 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
@@ -137,8 +169,26 @@ function Kiosk() {
       // Refresh table
       // const data = await (await fetch("/api/orders")).json();
       // setOrders(data);
+      placeOrder();
     }
   };
+
+  // const itemSubmit = async (e) => {
+    
+  //   e.preventDefault();
+  //   const methodItems = "POST";
+  //   const urlItems = `/api/orderitems/`;
+
+  //   const resItems = await fetch(urlItems, {
+  //     methodItems,
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify(itemData),
+  //   });
+
+  //   if (resItems.ok) {
+
+  //   }
+  // };
 
   useEffect(() => {
     if (currentItem && firstOptionRef.current) {

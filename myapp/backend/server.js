@@ -279,6 +279,33 @@ app.post("/api/orders", async (req, res) => {
     res.status(500).json({ error: "Failed to create order" });
   }
 });
+// update orderitems
+app.post("/api/orderitems", async (req, res) => {
+  const {orderDetailID, orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice} = req.body;
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO orderitems (orderdetailid, orderid, itemid, icelevel, sugarlevel, toppings, itemprice) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING orderdetailid as orderDetailID, orderid as orderID, itemid as itemID, icelevel as iceLevel, sugarlevel as sugarLevel, toppings as toppings, itemprice as itemPrice",
+      [orderDetailID, orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error("Error creating order item:", err);
+    res.status(500).json({ error: "Failed to create order item" });
+  }
+});
+// get unique id for next order item
+// app.post("/api/orderitems/new-id", async (req, res) => {
+//   try {
+//     const result = await pool.query("SELECT nextval('orderdetailid') AS id;");
+//     const nextId = result.rows[0].id;
+
+//     res.json({ id: nextId });
+//   } catch (err) {
+//     console.error("Error generating new item ID:", err);
+//     res.status(500).json({ error: "Failed to generate new ID" });
+//   }
+// });
 
 // Add new menu item
 app.post("/api/menu", async (req, res) => {
