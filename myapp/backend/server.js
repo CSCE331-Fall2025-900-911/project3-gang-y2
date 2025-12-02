@@ -270,7 +270,7 @@ app.post("/api/orders", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO orders (orderdate, ordertime, ordercost) VALUES ($1, $2, $3) RETURNING orderid as orderID",
+      "INSERT INTO orders (orderdate, ordertime, ordercost) VALUES ($1, $2, $3) RETURNING orderid as orderid",
       [orderDate, orderTime, orderCost]
     );
     res.status(201).json(result.rows[0]);

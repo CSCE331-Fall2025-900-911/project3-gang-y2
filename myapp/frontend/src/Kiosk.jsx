@@ -38,7 +38,7 @@ function Kiosk() {
   const [formData, setFormData] = useState({ 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
-      orderCost: subtotal
+      orderCost: parseFloat(subtotal.toFixed(2))
     });
 
   const [itemData, setItemData] = useState({
@@ -87,7 +87,7 @@ function Kiosk() {
       iceLevel: (currentModifiers.iceLevel).toUpperCase(),
       sugarLevel: (currentModifiers.sugarLevel).toUpperCase(),
       topping: (currentModifiers.topping).toUpperCase(),
-      itemPrice: currentModifiers.price
+      itemPrice: modifiedItem.price
     });
     if (canSpeakSelection && modifiedItem && ttsEnabled) {
       const price = Number.isFinite(parseFloat(modifiedItem.price))
@@ -114,10 +114,10 @@ function Kiosk() {
   // submit order & get payment
   function placeOrder() {
     setCurrentTime;
-    setFormData({ orderID: currentTime % 262144, 
+    setFormData({
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
-      orderCost: subtotal});
+      orderCost: parseFloat(subtotal.toFixed(2))});
     
     // reset order & subtotal
     setCurrentOrder([]);
@@ -148,6 +148,8 @@ function Kiosk() {
     const url = `/api/orders/`;
     const itemUrl = `/api/orderitems/`;
 
+    formData.orderCost = subtotal;
+
     // create order in table by submitting order metadata and receive orderID
     const res = await fetch(url, {
       method,
@@ -156,13 +158,13 @@ function Kiosk() {
     });
 
     const newOrder = await res.json(); 
-    const newOrderID = newOrder.orderID;
+    const newOrderID = newOrder.orderid;
     
     // for each item in the order
     for (let item of currentOrder) {
         const dbPayload = {
             orderID: newOrderID, 
-            itemID: item.itemID,
+            itemID: item.itemid,
             iceLevel: item.modifiers.iceLevel.toUpperCase(),
             sugarLevel: item.modifiers.sugarLevel.toUpperCase(),
             toppings: item.modifiers.topping.toUpperCase(), 
