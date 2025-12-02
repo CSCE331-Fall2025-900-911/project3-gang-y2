@@ -112,17 +112,16 @@ function Kiosk() {
   };
 
   // submit order & get payment
-  function placeOrder() {
+  function resetOrder() {
     setCurrentTime;
     setFormData({
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
-      orderCost: parseFloat(subtotal.toFixed(2))});
-    
+      orderCost: 0.0
+    });
     // reset order & subtotal
     setCurrentOrder([]);
     setSubtotal(0.0);
-    
   };
 
   // function prepareItemData() {
@@ -179,14 +178,8 @@ function Kiosk() {
     }
 
     if (res.ok) {
-      setFormData({ orderID: 0, 
-      orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
-      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
-      orderCost: 0.0});
-      // Refresh table
-      // const data = await (await fetch("/api/orders")).json();
-      // setOrders(data);
-      placeOrder();
+      // order was made successfully
+      resetOrder();
     }
   };
 
