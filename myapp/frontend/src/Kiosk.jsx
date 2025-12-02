@@ -35,14 +35,14 @@ function Kiosk() {
   const { ttsEnabled } = useTtsSettings();
 
   // orders table in db? stuff for API
-  const [formData, setFormData] = useState({ orderID: currentTime.getTime() % 1048576, 
+  const [formData, setFormData] = useState({ 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
-      orderCost: subtotal});
+      orderCost: subtotal
+    });
 
   const [itemData, setItemData] = useState({
-    orderDetailID: currentTime.getTime() % 1048576, 
-    orderID:formData.orderID,
+    orderID:null,
     itemID:0,
     iceLevel:"MEDIUM",
     sugarLevel:"MEDIUM",
@@ -81,7 +81,7 @@ function Kiosk() {
     
     setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
     setSubtotal(prev => prev + parseFloat(modifiedItem.price));
-    setItemData({orderDetailID: currentTime.getTime() % 1048576, 
+    setItemData({
       orderID: formData.orderID, 
       itemID: modifiedItem.itemID,
       iceLevel: (currentModifiers.iceLevel).toUpperCase(),
@@ -148,20 +148,35 @@ function Kiosk() {
     const url = `/api/orders/`;
     const itemUrl = `/api/orderitems/`;
 
+    // create order in table by submitting order metadata and receive orderID
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(formData)
     });
+
+    const newOrder = await res.json(); 
+    const newOrderID = newOrder.orderID;
     
-    const itemRes = await fetch(itemUrl, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(itemData),
-    });
+    // for each item in the order
+    for (let item of currentOrder) {
+        const dbPayload = {
+            orderID: newOrderID, 
+            itemID: item.itemID,
+            iceLevel: item.modifiers.iceLevel.toUpperCase(),
+            sugarLevel: item.modifiers.sugarLevel.toUpperCase(),
+            toppings: item.modifiers.topping.toUpperCase(), 
+            itemPrice: parseFloat(item.price)
+        };
 
+        await fetch(itemUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dbPayload)
+        });
+    }
 
-    if (res.ok && itemRes.ok) {
+    if (res.ok) {
       setFormData({ orderID: 0, 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
       orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 

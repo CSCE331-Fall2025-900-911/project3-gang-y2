@@ -266,12 +266,12 @@ app.delete("/api/inventory/:item", async (req, res) => {
 
 // place order
 app.post("/api/orders", async (req, res) => {
-  const { orderID, orderDate, orderTime, orderCost } = req.body;
+  const { orderDate, orderTime, orderCost } = req.body;
 
   try {
     const result = await pool.query(
-      "INSERT INTO orders (orderid, orderdate, ordertime, ordercost) VALUES ($1, $2, $3, $4) RETURNING orderid as orderID, orderdate as orderDate, ordertime as orderTime, ordercost as orderCost",
-      [orderID, orderDate, orderTime, orderCost]
+      "INSERT INTO orders (orderdate, ordertime, ordercost) VALUES ($1, $2, $3) RETURNING orderid as orderID",
+      [orderDate, orderTime, orderCost]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -281,12 +281,12 @@ app.post("/api/orders", async (req, res) => {
 });
 // update orderitems
 app.post("/api/orderitems", async (req, res) => {
-  const {orderDetailID, orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice} = req.body;
+  const {orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice} = req.body;
 
   try {
     const result = await pool.query(
-      "INSERT INTO orderitems (orderdetailid, orderid, itemid, icelevel, sugarlevel, toppings, itemprice) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING orderdetailid as orderDetailID, orderid as orderID, itemid as itemID, icelevel as iceLevel, sugarlevel as sugarLevel, toppings as toppings, itemprice as itemPrice",
-      [orderDetailID, orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice]
+      "INSERT INTO orderitems (orderid, itemid, icelevel, sugarlevel, toppings, itemprice) VALUES ($1, $2, $3, $4, $5, $6) RETURNING orderdetailid as orderDetailID",
+      [orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
