@@ -46,7 +46,7 @@ function Kiosk() {
     itemID:0,
     iceLevel:"MEDIUM",
     sugarLevel:"MEDIUM",
-    toppings:"NONE",
+    topping:"NONE",
     itemPrice:0.0
   });
 
@@ -86,7 +86,7 @@ function Kiosk() {
       itemID: modifiedItem.itemID,
       iceLevel: (currentModifiers.iceLevel).toUpperCase(),
       sugarLevel: (currentModifiers.sugarLevel).toUpperCase(),
-      toppings: (currentModifiers.toppings).toUpperCase(),
+      topping: (currentModifiers.topping).toUpperCase(),
       itemPrice: currentModifiers.price
     });
     if (canSpeakSelection && modifiedItem && ttsEnabled) {
@@ -108,7 +108,7 @@ function Kiosk() {
     }
     
     console.log("current subtotal: ", subtotal);
-    closeModification;
+    closeModification();
   };
 
   // submit order & get payment
