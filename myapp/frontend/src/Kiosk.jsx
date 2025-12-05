@@ -37,8 +37,9 @@ function Kiosk() {
   // orders table in db? stuff for API
   const [formData, setFormData] = useState({ 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
-      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
-      orderCost: parseFloat(subtotal.toFixed(2))
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`,
+      orderCost: parseFloat(subtotal.toFixed(2)),
+      customerEmail: null
     });
 
   const [itemData, setItemData] = useState({
@@ -49,6 +50,14 @@ function Kiosk() {
     topping:"NONE",
     itemPrice:0.0
   });
+
+  //email receipt states
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [customerEmail, setCustomerEmail] = useState("");
+
+  function startOrderSubmission() {
+  setShowEmailModal(true);
+  }
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -136,6 +145,16 @@ function Kiosk() {
   //       .then((data) => setOrders(data))
   //       .catch((err) => console.error("Error fetching orders:", err));
   //   }, []);
+  const handleSubmitWithEmail = (email) => {
+    setFormData((prev) => ({
+      ...prev,
+      customerEmail: email,
+      orderCost: subtotal,
+    }));
+    
+    setTimeout(() => handleSubmit(), 50); // ensures state update applies
+    
+  };
 
   // Add order to DB
   const handleSubmit = async (e) => {
@@ -143,12 +162,12 @@ function Kiosk() {
     alert("Present payment");
     
     console.log("submitting: ", formData);
-    e.preventDefault();
-    const method = "POST";
+    if (e) e.preventDefault();    const method = "POST";
     const url = `/api/orders/`;
     const itemUrl = `/api/orderitems/`;
 
     formData.orderCost = subtotal;
+    formData.customerEmail = customerEmail || null;
 
     // create order in table by submitting order metadata and receive orderID
     const res = await fetch(url, {
@@ -177,6 +196,19 @@ function Kiosk() {
             body: JSON.stringify(dbPayload)
         });
     }
+    if (formData.customerEmail) {
+      await fetch("/api/send-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.customerEmail,
+          orderId: newOrderID,
+          items: currentOrder,
+          subtotal: subtotal
+        }),
+      });
+    }
+
 
     if (res.ok) {
       setFormData({ orderID: 0, 
@@ -300,9 +332,7 @@ function Kiosk() {
           </ul>
 
           )}
-        </div>
-
-        
+        </div>        
       </div>
       <div className="subtotal-container">
         <strong>{translate("order.subtotal")} : </strong>${subtotal}
@@ -310,7 +340,7 @@ function Kiosk() {
       <div className="order-button-container">
           <button
             className="order-button"
-            onClick={handleSubmit}
+            onClick={startOrderSubmission}
             data-tts={translate("order.place")}
             aria-label={translate("order.place")}
           >
@@ -333,6 +363,70 @@ function Kiosk() {
           ))}
         </div>
       </main>
+      {showEmailModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "2rem",
+              borderRadius: "8px",
+              width: "320px",
+              border: "1px solid black",
+              textAlign: "center",
+            }}
+          >
+            <h3>Would you like an email receipt?</h3>
+
+            <input
+              type="email"
+              placeholder="Enter email for receipt (optional)"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.target.value)}
+              style={{
+                width: "90%",
+                margin: "1rem 0",
+                padding: "0.5rem",
+                fontSize: "1rem",
+              }}
+            />
+
+            <button
+              onClick={() => {
+                setShowEmailModal(false);
+                handleSubmitWithEmail(customerEmail || null);
+              }}
+              className="modify-button"
+              style={{ marginBottom: "1rem", width: "100%" }}
+            >
+              Submit with Email
+            </button>
+
+            <button
+              onClick={() => {
+                setShowEmailModal(false);
+                handleSubmitWithEmail(null);
+              }}
+              className="cancel-button"
+              style={{ width: "100%" }}
+            >
+              Skip
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal for customization */}
       {currentItem && (
