@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import "./Cashier.css";
+import "./Kiosk.css";
 import TextToSpeechButton from "./TextToSpeechButton.jsx";
 import { getOrderSpeech } from "./utils/speechHelpers.js";
 import { useTextToSpeech } from "./hooks/useTextToSpeech.js";

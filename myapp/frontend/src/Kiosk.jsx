@@ -272,48 +272,50 @@ function Kiosk() {
 
       <div className="sidebar-container">
         <div className="sidebar">
-            <h2>{translate("order.title")}</h2>
-            <div className="tts-stack">
-              <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
-              <TextToSpeechButton
-                text={kioskSpeechText}
-                label={translate("tts.helper.kiosk")}
-              />
-            </div>
-            {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
-            (<ul>
-                {currentOrder.map((item, index) => 
-                ( <li
-                    key={index}
-                    tabIndex="0"
-                    data-tts={orderLineLabel(item, index)}
-                  >
-                    ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
-                    <small>
-                        <br/>
-                        {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
-                        {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
-                        {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
-                    </small>
-                    <br/>
-                </li>))}
-            </ul>
+          <h2>{translate("order.title")}</h2>
+          <div className="tts-stack">
+            <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
+            <TextToSpeechButton
+              text={kioskSpeechText}
+              label={translate("tts.helper.kiosk")}
+            />
+          </div>
+          {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
+          (<ul>
+              {currentOrder.map((item, index) => 
+              ( <li
+                  key={index}
+                  tabIndex="0"
+                  data-tts={orderLineLabel(item, index)}
+                >
+                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
+                  <small>
+                      <br/>
+                      {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
+                      {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
+                      {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
+                  </small>
+                  <br/>
+              </li>))}
+          </ul>
 
-            )}
+          )}
         </div>
-        <div className="subtotal-container">
-          <strong>{translate("order.subtotal")} : </strong>${subtotal}
-        </div>
-        <div className="order-button-container">
-            <button
-              className="order-button"
-              onClick={handleSubmit}
-              data-tts={translate("order.place")}
-              aria-label={translate("order.place")}
-            >
-              {translate("order.place")}
-            </button>
-        </div>
+
+        
+      </div>
+      <div className="subtotal-container">
+        <strong>{translate("order.subtotal")} : </strong>${subtotal}
+      </div>
+      <div className="order-button-container">
+          <button
+            className="order-button"
+            onClick={handleSubmit}
+            data-tts={translate("order.place")}
+            aria-label={translate("order.place")}
+          >
+            {translate("order.place")}
+          </button>
       </div>
 
       <main className="menu-container">

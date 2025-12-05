@@ -21,6 +21,7 @@ body {
   font-family: "Poppins", sans-serif;
   background-color: var(--white);
   color: #333;
+  font-size: var(--font-size-base);
 }
 .kioskpage {
   min-height: 100vh;
@@ -43,7 +44,7 @@ body {
   justify-content: space-between;
   align-items: center;
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 0 0;
   padding: 0 20px;
 }
 
@@ -77,13 +78,16 @@ body {
 .sidebar-container {
   background-color: gray;
   color: white;
-  width: calc(400 * var(--zoom-scale))px;
+  width: 400px;
   min-width: 280px;
-  height: 100%;
   position: fixed;
   top: 58px;
   left: 0px;
   margin: 0px;
+  bottom: calc(150px * var(--zoom-scale));
+  transform: scale(var(--zoom-scale));
+  transform-origin: top left;
+  overflow-y: scroll;
 }
 .sidebar {
   display: grid;
@@ -94,21 +98,28 @@ body {
 
 .subtotal-container {
   position: fixed;
-  bottom: 125px;
-  left: 50px;
-  width: 300px;
+  bottom: calc(125px*var(--zoom-scale));
+  width: 400px;
   border: white;
+  background: #333;
+  color: var(--white);
   align-items: center;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: calc(1.4rem*var(--zoom-scale));
+  transform: scale(var(--zoom-scale));
+  transform-origin: bottom left;
 }
 
 .order-button-container {
+  background-color:#333;
   position: fixed;
-  bottom: 50px;
-  left: 50px;
-  width: 300px;
+  height: 125px;
+  bottom: 0px;
+  left: 0px;
+  width: 400px;
   border: white;
+  transform: scale(var(--zoom-scale));
+  transform-origin: bottom left;
 }
 .order-button {
   background-color: #086d32; 
@@ -118,7 +129,7 @@ body {
   border-radius: 10px;
   font-size: calc(1.4rem * var(--zoom-scale));
   cursor: pointer;
-  width: 300px;           
+  width: 400px;           
   height: 70px;           
   text-align: center;
   transition: background-color 0.2s ease;
