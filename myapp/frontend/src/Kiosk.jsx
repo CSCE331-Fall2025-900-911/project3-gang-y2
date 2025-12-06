@@ -259,6 +259,17 @@ function Kiosk() {
     [translate]
   );
 
+  const groupedMenu = useMemo(() => {
+    const groups = {};
+    menuItems.forEach((item) => {
+      const cat = item.category || "Other";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(item);
+    });
+    return groups;
+  }, [menuItems]);
+
+
   const orderLineLabel = useCallback(
     (item, index) => {
       const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
@@ -349,20 +360,27 @@ function Kiosk() {
       </div>
 
       <main className="menu-container">
-        <div className="menu-grid">
-          {menuItems.map((item) => (
-            <button
-              key={item.id} // unique key for React
-              className="menu-button"
-              onClick={() => openModification(item)}
-              data-tts={menuButtonLabel(item)}
-              aria-label={menuButtonLabel(item)}
-            >
-              ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
-            </button>
-          ))}
-        </div>
+        {Object.keys(groupedMenu).map((category) => (
+          <section key={category} className="menu-section">
+            <h2 className="menu-category-title">{category}</h2>
+
+            <div className="menu-grid">
+              {groupedMenu[category].map((item) => (
+                <button
+                  key={item.itemid}
+                  className="menu-button"
+                  onClick={() => openModification(item)}
+                  data-tts={menuButtonLabel(item)}
+                  aria-label={menuButtonLabel(item)}
+                >
+                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
+                </button>
+              ))}
+            </div>
+          </section>
+        ))}
       </main>
+
       {showEmailModal && (
         <div
           style={{

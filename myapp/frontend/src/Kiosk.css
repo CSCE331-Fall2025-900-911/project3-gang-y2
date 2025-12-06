@@ -304,3 +304,15 @@ body {
     padding: 0.85rem;
   }
 }
+
+.menu-section {
+  margin-bottom: 2rem;
+  padding-left: 0.5rem;
+}
+
+.menu-category-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #4C8C2B;
+  margin-bottom: 0.75rem;
+}
