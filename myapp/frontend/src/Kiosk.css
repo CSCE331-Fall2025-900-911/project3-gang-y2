@@ -204,22 +204,38 @@ body {
 }
 
 .menu-button {
-  background-color: #4C8C2B; 
-  color: white;
-  border: none;
-  padding: 1rem 1.5rem;
-  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #e8f5e9 40%,
+    #c5e1a5 100%
+  );
+  color: black;
+  border: calc(2px * var(--zoom-scale)) solid black;
+  border-radius: calc(10px * var(--zoom-scale));
+  padding: calc(1rem * var(--zoom-scale));
   font-size: calc(1rem * var(--zoom-scale));
+  width: calc(400px * var(--zoom-scale));
+  height: calc(60px * var(--zoom-scale));
   cursor: pointer;
-  width: calc(400px * var(--zoom-scale));           
-  height: 60px;           
   text-align: left;
-  transition: background-color 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Hover: lift and subtle highlight */
 .menu-button:hover {
-  background-color: #3a6d21;
+  transform: translateY(calc(-2px * var(--zoom-scale)));
+  box-shadow: 0 calc(4px * var(--zoom-scale)) calc(8px * var(--zoom-scale)) rgba(0,0,0,0.18);
 }
+
+/* Keyboard focus outline */
+.menu-button:focus {
+  outline: calc(4px * var(--zoom-scale)) solid #4da6ff;
+  outline-offset: calc(2px * var(--zoom-scale));
+}
+
 
 .loading {
   text-align: center;
