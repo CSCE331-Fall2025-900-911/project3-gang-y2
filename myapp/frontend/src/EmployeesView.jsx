@@ -6,7 +6,7 @@ import { useTranslation } from "./i18n/TranslationContext.jsx";
 function EmployeesView() {
   const [employees, setEmployees] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ id: null, name: "", username: "", password: "", ismanager: false });
+  const [formData, setFormData] = useState({ id: null, name: "", email: "", username: "", password: "", ismanager: false });
   const [isEditing, setIsEditing] = useState(false);
   const { translate } = useTranslation();
 
@@ -34,7 +34,7 @@ function EmployeesView() {
     if (res.ok) {
       setShowForm(false);
       setIsEditing(false);
-      setFormData({ id: null, name: "", username: "", password: "", ismanager: false });
+      setFormData({ id: null, name: "", email: "", username: "", password: "", ismanager: false });
       // Refresh table
       const data = await (await fetch("/api/employees")).json();
       setEmployees(data);
@@ -81,6 +81,7 @@ function EmployeesView() {
             <tr>
               <th>{translate("employees.table.id")}</th>
               <th>{translate("employees.table.name")}</th>
+              <th>{translate("employees.table.email")}</th>
               <th>{translate("employees.table.username")}</th>
               <th>{translate("employees.table.role")}</th>
               <th>{translate("employees.table.actions")}</th>
@@ -91,6 +92,7 @@ function EmployeesView() {
               <tr key={emp.id}>
                 <td>{emp.id}</td>
                 <td>{emp.name}</td>
+                <td>{emp.email}</td>
                 <td>{emp.username}</td>
                 <td>{emp.ismanager ? translate("employees.role.manager") : translate("employees.role.cashier")}</td>
                 <td>
@@ -119,6 +121,13 @@ function EmployeesView() {
                   placeholder={translate("employees.table.username")}
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder={formData.email}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                 />
                 <input

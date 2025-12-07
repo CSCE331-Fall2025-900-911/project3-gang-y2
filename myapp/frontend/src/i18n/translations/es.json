@@ -57,6 +57,7 @@
   "employees.add": "Agregar empleado",
   "employees.table.id": "ID",
   "employees.table.name": "Nombre",
+  "employees.table.email": "Correo Electrónico",  
   "employees.table.username": "Usuario",
   "employees.table.role": "Rol",
   "employees.table.actions": "Acciones",

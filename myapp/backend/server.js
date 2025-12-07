@@ -101,7 +101,7 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/employees", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT employeeid as id, name, username, CASE WHEN ismanager = true THEN true ELSE false END as ismanager FROM employees ORDER BY employeeid ASC"
+      "SELECT employeeid as id, name, email, username, CASE WHEN ismanager = true THEN true ELSE false END as ismanager FROM employees ORDER BY employeeid ASC"
     );
     res.json(result.rows);
   } 
@@ -118,8 +118,8 @@ app.post("/api/employees", async (req, res) => {
   
   try {    
     const result = await pool.query(
-      "INSERT INTO employees (name, username, password, ismanager) VALUES ($1, $2, $3, $4) RETURNING employeeid as id, name, username, ismanager",
-      [name, username, password, ismanager || false]
+      "INSERT INTO employees (name, email, username, password, ismanager) VALUES ($1, $2, $3, $4) RETURNING employeeid as id, name, email, username, ismanager",
+      [name, email, username, password, ismanager || false]
     );
     
     res.status(201).json(result.rows[0]);
@@ -137,19 +137,19 @@ app.post("/api/employees", async (req, res) => {
 
 app.put("/api/employees/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, username, password, ismanager } = req.body;
+  const { name, email, username, password, ismanager } = req.body;
   
   try {
     let query;
     let params;
     
     if (password) {
-      query = "UPDATE employees SET name = $1, username = $2, password = $3, ismanager = $4 WHERE employeeid = $5 RETURNING employeeid as id, name, username, ismanager";
-      params = [name, username, password, ismanager, id];
+      query = "UPDATE employees SET name = $1, username = $2, password = $3, ismanager = $4, email = $5 WHERE employeeid = $6 RETURNING employeeid as id, name, email, username, ismanager";
+      params = [name, username, password, ismanager, email, id];
     }
     else {
-      query = "UPDATE employees SET name = $1, username = $2, ismanager = $3 WHERE employeeid = $4 RETURNING employeeid as id, name, username, ismanager";
-      params = [name, username, ismanager, id];
+      query = "UPDATE employees SET name = $1, username = $2, ismanager = $3, email = $4 WHERE employeeid = $5 RETURNING employeeid as id, name, email, username, ismanager";
+      params = [name, username, ismanager, email, id];
     }
     
     const result = await pool.query(query, params);
