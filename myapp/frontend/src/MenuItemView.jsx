@@ -7,7 +7,7 @@ import { useTranslation } from "./i18n/TranslationContext.jsx";
 function MenuItemView() {
   const [menuItems, setMenuItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: "", description: "", price: "", calories: ""});
+  const [formData, setFormData] = useState({ name: "", description: "", price: "", calories: "", category: "" });
   const [isEditing, setIsEditing] = useState(false);
   const { translate } = useTranslation();
 
@@ -31,6 +31,7 @@ function MenuItemView() {
         description: formData.description,
         price: formData.price,
         calories: formData.calories,
+        category: formData.category,
     });
 
     const res = await fetch(url, {
@@ -143,6 +144,7 @@ function MenuItemView() {
               <th>{translate("menu.table.description") || "Description"}</th>
               <th>{translate("menu.table.price") || "Price"}</th>
               <th>{translate("menu.table.calories") || "Calories"}</th>
+              <th>{translate("menu.table.category") || "Category"}</th>
               <th>{translate("menu.table.actions") || "Actions"}</th>
             </tr>
           </thead>
@@ -154,6 +156,8 @@ function MenuItemView() {
                 <td>{item.description}</td>
                 <td>{Number.parseFloat(item.price).toFixed(2)}</td>
                 <td>{item.calories}</td>
+                <td>{item.category}</td>
+
                 <td>
                   <button
                     className="edit-btn"
@@ -210,6 +214,14 @@ function MenuItemView() {
                   onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
                   required
                 />
+                <input
+                  type="text"
+                  placeholder="Category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  required
+                />
+
                 <div className="modal-buttons">
                   <button type="submit">{isEditing ? "Update" : "Add"}</button>
                   <button type="button" onClick={() => setShowForm(false)}>Cancel</button>

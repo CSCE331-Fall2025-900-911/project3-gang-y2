@@ -21,6 +21,7 @@ body {
   font-family: "Poppins", sans-serif;
   background-color: var(--white);
   color: #333;
+  font-size: var(--font-size-base);
 }
 .kioskpage {
   min-height: 100vh;
@@ -43,8 +44,18 @@ body {
   justify-content: space-between;
   align-items: center;
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 0 0;
   padding: 0 20px;
+}
+.zoom-button {
+  font-size: calc(1rem*var(--zoom-scale));
+  background-color: #4C8C2B;
+  color: var(--white);
+  border-radius: 5px;
+  border: 1px solid white;
+}
+.zoom-button:hover {
+  background-color: #2e561a;
 }
 
 .logo {
@@ -75,15 +86,19 @@ body {
 }
 
 .sidebar-container {
+  z-index: 100;
   background-color: gray;
   color: white;
-  width: calc(400 * var(--zoom-scale))px;
+  width: 400px;
   min-width: 280px;
-  height: 100%;
   position: fixed;
   top: 58px;
   left: 0px;
   margin: 0px;
+  bottom: calc(150px * var(--zoom-scale));
+  transform: scale(var(--zoom-scale));
+  transform-origin: top left;
+  overflow-y: scroll;
 }
 .sidebar {
   display: grid;
@@ -93,22 +108,31 @@ body {
 }
 
 .subtotal-container {
+  z-index: 101;
   position: fixed;
-  bottom: 125px;
-  left: 50px;
-  width: 300px;
+  bottom: calc(125px*var(--zoom-scale));
+  width: 400px;
   border: white;
+  background: #333;
+  color: var(--white);
   align-items: center;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: calc(1.4rem*var(--zoom-scale));
+  transform: scale(var(--zoom-scale));
+  transform-origin: bottom left;
 }
 
 .order-button-container {
+  z-index: 101;
+  background-color:#333;
   position: fixed;
-  bottom: 50px;
-  left: 50px;
-  width: 300px;
+  height: 125px;
+  bottom: 0px;
+  left: 0px;
+  width: 400px;
   border: white;
+  transform: scale(var(--zoom-scale));
+  transform-origin: bottom left;
 }
 .order-button {
   background-color: #086d32; 
@@ -118,7 +142,7 @@ body {
   border-radius: 10px;
   font-size: calc(1.4rem * var(--zoom-scale));
   cursor: pointer;
-  width: 300px;           
+  width: 400px;           
   height: 70px;           
   text-align: center;
   transition: background-color 0.2s ease;
@@ -149,46 +173,69 @@ body {
 }
 
 .menu-container {
+  left: calc(400px * var(--zoom-scale));
   text-align: center;
   padding: 20px;
   overflow: auto;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: left;
+  align-items: left;
   text-align: center;
   margin-top: 90px;
-  margin-left: 400px;
+  margin-left: 40px;
+  transform: scale(var(--zoom-scale));
+  transform-origin: top left;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(calc(400px*var(--zoom-scale)), 1fr)); 
   gap: 1.2rem;
-  justify-items: center;
-  padding: 2rem;
+  justify-items: left;
+  padding: 1rem;
   max-width: 1000px;
   margin: 0 auto;
+  margin-left: 400px;
+  margin-right: 0px;
+  transform: scale(var(--zoom-scale));
+  transform-origin: top left;
 }
 
 .menu-button {
-  background-color: #4C8C2B; 
-  color: white;
-  border: none;
-  padding: 1rem 1.5rem;
-  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #e8f5e9 40%,
+    #c5e1a5 100%
+  );
+  color: black;
+  border: calc(2px * var(--zoom-scale)) solid black;
+  border-radius: calc(10px * var(--zoom-scale));
+  padding: calc(1rem * var(--zoom-scale));
   font-size: calc(1rem * var(--zoom-scale));
+  width: calc(400px * var(--zoom-scale));
+  height: calc(60px * var(--zoom-scale));
   cursor: pointer;
-  width: 400px;           
-  height: 60px;           
   text-align: left;
-  transition: background-color 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Hover: lift and subtle highlight */
 .menu-button:hover {
-  background-color: #3a6d21;
+  transform: translateY(calc(-2px * var(--zoom-scale)));
+  box-shadow: 0 calc(4px * var(--zoom-scale)) calc(8px * var(--zoom-scale)) rgba(0,0,0,0.18);
 }
+
+/* Keyboard focus outline */
+.menu-button:focus {
+  outline: calc(4px * var(--zoom-scale)) solid #4da6ff;
+  outline-offset: calc(2px * var(--zoom-scale));
+}
+
 
 .loading {
   text-align: center;
@@ -256,4 +303,16 @@ body {
     font-size: 0.95rem;
     padding: 0.85rem;
   }
+}
+
+.menu-section {
+  margin-bottom: 2rem;
+  padding-left: 0.5rem;
+}
+
+.menu-category-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #4C8C2B;
+  margin-bottom: 0.75rem;
 }

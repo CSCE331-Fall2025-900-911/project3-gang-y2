@@ -37,8 +37,9 @@ function Kiosk() {
   // orders table in db? stuff for API
   const [formData, setFormData] = useState({ 
       orderDate: `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}`, 
-      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`, 
-      orderCost: parseFloat(subtotal.toFixed(2))
+      orderTime: `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`,
+      orderCost: parseFloat(subtotal.toFixed(2)),
+      customerEmail: null
     });
 
   const [itemData, setItemData] = useState({
@@ -49,6 +50,14 @@ function Kiosk() {
     topping:"NONE",
     itemPrice:0.0
   });
+
+  //email receipt states
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [customerEmail, setCustomerEmail] = useState("");
+
+  function startOrderSubmission() {
+  setShowEmailModal(true);
+  }
 
   const openModification = (item) => {
     setCurrentItem(item);
@@ -135,6 +144,16 @@ function Kiosk() {
   //       .then((data) => setOrders(data))
   //       .catch((err) => console.error("Error fetching orders:", err));
   //   }, []);
+  const handleSubmitWithEmail = (email) => {
+    setFormData((prev) => ({
+      ...prev,
+      customerEmail: email,
+      orderCost: subtotal,
+    }));
+    
+    setTimeout(() => handleSubmit(), 50); // ensures state update applies
+    
+  };
 
   // Add order to DB
   const handleSubmit = async (e) => {
@@ -142,12 +161,12 @@ function Kiosk() {
     alert("Present payment");
     
     console.log("submitting: ", formData);
-    e.preventDefault();
-    const method = "POST";
+    if (e) e.preventDefault();    const method = "POST";
     const url = `/api/orders/`;
     const itemUrl = `/api/orderitems/`;
 
     formData.orderCost = subtotal;
+    formData.customerEmail = customerEmail || null;
 
     // create order in table by submitting order metadata and receive orderID
     const res = await fetch(url, {
@@ -176,6 +195,19 @@ function Kiosk() {
             body: JSON.stringify(dbPayload)
         });
     }
+    if (formData.customerEmail) {
+      await fetch("/api/send-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.customerEmail,
+          orderId: newOrderID,
+          items: currentOrder,
+          subtotal: subtotal
+        }),
+      });
+    }
+
 
     if (res.ok) {
       // order was made successfully
@@ -219,6 +251,17 @@ function Kiosk() {
     },
     [translate]
   );
+
+  const groupedMenu = useMemo(() => {
+    const groups = {};
+    menuItems.forEach((item) => {
+      const cat = item.category || "Other";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(item);
+    });
+    return groups;
+  }, [menuItems]);
+
 
   const orderLineLabel = useCallback(
     (item, index) => {
@@ -265,65 +308,136 @@ function Kiosk() {
 
       <div className="sidebar-container">
         <div className="sidebar">
-            <h2>{translate("order.title")}</h2>
-            <div className="tts-stack">
-              <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
-              <TextToSpeechButton
-                text={kioskSpeechText}
-                label={translate("tts.helper.kiosk")}
-              />
-            </div>
-            {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
-            (<ul>
-                {currentOrder.map((item, index) => 
-                ( <li
-                    key={index}
-                    tabIndex="0"
-                    data-tts={orderLineLabel(item, index)}
-                  >
-                    ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
-                    <small>
-                        <br/>
-                        {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
-                        {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
-                        {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
-                    </small>
-                    <br/>
-                </li>))}
-            </ul>
+          <h2>{translate("order.title")}</h2>
+          <div className="tts-stack">
+            <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
+            <TextToSpeechButton
+              text={kioskSpeechText}
+              label={translate("tts.helper.kiosk")}
+            />
+          </div>
+          {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
+          (<ul>
+              {currentOrder.map((item, index) => 
+              ( <li
+                  key={index}
+                  tabIndex="0"
+                  data-tts={orderLineLabel(item, index)}
+                >
+                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
+                  <small>
+                      <br/>
+                      {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
+                      {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
+                      {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
+                  </small>
+                  <br/>
+              </li>))}
+          </ul>
 
-            )}
-        </div>
-        <div className="subtotal-container">
-          <strong>{translate("order.subtotal")} : </strong>${subtotal}
-        </div>
-        <div className="order-button-container">
-            <button
-              className="order-button"
-              onClick={handleSubmit}
-              data-tts={translate("order.place")}
-              aria-label={translate("order.place")}
-            >
-              {translate("order.place")}
-            </button>
-        </div>
+          )}
+        </div>        
+      </div>
+      <div className="subtotal-container">
+        <strong>{translate("order.subtotal")} : </strong>${subtotal}
+      </div>
+      <div className="order-button-container">
+          <button
+            className="order-button"
+            onClick={startOrderSubmission}
+            data-tts={translate("order.place")}
+            aria-label={translate("order.place")}
+          >
+            {translate("order.place")}
+          </button>
       </div>
 
       <main className="menu-container">
-        <div className="menu-grid">
-          {menuItems.map((item) => (
-            <button
-              key={item.id} // unique key for React
-              className="menu-button"
-              onClick={() => openModification(item)}
-              data-tts={menuButtonLabel(item)}
-              aria-label={menuButtonLabel(item)}
-            >
-              ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
-            </button>
-          ))}
-        </div>
+        {Object.keys(groupedMenu).map((category) => (
+          <section key={category} className="menu-section">
+            <h2 className="menu-category-title">{category}</h2>
+
+            <div className="menu-grid">
+              {groupedMenu[category].map((item) => (
+                <button
+                  key={item.itemid}
+                  className="menu-button"
+                  onClick={() => openModification(item)}
+                  data-tts={menuButtonLabel(item)}
+                  aria-label={menuButtonLabel(item)}
+                >
+                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
+                </button>
+              ))}
+            </div>
+          </section>
+        ))}
       </main>
+
+      {showEmailModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "2rem",
+              borderRadius: "8px",
+              width: "320px",
+              border: "1px solid black",
+              textAlign: "center",
+            }}
+          >
+            <h3>Would you like an email receipt?</h3>
+
+            <input
+              type="email"
+              placeholder="Enter email for receipt (optional)"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.target.value)}
+              style={{
+                width: "90%",
+                margin: "1rem 0",
+                padding: "0.5rem",
+                fontSize: "1rem",
+              }}
+            />
+
+            <button
+              onClick={() => {
+                setShowEmailModal(false);
+                handleSubmitWithEmail(customerEmail || null);
+              }}
+              className="modify-button"
+              style={{ marginBottom: "1rem", width: "100%" }}
+            >
+              Submit with Email
+            </button>
+
+            <button
+              onClick={() => {
+                setShowEmailModal(false);
+                handleSubmitWithEmail(null);
+              }}
+              className="cancel-button"
+              style={{ width: "100%" }}
+            >
+              Skip
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal for customization */}
       {currentItem && (

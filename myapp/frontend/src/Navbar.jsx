@@ -18,9 +18,9 @@ export default function Navbar() {
         </ul>
         <div className="zoom-controls">
           Zoom: 
-          <button onClick={() => updateZoom(1)}>100%</button>
-          <button onClick={() => updateZoom(1.25)}>125%</button>
-          <button onClick={() => updateZoom(1.5)}>150%</button>
+          <button className = "zoom-button" onClick={() => updateZoom(1)}>100%</button>
+          <button className = "zoom-button" onClick={() => updateZoom(1.25)}>125%</button>
+          <button className = "zoom-button" onClick={() => updateZoom(1.5)}>150%</button>
         </div>
       </div>
     </nav>
