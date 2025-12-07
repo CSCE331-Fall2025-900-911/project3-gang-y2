@@ -5,10 +5,10 @@
   --zoom-scale: 1;
 
   /* Use variables for sizing */
-  --font-size-base: calc(16px * var(--zoom-scale));
-  --spacing-base: calc(1rem * var(--zoom-scale));
-  --button-padding: calc(0.5rem * var(--zoom-scale))
-                     calc(1rem * var(--zoom-scale));
+  --font-size-base: calc(16px * var(--kiosk-zoom));
+  --spacing-base: calc(1rem * var(--kiosk-zoom));
+  --button-padding: calc(0.5rem * var(--kiosk-zoom))
+                     calc(1rem * var(--kiosk-zoom));
 }
 
 * {
@@ -24,6 +24,8 @@ body {
   font-size: var(--font-size-base);
 }
 .kioskpage {
+  --kiosk-zoom: calc(0.80 + 0.19 * var(--zoom-scale));
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -48,7 +50,7 @@ body {
   padding: 0 20px;
 }
 .zoom-button {
-  font-size: calc(1rem*var(--zoom-scale));
+  font-size: calc(1rem*var(--kiosk-zoom));
   background-color: #4C8C2B;
   color: var(--white);
   border-radius: 5px;
@@ -95,8 +97,8 @@ body {
   top: 58px;
   left: 0px;
   margin: 0px;
-  bottom: calc(150px * var(--zoom-scale));
-  transform: scale(var(--zoom-scale));
+  bottom: calc(150px * var(--kiosk-zoom));
+  transform: scale(var(--kiosk-zoom));
   transform-origin: top left;
   overflow-y: scroll;
 }
@@ -110,15 +112,15 @@ body {
 .subtotal-container {
   z-index: 101;
   position: fixed;
-  bottom: calc(125px*var(--zoom-scale));
+  bottom: calc(125px*var(--kiosk-zoom));
   width: 400px;
   border: white;
   background: #333;
   color: var(--white);
   align-items: center;
   text-align: center;
-  font-size: calc(1.4rem*var(--zoom-scale));
-  transform: scale(var(--zoom-scale));
+  font-size: calc(1.4rem*var(--kiosk-zoom));
+  transform: scale(var(--kiosk-zoom));
   transform-origin: bottom left;
 }
 
@@ -131,7 +133,7 @@ body {
   left: 0px;
   width: 400px;
   border: white;
-  transform: scale(var(--zoom-scale));
+  transform: scale(var(--kiosk-zoom));
   transform-origin: bottom left;
 }
 .order-button {
@@ -140,7 +142,7 @@ body {
   border: 1px solid white;
   padding: 1rem 1.5rem;
   border-radius: 10px;
-  font-size: calc(1.4rem * var(--zoom-scale));
+  font-size: calc(1.4rem * var(--kiosk-zoom));
   cursor: pointer;
   width: 400px;           
   height: 70px;           
@@ -173,7 +175,7 @@ body {
 }
 
 .menu-container {
-  left: calc(400px * var(--zoom-scale));
+  left: calc(400px * var(--kiosk-zoom));
   text-align: center;
   padding: 20px;
   overflow: auto;
@@ -184,14 +186,14 @@ body {
   align-items: left;
   text-align: center;
   margin-top: 90px;
-  margin-left: 40px;
-  transform: scale(var(--zoom-scale));
+  margin-left: 10px;
+  transform: scale(var(--kiosk-zoom));
   transform-origin: top left;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(calc(400px*var(--zoom-scale)), 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(calc(400px*var(--kiosk-zoom)), 1fr)); 
   gap: 1.2rem;
   justify-items: left;
   padding: 1rem;
@@ -199,7 +201,7 @@ body {
   margin: 0 auto;
   margin-left: 400px;
   margin-right: 0px;
-  transform: scale(var(--zoom-scale));
+  transform: scale(var(--kiosk-zoom));
   transform-origin: top left;
 }
 
@@ -211,12 +213,12 @@ body {
     #c5e1a5 100%
   );
   color: black;
-  border: calc(2px * var(--zoom-scale)) solid black;
-  border-radius: calc(10px * var(--zoom-scale));
-  padding: calc(1rem * var(--zoom-scale));
-  font-size: calc(1rem * var(--zoom-scale));
-  width: calc(400px * var(--zoom-scale));
-  height: calc(60px * var(--zoom-scale));
+  border: calc(2px * var(--kiosk-zoom)) solid black;
+  border-radius: calc(10px * var(--kiosk-zoom));
+  padding: calc(1rem * var(--kiosk-zoom));
+  font-size: calc(1rem * var(--kiosk-zoom));
+  width: calc(400px * var(--kiosk-zoom));
+  height: calc(60px * var(--kiosk-zoom));
   cursor: pointer;
   text-align: left;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -226,14 +228,14 @@ body {
 
 /* Hover: lift and subtle highlight */
 .menu-button:hover {
-  transform: translateY(calc(-2px * var(--zoom-scale)));
-  box-shadow: 0 calc(4px * var(--zoom-scale)) calc(8px * var(--zoom-scale)) rgba(0,0,0,0.18);
+  transform: translateY(calc(-2px * var(--kiosk-zoom)));
+  box-shadow: 0 calc(4px * var(--kiosk-zoom)) calc(8px * var(--kiosk-zoom)) rgba(0,0,0,0.18);
 }
 
 /* Keyboard focus outline */
 .menu-button:focus {
-  outline: calc(4px * var(--zoom-scale)) solid #4da6ff;
-  outline-offset: calc(2px * var(--zoom-scale));
+  outline: calc(4px * var(--kiosk-zoom)) solid #4da6ff;
+  outline-offset: calc(2px * var(--kiosk-zoom));
 }
 
 
