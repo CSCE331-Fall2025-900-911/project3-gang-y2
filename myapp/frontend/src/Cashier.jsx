@@ -297,17 +297,17 @@ function Cashier() {
 
   // Display loading message until data is ready
   if (loading) {
-    return <p className="loading">Loading menu...</p>;
+    return <p className="cash-loading">Loading menu...</p>;
   }
 
   // Render the actual page
   return (
     <ZoomProvider>
-    <div className="kioskpage">
+    <div className="cash-kioskpage">
       <Navbar />
 
-      <div className="sidebar-container">
-        <div className="sidebar">
+      <div className="cash-sidebar-container">
+        <div className="cash-sidebar">
           <h2>{translate("order.title")}</h2>
           <div className="tts-stack">
             <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
@@ -338,12 +338,12 @@ function Cashier() {
           )}
         </div>        
       </div>
-      <div className="subtotal-container">
+      <div className="cash-subtotal-container">
         <strong>{translate("order.subtotal")} : </strong>${subtotal}
       </div>
-      <div className="order-button-container">
+      <div className="cash-order-button-container">
           <button
-            className="order-button"
+            className="cash-order-button"
             onClick={startOrderSubmission}
             data-tts={translate("order.place")}
             aria-label={translate("order.place")}
@@ -352,16 +352,16 @@ function Cashier() {
           </button>
       </div>
 
-      <main className="menu-container">
+      <main className="cash-menu-container">
         {Object.keys(groupedMenu).map((category) => (
           <section key={category} className="menu-section">
-            <h2 className="menu-category-title">{category}</h2>
+            <h2 className="cash-menu-category-title">{category}</h2>
 
-            <div className="menu-grid">
+            <div className="cash-menu-grid">
               {groupedMenu[category].map((item) => (
                 <button
                   key={item.itemid}
-                  className="menu-button"
+                  className="cash-menu-button"
                   onClick={() => openModification(item)}
                   data-tts={menuButtonLabel(item)}
                   aria-label={menuButtonLabel(item)}
@@ -419,7 +419,7 @@ function Cashier() {
                 setShowEmailModal(false);
                 handleSubmitWithEmail(customerEmail || null);
               }}
-              className="modify-button"
+              className="cash-modify-button"
               style={{ marginBottom: "1rem", width: "100%" }}
             >
               Submit with Email
@@ -430,7 +430,7 @@ function Cashier() {
                 setShowEmailModal(false);
                 handleSubmitWithEmail(null);
               }}
-              className="cancel-button"
+              className="cash-cancel-button"
               style={{ width: "100%" }}
             >
               Skip
@@ -532,10 +532,10 @@ function Cashier() {
               </label>
             </div>
 
-            <button onClick={addToOrder} className="modify-button" data-tts={translate("modal.add")}>
+            <button onClick={addToOrder} className="cash-modify-button" data-tts={translate("modal.add")}>
               {translate("modal.add")}
             </button>
-            <button onClick={closeModification} className="cancel-button" data-tts={translate("modal.cancel")}>
+            <button onClick={closeModification} className="cash-cancel-button" data-tts={translate("modal.cancel")}>
               {translate("modal.cancel")}
             </button>
           </div>

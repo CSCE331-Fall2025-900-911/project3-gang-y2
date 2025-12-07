@@ -17,13 +17,13 @@
   box-sizing: border-box;
 }
 
-body {
+.cash-body {
   font-family: "Poppins", sans-serif;
   background-color: var(--white);
   color: #333;
   font-size: var(--font-size-base);
 }
-.kioskpage {
+.cash-kioskpage {
   --kiosk-zoom: calc(0.80 + 0.19 * var(--zoom-scale));
 
   min-height: 100vh;
@@ -31,63 +31,7 @@ body {
   flex-direction: column;
 }
 
-.navbar {
-  background-color: var(--matcha-green);
-  color: var(--white);
-  padding: 15px 0;
-  width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-}
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1000px;
-  margin: 0 0;
-  padding: 0 20px;
-}
-.zoom-button {
-  font-size: calc(1rem*var(--kiosk-zoom));
-  background-color: #4C8C2B;
-  color: var(--white);
-  border-radius: 5px;
-  border: 1px solid white;
-}
-.zoom-button:hover {
-  background-color: #2e561a;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.pageTitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: var(--white);
-  font-weight: 500;
-  transition: opacity 0.2s ease;
-}
-
-.nav-links a:hover {
-  opacity: 0.8;
-}
-
-.sidebar-container {
+.cash-sidebar-container {
   z-index: 100;
   background-color: gray;
   color: white;
@@ -97,19 +41,19 @@ body {
   top: 58px;
   left: 0px;
   margin: 0px;
-  bottom: calc(150px * var(--kiosk-zoom));
+  bottom: calc(140px * var(--kiosk-zoom));
   transform: scale(var(--kiosk-zoom));
   transform-origin: top left;
   overflow-y: scroll;
 }
-.sidebar {
+.cash-sidebar {
   display: grid;
   grid-template-columns: 1;
   padding: 25px 50px;
   margin: 10px;
 }
 
-.subtotal-container {
+.cash-subtotal-container {
   z-index: 101;
   position: fixed;
   bottom: calc(125px*var(--kiosk-zoom));
@@ -124,7 +68,7 @@ body {
   transform-origin: bottom left;
 }
 
-.order-button-container {
+.cash-order-button-container {
   z-index: 101;
   background-color:#333;
   position: fixed;
@@ -136,8 +80,8 @@ body {
   transform: scale(var(--kiosk-zoom));
   transform-origin: bottom left;
 }
-.order-button {
-  background-color: #086d32; 
+.cash-order-button {
+  background-color: #62048e; 
   color: white;
   border: 1px solid white;
   padding: 1rem 1.5rem;
@@ -149,32 +93,32 @@ body {
   text-align: center;
   transition: background-color 0.2s ease;
 }
-.order-button:hover{
-  background-color: #03411c;
+.cash-order-button:hover{
+  background-color: #390253;
 }
 
-.modify-button {
+.cash-modify-button {
   background-color: #4C8C2B; 
   color: white;
   border: 1px solid black;
   border-radius: 4px;
   padding: 0.2rem;
 }
-.modify-button:hover {
+.cash-modify-button:hover {
   background-color: #274916;
 }
-.cancel-button{
+.cash-cancel-button{
   background-color: #a90f07; 
   color: white;
   border: 1px solid black;
   border-radius: 4px;
   padding: 0.2rem;
 }
-.cancel-button:hover {
+.cash-cancel-button:hover {
   background-color: #5f0804;
 }
 
-.menu-container {
+.cash-menu-container {
   left: calc(400px * var(--kiosk-zoom));
   text-align: center;
   padding: 20px;
@@ -191,7 +135,7 @@ body {
   transform-origin: top left;
 }
 
-.menu-grid {
+.cash-menu-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(calc(400px*var(--kiosk-zoom)), 1fr)); 
   gap: 1.2rem;
@@ -205,12 +149,12 @@ body {
   transform-origin: top left;
 }
 
-.menu-button {
+.cash-menu-button {
   background: linear-gradient(
     135deg,
     #ffffff 0%,
-    #e8f5e9 40%,
-    #c5e1a5 100%
+    #d6cadb 40%,
+    #cca0dd 100%
   );
   color: black;
   border: calc(2px * var(--kiosk-zoom)) solid black;
@@ -227,19 +171,19 @@ body {
 }
 
 /* Hover: lift and subtle highlight */
-.menu-button:hover {
+.cash-menu-button:hover {
   transform: translateY(calc(-2px * var(--kiosk-zoom)));
   box-shadow: 0 calc(4px * var(--kiosk-zoom)) calc(8px * var(--kiosk-zoom)) rgba(0,0,0,0.18);
 }
 
 /* Keyboard focus outline */
-.menu-button:focus {
+.cash-menu-button:focus {
   outline: calc(4px * var(--kiosk-zoom)) solid #4da6ff;
   outline-offset: calc(2px * var(--kiosk-zoom));
 }
 
 
-.loading {
+.cash-loading {
   text-align: center;
   font-size: 1.2rem;
   color: gray;
@@ -312,9 +256,9 @@ body {
   padding-left: 0.5rem;
 }
 
-.menu-category-title {
-  font-size: 1.6rem;
+.cash-menu-category-title {
+  font-size: calc(1.6rem * var(--zoom-scale));
+  color:#460464;
   font-weight: 700;
-  color: #4C8C2B;
   margin-bottom: 0.75rem;
 }
