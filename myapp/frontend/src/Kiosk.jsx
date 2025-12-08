@@ -621,6 +621,7 @@ useEffect(() => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            zIndex: 9999,
           }}
         >
           <div
