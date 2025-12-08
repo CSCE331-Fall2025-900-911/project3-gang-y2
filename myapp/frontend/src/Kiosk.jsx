@@ -314,6 +314,21 @@ function Kiosk() {
     <div className="kioskpage">
       <Navbar />
 
+      <div className="category-nav">
+          {Object.keys(groupedMenu).map((cat) => (
+            <button
+              key={cat}
+              className="category-nav-button"
+              onClick={() => {
+                const el = document.getElementById(`section-${cat}`);
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        
       <div className="sidebar-container">
         <div className="sidebar">
           <h2>{translate("order.title")}</h2>
@@ -366,9 +381,16 @@ function Kiosk() {
           </button>
       </div>
 
+
+      
       <main className="menu-container">
+
         {Object.keys(groupedMenu).map((category) => (
-          <section key={category} className="menu-section">
+          <section
+            key={category}
+            id={`section-${category}`}   // <-- enables scroll-to-section
+            className="menu-section"
+          >
             <h2 className="menu-category-title">{category}</h2>
 
             <div className="menu-grid">
@@ -380,7 +402,8 @@ function Kiosk() {
                   data-tts={menuButtonLabel(item)}
                   aria-label={menuButtonLabel(item)}
                 >
-                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
+                  ${Number.parseFloat(item.price).toFixed(2)} :
+                  <strong>{item.name}</strong>
                 </button>
               ))}
             </div>

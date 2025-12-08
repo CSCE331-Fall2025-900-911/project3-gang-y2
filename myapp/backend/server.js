@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
 const path = require('path');
+const nodemailer = require("nodemailer");
 
 const app = express();
 app.use(cors());
@@ -15,6 +16,59 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+});
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+app.post("/api/send-receipt", async (req, res) => {
+  const { email, orderId, items, subtotal } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email missing" });
+  }
+
+  try {
+    // receipt body
+    const itemLines = items
+      .map(item => {
+        return `${item.name} - $${item.price.toFixed(2)}  
+Ice: ${item.modifiers.iceLevel} | Sugar: ${item.modifiers.sugarLevel} | Topping: ${item.modifiers.topping}`;
+      })
+      .join("\n\n");
+
+    const message = `
+Thank you for your order!
+
+Order ID: ${orderId}
+
+Items:
+${itemLines}
+
+Subtotal: $${subtotal.toFixed(2)}
+
+Have a great day!
+    `;
+
+    // send email
+    await transporter.sendMail({
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: `Your Receipt - Order #${orderId}`,
+      text: message,
+    });
+
+    res.json({ success: true, message: "Email sent" });
+
+  } catch (err) {
+    console.error("Email send failed:", err);
+    res.status(500).json({ error: "Failed to send email" });
+  }
 });
 
 // get a token for user login 
@@ -309,11 +363,11 @@ app.post("/api/orderitems", async (req, res) => {
 
 // Add new menu item
 app.post("/api/menu", async (req, res) => {
-  const { itemid, name, description, price, calories } = req.body;
+  const { itemid, name, description, price, calories, category } = req.body;
 
   try {
     const result = await pool.query(
-      "INSERT INTO menuitems (name, description, price, calories) VALUES ($1, $2, $3, $4) RETURNING itemid, name, description, price, calories",
+      "INSERT INTO menuitems (name, description, price, calories, category) VALUES ($1, $2, $3, $4, $5) RETURNING itemid, name, description, price, calories. category",
       [name, description, price, calories]
     );
     res.status(201).json(result.rows[0]);
@@ -326,12 +380,15 @@ app.post("/api/menu", async (req, res) => {
 // Update menu item
 app.put("/api/menu/:itemid", async (req, res) => {
   const { itemid } = req.params;
-  const { name, description, price, calories } = req.body;
+  const { name, description, price, calories, category } = req.body;
 
   try {
     const result = await pool.query(
-      "UPDATE menuitems SET name = $1, description = $2, price = $3, calories = $4 WHERE itemid = $5 RETURNING itemid, name, description, price, calories",
-      [name, description, price, calories, itemid]
+      `UPDATE menuitems 
+       SET name = $1, description = $2, price = $3, calories = $4, category = $5
+       WHERE itemid = $6
+       RETURNING itemid, name, description, price, calories, category`,
+      [name, description, price, calories, category, itemid]
     );
 
     if (result.rows.length === 0) {
@@ -344,6 +401,7 @@ app.put("/api/menu/:itemid", async (req, res) => {
     res.status(500).json({ error: "Failed to update menu item" });
   }
 });
+
 
 // Delete menu item
 app.delete("/api/menu/:itemid", async (req, res) => {
