@@ -288,7 +288,7 @@ function Kiosk() {
     (item) => {
       const numericPrice = parseFloat(item.price);
       const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
-      return translate("tts.menuButton", { name: item.name, price: priceText });
+      return translate("tts.menuButton", { name: translate(item.name), price: priceText });
     },
     [translate]
   );
@@ -434,7 +434,7 @@ useEffect(() => {
                 tabIndex={0}
                 data-tts={orderLineLabel(item, index)}
               >
-                <strong>{item.name}</strong>{" "} <button
+                <strong>{translate(item.name)}</strong>{" "} <button
                   type="button"
                   onClick={() => removeLine(index)}
                   className="zoom-button"
@@ -535,7 +535,7 @@ useEffect(() => {
                   aria-label={menuButtonLabel(item)}
                 >
                   ${Number.parseFloat(item.price).toFixed(2)} :
-                  <strong>{item.name}</strong>
+                  <strong>{" " + translate(item.name)}</strong>
                 </button>
               ))}
             </div>
