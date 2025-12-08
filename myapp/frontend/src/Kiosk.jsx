@@ -493,7 +493,7 @@ useEffect(() => {
         </div>        
       </div>
       <div className="subtotal-container">
-        <strong>{translate("order.subtotal")} : </strong>${subtotal}
+        <strong>{translate("order.subtotal")}: </strong>${subtotal.toFixed(2)}
       </div>
       <div className="order-button-container">
           <button
