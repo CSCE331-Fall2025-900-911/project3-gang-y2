@@ -45,8 +45,8 @@ function Kiosk() {
   const [itemData, setItemData] = useState({
     orderID:null,
     itemID:0,
-    size:"medium",
-    temperature:"cold",
+    size:"Medium",
+    temperature:"Cold",
     iceLevel:"HIGH",
     sugarLevel:"HIGH",
     topping:"NONE",
@@ -64,7 +64,7 @@ function Kiosk() {
 
   const openModification = (item) => {
     setCurrentItem(item);
-    setCurrentModifiers({size:"medium", iceLevel:"high", sugarLevel:"high", temperature:"cold", toppings:[], quantity:1 }); // default values for each item
+    setCurrentModifiers({size:"Medium", iceLevel:"high", sugarLevel:"high", temperature:"Cold", toppings:[], quantity:1 }); // default values for each item
   };
 
   const closeModification = () => {
