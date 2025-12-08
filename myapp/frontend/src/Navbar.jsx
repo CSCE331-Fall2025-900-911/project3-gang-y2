@@ -10,7 +10,14 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav-container">
-        <h1 className="logo">MatchaBoba POS</h1>
+        {/* <h1 className="logo"><a href = "./" text-decoration = "none">MatchaBoba POS</a></h1> */}
+        <Link
+          to="/"
+          style={{
+            textDecoration: "none",
+            color: "inherit"
+          }}
+        >MatchaBoba POS</Link>
         <ul className="nav-links">
           <li><Link to="/login">{translate("nav.login")}</Link></li>
           <li><Link to="/kiosk">{translate("nav.kiosk")}</Link></li>
