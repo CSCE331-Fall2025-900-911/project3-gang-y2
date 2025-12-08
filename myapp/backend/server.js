@@ -114,11 +114,11 @@ app.get("/api/employees", async (req, res) => {
 
 // Add employee
 app.post("/api/employees", async (req, res) => {
-  const { name, username, password, ismanager } = req.body;
+  const { name, email, username, password, ismanager } = req.body;
   
   try {    
     const result = await pool.query(
-      "INSERT INTO employees (name, email, username, password, ismanager) VALUES ($1, $2, $3, $4) RETURNING employeeid as id, name, email, username, ismanager",
+      "INSERT INTO employees (name, email, username, password, ismanager) VALUES ($1, $2, $3, $4, $5) RETURNING employeeid as id, name, email, username, ismanager",
       [name, email, username, password, ismanager || false]
     );
     
