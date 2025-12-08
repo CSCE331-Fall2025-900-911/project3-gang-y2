@@ -19,7 +19,7 @@ function Kiosk() {
 
   // currentOrder holds the list of the items on the current order
   const [currentOrder, setCurrentOrder] = useState([]);
-
+  
   // currentItem holds the item currently being modified
   const [currentItem, setCurrentItem] = useState(null);
   const firstOptionRef = useRef(null);
@@ -80,6 +80,14 @@ function Kiosk() {
     }
   };
 
+  const removeFromOrder = (indexToRemove) => {
+    setCurrentOrder((prevOrder) => {
+      const item = prevOrder[indexToRemove];
+      if (!item) return prevOrder;
+      setSubtotal((prev) => prev - parseFloat(item.price));
+      return prevOrder.filter((_, idx) => idx !== indexToRemove);
+    });
+  };
 
   // function to add the pressed item to the order
   const addToOrder = () => {
@@ -324,14 +332,20 @@ function Kiosk() {
                   tabIndex="0"
                   data-tts={orderLineLabel(item, index)}
                 >
-                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
+                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}    </strong>   
+                  <button
+                    type="button"
+                    onClick={() => removeFromOrder(index)}
+                    className="zoom-button"
+                  >
+                    X
+                  </button>
                   <small>
                       <br/>
                       {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
                       {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
                       {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
                   </small>
-                  <br/>
               </li>))}
           </ul>
 

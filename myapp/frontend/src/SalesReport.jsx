@@ -43,28 +43,31 @@ function SalesReport() {
           <button onClick={fetchReport}>Generate Report</button>
         </div>
 
-        <table className="sales-report-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Sales</th>
-            </tr>
-          </thead>
-          <tbody>
-            {report.length > 0 ? (
-              report.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.itemName}</td>
-                  <td>{row.salesCount}</td>
-                </tr>
-              ))
-            ) : (
+        <div className="sales-report-results box">
+          <h2>Sales report</h2>
+          <table>
+            <thead>
               <tr>
-                <td colSpan="2">No data</td>
+                <th>Item</th>
+                <th>Sales</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {report.length > 0 ? (
+                report.map((row, idx) => (
+                  <tr key={idx}>
+                    <td>{row.itemname ?? row.itemName}</td>
+                    <td>{row.salescount ?? row.salesCount}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={2}>No data</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </main>
     </div>
   );
