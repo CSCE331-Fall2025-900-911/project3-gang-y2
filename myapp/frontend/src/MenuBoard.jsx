@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./MenuBoard.css";
+import Navbar from "./Navbar";
+import { ZoomProvider } from "./ZoomContext";
 
 function MenuBoard() {
   const [items, setItems] = useState([]);
@@ -13,17 +15,9 @@ function MenuBoard() {
   }, []);
 
   return (
+    <ZoomProvider>
     <div className="menuboard-page">
-      <nav className="navbar">
-        <div className="nav-container">
-          <h1 className="logo">MatchaBoba POS</h1>
-          <ul className="nav-links">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/kiosk">Customer Kiosk</Link></li>
-            <li><Link to="/login">Manager Login</Link></li>
-          </ul>
-        </div>
-      </nav>
+      <Navbar />
 
       <h2 className="menu-title">Our Menu</h2>
 
@@ -76,6 +70,7 @@ function MenuBoard() {
       </div>
 
     </div>
+    </ZoomProvider>
   );
 }
 

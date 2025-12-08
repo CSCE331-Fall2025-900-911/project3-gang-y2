@@ -44,7 +44,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 90%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 calc(0.75rem * var(--zoom-scale)) calc(1rem * var(--zoom-scale));
 }
