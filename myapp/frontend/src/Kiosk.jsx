@@ -19,13 +19,13 @@ function Kiosk() {
 
   // currentOrder holds the list of the items on the current order
   const [currentOrder, setCurrentOrder] = useState([]);
-
+  
   // currentItem holds the item currently being modified
   const [currentItem, setCurrentItem] = useState(null);
   const firstOptionRef = useRef(null);
 
   // holds a value for modifiers 
-  const [currentModifiers, setCurrentModifiers] = useState({iceLevel:"medium", sugarLevel:"medium", topping:"none"});
+  const [currentModifiers, setCurrentModifiers] = useState({iceLevel:"medium", sugarLevel:"medium", toppings:[]});
 
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
@@ -62,7 +62,7 @@ function Kiosk() {
 
   const openModification = (item) => {
     setCurrentItem(item);
-    setCurrentModifiers({iceLevel:"medium", sugarLevel:"medium", topping:"none"}); // default values for each item
+    setCurrentModifiers({iceLevel:"medium", sugarLevel:"medium", toppings:[]}); // default values for each item
   };
 
   const closeModification = () => {
@@ -81,6 +81,14 @@ function Kiosk() {
     }
   };
 
+  const removeFromOrder = (indexToRemove) => {
+    setCurrentOrder((prevOrder) => {
+      const item = prevOrder[indexToRemove];
+      if (!item) return prevOrder;
+      setSubtotal((prev) => prev - parseFloat(item.price));
+      return prevOrder.filter((_, idx) => idx !== indexToRemove);
+    });
+  };
 
   // function to add the pressed item to the order
   const addToOrder = () => {
@@ -96,7 +104,7 @@ function Kiosk() {
       itemID: modifiedItem.itemID,
       iceLevel: (currentModifiers.iceLevel).toUpperCase(),
       sugarLevel: (currentModifiers.sugarLevel).toUpperCase(),
-      topping: (currentModifiers.topping).toUpperCase(),
+      toppings: currentModifiers.toppings.map((t) => t.toUpperCase()),
       itemPrice: modifiedItem.price
     });
     if (canSpeakSelection && modifiedItem && ttsEnabled) {
@@ -105,7 +113,9 @@ function Kiosk() {
         : modifiedItem.price;
       const ice = translate(`mod.ice.${modifiedItem.modifiers.iceLevel}`);
       const sugar = translate(`mod.sugar.${modifiedItem.modifiers.sugarLevel}`);
-      const topping = translate(`mod.topping.${modifiedItem.modifiers.topping}`);
+      const topping = modifiedItem.modifiers.toppings
+            .map(t => translate(`mod.topping.${t}`))
+            .join(", ");      
       saySelection(
         translate("order.added", {
           name: modifiedItem.name,
@@ -145,6 +155,23 @@ function Kiosk() {
   //       .then((data) => setOrders(data))
   //       .catch((err) => console.error("Error fetching orders:", err));
   //   }, []);
+  const handleToppingChange = (e) => {
+    const { value, checked } = e.target;
+
+    setCurrentModifiers((prev) => {
+      let updated;
+
+      if (checked) {
+        updated = [...prev.toppings, value];
+      } else {
+        updated = prev.toppings.filter((t) => t !== value);
+      }
+
+      return { ...prev, toppings: updated };
+    });
+  };
+
+
   const handleSubmitWithEmail = (email) => {
     setFormData((prev) => ({
       ...prev,
@@ -186,7 +213,7 @@ function Kiosk() {
             itemID: item.itemid,
             iceLevel: item.modifiers.iceLevel.toUpperCase(),
             sugarLevel: item.modifiers.sugarLevel.toUpperCase(),
-            toppings: [item.modifiers.topping.toUpperCase()], 
+            toppings: item.modifiers.toppings.map((t) => t.toUpperCase()),
             itemPrice: parseFloat(item.price)
         };
 
@@ -268,7 +295,9 @@ function Kiosk() {
     (item, index) => {
       const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
       const sugar = translate(`mod.sugar.${item.modifiers.sugarLevel}`);
-      const topping = translate(`mod.topping.${item.modifiers.topping}`);
+      const topping = item.modifiers.toppings.length > 0
+        ? item.modifiers.toppings.map(t => translate(`mod.topping.${t}`)).join(", ")
+        : translate("mod.topping.none");
       const priceText = Number.parseFloat(item.price).toFixed(2);
       return translate("tts.orderLine", {
         num: index + 1,
@@ -329,6 +358,21 @@ useEffect(() => {
     <div className="kioskpage">
       <Navbar />
 
+      <div className="category-nav">
+          {Object.keys(groupedMenu).map((cat) => (
+            <button
+              key={cat}
+              className="category-nav-button"
+              onClick={() => {
+                const el = document.getElementById(`section-${cat}`);
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        
       <div className="sidebar-container">
         <div className="sidebar">
           <h2>{translate("order.title")}</h2>
@@ -347,14 +391,22 @@ useEffect(() => {
                   tabIndex="0"
                   data-tts={orderLineLabel(item, index)}
                 >
-                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name} :</strong>   
+                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}    </strong>   
+                  <button
+                    type="button"
+                    onClick={() => removeFromOrder(index)}
+                    className="zoom-button"
+                  >
+                    X
+                  </button>
                   <small>
                       <br/>
                       {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
                       {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
-                      {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
+                      {translate("order.list.topping")}: {item.modifiers.toppings.length > 0
+                        ? item.modifiers.toppings.map(t => translate(`mod.topping.${t}`)).join(", ")
+                        : translate("mod.topping.none")}<br/>
                   </small>
-                  <br/>
               </li>))}
           </ul>
           )}
@@ -404,9 +456,16 @@ useEffect(() => {
           </button>
       </div>
 
+
+      
       <main className="menu-container">
+
         {Object.keys(groupedMenu).map((category) => (
-          <section key={category} className="menu-section">
+          <section
+            key={category}
+            id={`section-${category}`}   // <-- enables scroll-to-section
+            className="menu-section"
+          >
             <h2 className="menu-category-title">{category}</h2>
 
             <div className="menu-grid">
@@ -418,7 +477,8 @@ useEffect(() => {
                   data-tts={menuButtonLabel(item)}
                   aria-label={menuButtonLabel(item)}
                 >
-                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
+                  ${Number.parseFloat(item.price).toFixed(2)} :
+                  <strong>{item.name}</strong>
                 </button>
               ))}
             </div>
@@ -561,26 +621,38 @@ useEffect(() => {
             <div style={{ margin: "1rem 0" }}>
               <label>
                 {translate("order.list.topping")}:
-                <select
-                  name="topping"
-                  value={currentModifiers.topping}
-                  onChange={changeModifiers}
-                  aria-label={translate("modal.selectTopping")}
-                  style={{ marginLeft: "0.5rem" }}
-                >
-                  <option value="none">{translate("mod.topping.none")}</option>
-                  <option value="pearl" data-tts={translate("mod.topping.pearl")}>{translate("mod.topping.pearl")}</option>
-                  <option value="mini_pearl" data-tts={translate("mod.topping.mini_pearl")}>{translate("mod.topping.mini_pearl")}</option>
-                  <option value="crystal_boba" data-tts={translate("mod.topping.crystal_boba")}>{translate("mod.topping.crystal_boba")}</option>
-                  <option value="pudding" data-tts={translate("mod.topping.pudding")}>{translate("mod.topping.pudding")}</option>
-                  <option value="aloe_vera" data-tts={translate("mod.topping.aloe_vera")}>{translate("mod.topping.aloe_vera")}</option>
-                  <option value="red_bean" data-tts={translate("mod.topping.red_bean")}>{translate("mod.topping.red_bean")}</option>
-                  <option value="herb_jelly" data-tts={translate("mod.topping.herb_jelly")}>{translate("mod.topping.herb_jelly")}</option>
-                  <option value="aiyu_jelly" data-tts={translate("mod.topping.aiyu_jelly")}>{translate("mod.topping.aiyu_jelly")}</option>
-                  <option value="lychee_jelly" data-tts={translate("mod.topping.lychee_jelly")}>{translate("mod.topping.lychee_jelly")}</option>
-                  <option value="crema" data-tts={translate("mod.topping.crema")}>{translate("mod.topping.crema")}</option>
-                  <option value="ice_cream" data-tts={translate("mod.topping.ice_cream")}>{translate("mod.topping.ice_cream")}</option>
-                </select>
+                <div style={{ margin: "1rem 0" }}>
+
+                  <div style={{ textAlign: "left", marginTop: "0.5rem" }}>
+                    {[
+                      "pearl",
+                      "mini_pearl",
+                      "crystal_boba",
+                      "pudding",
+                      "aloe_vera",
+                      "red_bean",
+                      "herb_jelly",
+                      "aiyu_jelly",
+                      "lychee_jelly",
+                      "crema",
+                      "ice_cream"
+                    ].map((t) => (
+                      <div key={t}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="toppings"
+                            value={t}
+                            checked={currentModifiers.toppings?.includes(t)}
+                            onChange={handleToppingChange}
+                          />
+                          {translate(`mod.topping.${t}`)}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </label>
             </div>
 

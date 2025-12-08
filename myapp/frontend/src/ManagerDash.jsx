@@ -12,11 +12,11 @@ function ManagerDash() {
         <div className="nav-container">
           <h1 className="logo">MatchaBoba POS</h1>
           <ul className="nav-links">
-            <li><Link to="/">{translate("nav.managerBack") || "Back to Landing"}</Link></li>
-            <li><Link to="/employees">{translate("nav.employees") || "Employees"}</Link></li>
-            <li><Link to="/inventory">{translate("nav.inventory") || "Inventory"}</Link></li>
-            <li><Link to="/menu-items">{translate("nav.menuItems") || "Menu Items"}</Link></li>
-            <li><Link to="/reports">{translate("nav.reports") || "Reports"}</Link></li>
+            <li><Link to="/">{"Back to Landing" || translate("nav.managerBack")}</Link></li>
+            <li><Link to="/employees">{translate("nav.employees")}</Link></li>
+            <li><Link to="/inventory">{translate("nav.inventory")}</Link></li>
+            <li><Link to="/menu-items">{translate("nav.menuItems")}</Link></li>
+            <li><Link to="/reports">{translate("nav.reports")}</Link></li>
           </ul>
         </div>
       </nav>
