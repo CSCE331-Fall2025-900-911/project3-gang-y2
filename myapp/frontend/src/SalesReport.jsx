@@ -44,7 +44,6 @@ function SalesReport() {
         </div>
 
         <div className="sales-report-results box">
-          <h2>Sales report</h2>
           <table>
             <thead>
               <tr>

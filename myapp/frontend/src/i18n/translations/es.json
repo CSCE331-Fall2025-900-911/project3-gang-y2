@@ -37,6 +37,8 @@
   "menu.table.description": "Descripcion",
   "menu.table.price": "Precio",
   "menu.table.calories": "Calorias",
+  "menu.table.actions": "Comportamiento",
+  "menu.table.category": "Categorias",
   "menu.summary.empty": "Gestion de articulos del menu. No hay articulos todavia. Usa el boton para agregar uno.",
   "menu.summary": "Gestion de articulos del menu. Hay {count} articulos. {highlights} Usa el boton para agregar un articulo, o los botones de editar y eliminar en la columna de acciones para actualizarlos.",
   "menu.highlight": "Destacados: {list}.",
