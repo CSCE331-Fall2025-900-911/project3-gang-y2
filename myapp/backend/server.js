@@ -336,15 +336,15 @@ app.post("/api/orders", async (req, res) => {
 // update orderitems
 app.post("/api/orderitems", async (req, res) => {
   try {
-    const { orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice } = req.body;
+    const { orderID, itemID, size, temperature, iceLevel, sugarLevel, toppings, itemPrice } = req.body;
 
     const toppingsArray = Array.isArray(toppings) ? toppings : [];
 
     const result = await pool.query(
-      `INSERT INTO orderitems (orderid, itemid, icelevel, sugarlevel, toppings, itemprice)
-       VALUES ($1, $2, $3, $4, $5::text[], $6)
+      `INSERT INTO orderitems (orderid, itemid, icelevel, sugarlevel, toppings, itemprice, size, temperature)
+       VALUES ($1, $2, $3, $4, $5::text[], $6, $7, $8)
        RETURNING *;`,
-      [orderID, itemID, iceLevel, sugarLevel, toppingsArray, itemPrice]
+      [orderID, itemID, iceLevel, sugarLevel, toppingsArray, itemPrice, size, temperature]
     );
 
     res.json(result.rows[0]);

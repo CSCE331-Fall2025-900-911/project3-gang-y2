@@ -25,7 +25,7 @@ function Kiosk() {
   const firstOptionRef = useRef(null);
 
   // holds a value for modifiers 
-  const [currentModifiers, setCurrentModifiers] = useState({iceLevel:"medium", sugarLevel:"medium", toppings:[]});
+  const [currentModifiers, setCurrentModifiers] = useState({iceLevel:"high", sugarLevel:"high", toppings:[], quantity:1});
 
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
@@ -45,8 +45,10 @@ function Kiosk() {
   const [itemData, setItemData] = useState({
     orderID:null,
     itemID:0,
-    iceLevel:"MEDIUM",
-    sugarLevel:"MEDIUM",
+    size:"medium",
+    temperature:"cold",
+    iceLevel:"HIGH",
+    sugarLevel:"HIGH",
     topping:"NONE",
     itemPrice:0.0
   });
@@ -56,12 +58,12 @@ function Kiosk() {
   const [customerEmail, setCustomerEmail] = useState("");
 
   function startOrderSubmission() {
-  setShowEmailModal(true);
+    setShowEmailModal(true);
   }
 
   const openModification = (item) => {
     setCurrentItem(item);
-    setCurrentModifiers({iceLevel:"medium", sugarLevel:"medium", toppings:[]}); // default values for each item
+    setCurrentModifiers({size:"medium", iceLevel:"high", sugarLevel:"high", temperature:"cold", toppings:[], quantity:1 }); // default values for each item
   };
 
   const closeModification = () => {
@@ -92,43 +94,42 @@ function Kiosk() {
   // function to add the pressed item to the order
   const addToOrder = () => {
     const modifiedItem = {
-        ...currentItem, modifiers: {...currentModifiers}, // copies the state of modifiers and adds it to list
+      ...currentItem,
+      modifiers: { ...currentModifiers }
     };
-    
-    
-    setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
-    setSubtotal(prev => prev + parseFloat(modifiedItem.price));
-    setItemData({
-      orderID: formData.orderID, 
-      itemID: modifiedItem.itemID,
-      iceLevel: (currentModifiers.iceLevel).toUpperCase(),
-      sugarLevel: (currentModifiers.sugarLevel).toUpperCase(),
-      toppings: currentModifiers.toppings.map((t) => t.toUpperCase()),
-      itemPrice: modifiedItem.price
-    });
-    if (canSpeakSelection && modifiedItem && ttsEnabled) {
-      const price = Number.isFinite(parseFloat(modifiedItem.price))
-        ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
-        : modifiedItem.price;
-      const ice = translate(`mod.ice.${modifiedItem.modifiers.iceLevel}`);
-      const sugar = translate(`mod.sugar.${modifiedItem.modifiers.sugarLevel}`);
-      const topping = modifiedItem.modifiers.toppings
-            .map(t => translate(`mod.topping.${t}`))
-            .join(", ");      
-      saySelection(
-        translate("order.added", {
-          name: modifiedItem.name,
-          price,
-          ice,
-          sugar,
-          topping,
-        })
+    const qtyToAdd = currentModifiers.quantity ?? 1;
+
+    setCurrentOrder((prevOrder) => {
+      const index = prevOrder.findIndex(
+        (line) =>
+          line.itemid === modifiedItem.itemid &&
+          line.modifiers.size === modifiedItem.modifiers.size &&
+          line.modifiers.temperature === modifiedItem.modifiers.temperature &&
+          line.modifiers.iceLevel === modifiedItem.modifiers.iceLevel &&
+          line.modifiers.sugarLevel === modifiedItem.modifiers.sugarLevel &&
+          JSON.stringify(line.modifiers.toppings) ===
+            JSON.stringify(modifiedItem.modifiers.toppings)
       );
-    }
-    
-    console.log("current subtotal: ", subtotal);
+
+      if (index === -1) {
+        return [
+          ...prevOrder,
+          { ...modifiedItem, quantity: qtyToAdd }
+        ];
+      }
+
+      const updated = [...prevOrder];
+      updated[index] = {
+        ...updated[index],
+        quantity: updated[index].quantity + qtyToAdd
+      };
+      return updated;
+    });
+
+    setSubtotal((prev) => prev + qtyToAdd * parseFloat(modifiedItem.price));
     closeModification();
   };
+
 
   // submit order & get payment
   function resetOrder() {
@@ -195,6 +196,8 @@ function Kiosk() {
     formData.orderCost = subtotal;
     formData.customerEmail = customerEmail || null;
 
+    formData.currentTime = `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
+
     // create order in table by submitting order metadata and receive orderID
     const res = await fetch(url, {
       method,
@@ -207,20 +210,23 @@ function Kiosk() {
     
     // for each item in the order
     for (let item of currentOrder) {
+      for (let i = 0; i < item.quantity; i++) {
         const dbPayload = {
-            orderID: newOrderID, 
-            itemID: item.itemid,
-            iceLevel: item.modifiers.iceLevel.toUpperCase(),
-            sugarLevel: item.modifiers.sugarLevel.toUpperCase(),
-            toppings: item.modifiers.toppings.map((t) => t.toUpperCase()),
-            itemPrice: parseFloat(item.price)
+          orderID: newOrderID,
+          itemID: item.itemid,
+          iceLevel: item.modifiers.iceLevel.toUpperCase(),
+          sugarLevel: item.modifiers.sugarLevel.toUpperCase(),
+          toppings: item.modifiers.toppings.map((t) => t.toUpperCase()),
+          itemPrice: parseFloat(item.price),
+          size: item.modifiers.size.toLowerCase(),
+          temperature: item.modifiers.temperature.toLowerCase()
         };
-
         await fetch(itemUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dbPayload)
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dbPayload)
         });
+      }
     }
     if (formData.customerEmail) {
       await fetch("/api/send-receipt", {
@@ -298,6 +304,8 @@ function Kiosk() {
         ? item.modifiers.toppings.map(t => translate(`mod.topping.${t}`)).join(", ")
         : translate("mod.topping.none");
       const priceText = Number.parseFloat(item.price).toFixed(2);
+      const size = item.modifiers.size;
+      const temperature = item.modifiers.temparature;
       return translate("tts.orderLine", {
         num: index + 1,
         name: item.name,
@@ -305,10 +313,38 @@ function Kiosk() {
         ice,
         sugar,
         topping,
+        size,
+        temperature
       });
     },
     [translate]
   );
+
+  const changeQuantity = (index, delta) => {
+    setCurrentOrder((prevOrder) => {
+      const updated = [...prevOrder];
+      const item = updated[index];
+      const newQty = item.quantity + delta;
+
+      if (newQty <= 0) {
+        setSubtotal((prev) => prev - item.quantity * parseFloat(item.price));
+        return updated.filter((_, i) => i !== index);
+      }
+
+      updated[index] = { ...item, quantity: newQty };
+      setSubtotal((prev) => prev + delta * parseFloat(item.price));
+      return updated;
+    });
+  };
+
+  const removeLine = (indexToRemove) => {
+    setCurrentOrder((prevOrder) => {
+      const item = prevOrder[indexToRemove];
+      if (!item) return prevOrder;
+      setSubtotal((prev) => prev - item.quantity * parseFloat(item.price));
+      return prevOrder.filter((_, idx) => idx !== indexToRemove);
+    });
+  };
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
@@ -362,31 +398,44 @@ function Kiosk() {
           </div>
           {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
           (<ul>
-              {currentOrder.map((item, index) => 
-              ( <li
-                  key={index}
-                  tabIndex="0"
-                  data-tts={orderLineLabel(item, index)}
-                >
-                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}    </strong>   
+            {currentOrder.map((item, index) => (
+              <li
+                key={index}
+                tabIndex={0}
+                data-tts={orderLineLabel(item, index)}
+              >
+                <strong>{item.name}</strong>{" "} <button
+                  type="button"
+                  onClick={() => removeLine(index)}
+                  className="zoom-button"
+                >X</button>
+                <span>({item.modifiers.size})</span>
+                <div>
                   <button
                     type="button"
-                    onClick={() => removeFromOrder(index)}
-                    className="zoom-button"
-                  >
-                    X
-                  </button>
-                  <small>
-                      <br/>
-                      {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
-                      {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
-                      {translate("order.list.topping")}: {item.modifiers.toppings.length > 0
-                        ? item.modifiers.toppings.map(t => translate(`mod.topping.${t}`)).join(", ")
-                        : translate("mod.topping.none")}<br/>
-                  </small>
-              </li>))}
+                    onClick={() => changeQuantity(index, -1)}
+                    className="qty-button"
+                  >-</button>
+                  <span>{item.quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => changeQuantity(index, 1)}
+                    className="qty-button"
+                  >+</button>
+                </div>
+                <small>
+                  {translate("order.list.ice")}: {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br />
+                  {translate("order.list.sugar")}: {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br />
+                  {translate("order.list.topping")}:{" "}
+                  {item.modifiers.toppings.length > 0
+                    ? item.modifiers.toppings.map((t) => translate(`mod.topping.${t}`)).join(", ")
+                    : translate("mod.topping.none")} <br />
+                  {/* {translate("order.list.size")}: {translate(`mod.size.${item.modifiers.size}`)}<br /> */}
+                  {translate("order.list.temperature")}: {translate(`mod.temperature.${item.modifiers.temperature.toLowerCase()}`)}<br />
+                </small>
+              </li>
+            ))}
           </ul>
-
           )}
         </div>        
       </div>
@@ -568,6 +617,39 @@ function Kiosk() {
 
             <div style={{ margin: "1rem 0" }}>
               <label>
+                {translate("order.list.size")}:
+                <select
+                  name="size"
+                  value={currentModifiers.size}
+                  onChange={changeModifiers}
+                  aria-label={translate("order.list.size")}
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  <option value={translate("mod.size.small")}>{translate("mod.size.small")}</option>
+                  <option value={translate("mod.size.medium")}>{translate("mod.size.medium")}</option>
+                  <option value={translate("mod.size.large")}>{translate("mod.size.large")}</option>
+                </select>
+              </label>
+            </div>
+
+            <div style={{ margin: "1rem 0" }}>
+              <label>
+                {translate("order.list.temperature")}:
+                <select
+                  name="temperature"
+                  value={currentModifiers.temperature}
+                  onChange={changeModifiers}
+                  aria-label={translate("order.list.temperature")}
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  <option value={translate("mod.temperature.cold")}>{translate("mod.temperature.cold")}</option>
+                  <option value={translate("mod.temperature.hot")}>{translate("mod.temperature.hot")}</option>
+                </select>
+              </label>
+            </div>
+
+            <div style={{ margin: "1rem 0" }}>
+              <label>
                 {translate("order.list.topping")}:
                 <div style={{ margin: "1rem 0" }}>
 
@@ -600,8 +682,46 @@ function Kiosk() {
                     ))}
                   </div>
                 </div>
-
               </label>
+            </div>
+
+            <div style={{ margin: "1rem 0" }}>
+              <label>
+                {translate("order.list.quantity")}
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginTop: "0.5rem"
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentModifiers((prev) => ({
+                      ...prev,
+                      quantity: Math.max(1, prev.quantity - 1)
+                    }))
+                  }
+                  className="qty-button"
+                  aria-label={translate("modal.decreaseQuantity")}
+                >-</button>
+                <span>{currentModifiers.quantity}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentModifiers((prev) => ({
+                      ...prev,
+                      quantity: prev.quantity + 1
+                    }))
+                  }
+                  className="qty-button"
+                  aria-label={translate("modal.increaseQuantity")}
+                >+</button>
+              </div>
             </div>
 
             <button onClick={addToOrder} className="modify-button" data-tts={translate("modal.add")}>
