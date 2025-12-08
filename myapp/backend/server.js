@@ -362,8 +362,8 @@ app.post("/api/menu", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO menuitems (name, description, price, calories, category) VALUES ($1, $2, $3, $4, $5) RETURNING itemid, name, description, price, calories. category",
-      [name, description, price, calories]
+      "INSERT INTO menuitems (name, description, price, calories, category) VALUES ($1, $2, $3, $4, $5) RETURNING itemid, name, description, price, calories, category",
+      [name, description, price, calories, category]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {

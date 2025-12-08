@@ -43,7 +43,7 @@ function MenuItemView() {
     if (res.ok) {
       setShowForm(false);
       setIsEditing(false);
-      setFormData({ itemid: null, name: "", description: "", price: "", calories: ""});
+      setFormData({ itemid: null, name: "", description: "", price: "", calories: "", category: ""});
       // Refresh table
       const data = await (await fetch("/api/menu")).json();
       setMenuItems(data);
