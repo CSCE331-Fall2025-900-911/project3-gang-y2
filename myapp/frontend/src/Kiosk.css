@@ -109,6 +109,61 @@ body {
   margin: 10px;
 }
 
+/* ----------- Suggested Items Bubble (Fixed Width) ----------- */
+.suggested-bubble {
+  width: 100%;              /* lock to sidebar width */
+  box-sizing: border-box;  /* include padding in width */
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #ffffff, #e8f5e9);
+  border-radius: 15px;
+  border: 2px solid #4C8C2B;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  text-align: center;
+  overflow: hidden;        /* prevent overflow spill */
+}
+
+.suggested-bubble button {
+  width: 95%;              /* takes 80% of the bubble width */
+  max-width: 100%;         /* never overflow */
+  padding: 10px 10px;         /* nice vertical padding */
+  margin: 6px auto;        /* center horizontally with spacing */
+  display: block;          /* needed for margin auto to work */
+  border-radius: 10px;     /* rounded corners */
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold; 
+  border: 1px solid #333;
+  transition: background 0.2s ease;
+  border: 2px solid #333;
+}
+
+/* Make sure its parent doesn't stretch it */
+.sidebar .suggested-bubble {
+  max-width: 100%;
+}
+
+
+.suggested-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2e561a;
+  margin-bottom: 0.75rem;
+}
+
+.suggested-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.suggested-button {
+  width: 100%;
+  font-size: 0.95rem;
+  height: auto;
+}
+
+
 .subtotal-container {
   z-index: 101;
   position: fixed;
