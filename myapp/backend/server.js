@@ -333,6 +333,7 @@ app.post("/api/orders", async (req, res) => {
     res.status(500).json({ error: "Failed to create order" });
   }
 });
+
 // update orderitems
 app.post("/api/orderitems", async (req, res) => {
   try {
@@ -354,19 +355,6 @@ app.post("/api/orderitems", async (req, res) => {
     res.status(500).json({ error: "Failed to insert order item" });
   }
 });
-
-// get unique id for next order item
-// app.post("/api/orderitems/new-id", async (req, res) => {
-//   try {
-//     const result = await pool.query("SELECT nextval('orderdetailid') AS id;");
-//     const nextId = result.rows[0].id;
-
-//     res.json({ id: nextId });
-//   } catch (err) {
-//     console.error("Error generating new item ID:", err);
-//     res.status(500).json({ error: "Failed to generate new ID" });
-//   }
-// });
 
 // Add new menu item
 app.post("/api/menu", async (req, res) => {
@@ -593,6 +581,24 @@ app.get("/api/reports/productUsage", async (req, res) => {
   }
 });
 
+//Get suggest item data (most popular orders)
+app.get("/api/reports/top-items", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT mi.name, mi.itemID, mi.price
+      FROM orderItems oi
+      JOIN menuItems mi ON oi.itemID = mi.itemID
+      GROUP BY mi.name, mi.itemID, mi.price
+      ORDER BY COUNT(*) DESC
+      LIMIT 3;
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching top items:", err);
+    res.status(500).json({ error: "Failed to fetch top items" });
+  }
+});
 
 //production stuff
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

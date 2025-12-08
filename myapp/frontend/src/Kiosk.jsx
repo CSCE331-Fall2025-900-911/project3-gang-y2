@@ -56,6 +56,7 @@ function Kiosk() {
   //email receipt states
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("");
+  const [suggestedItems, setSuggestedItems] = useState([]);
 
   function startOrderSubmission() {
     setShowEmailModal(true);
@@ -360,6 +361,28 @@ function Kiosk() {
       });
   }, []); // empty [] means this runs once, when the page first loads
 
+  // Fetch top items from DB ONLY after menuItems is ready
+useEffect(() => {
+  // 💡 Only run this effect if menuItems has items
+  if (menuItems.length > 0) {
+    fetch("/api/reports/top-items")
+      .then(res => res.json())
+      .then(suggestedData => {
+        // Map the suggested items (which are partial) to the full item objects
+        const fullSuggestedItems = suggestedData
+          .map(suggested => 
+            // Find the complete item object - check both itemid and itemID
+            menuItems.find(menuItem => (menuItem.itemid || menuItem.itemID) === (suggested.itemID || suggested.itemid))
+          )
+          // Filter out any undefined results, just in case a suggested item is missing from the menu
+          .filter(item => item !== undefined);
+          
+        setSuggestedItems(fullSuggestedItems);
+      })
+      .catch(err => console.error("Error fetching suggested items:", err));
+  }
+}, [menuItems]); // 🔑 Dependency Array now includes menuItems
+
   // Display loading message until data is ready
   if (loading) {
     return <p className="loading">Loading menu...</p>;
@@ -437,6 +460,36 @@ function Kiosk() {
             ))}
           </ul>
           )}
+          <div className="suggested-bubble">
+            <h3 className="suggested-title">{translate("Try These Most Popular Items!")}</h3>
+
+            <div className="suggested-buttons">
+              {suggestedItems.length === 0 ? (
+                <p>{translate("order.noSuggestions") || "No suggestions available."}</p>
+              ) : (
+                suggestedItems.map((item) => {
+                  // Find the full menu item by ID (or name) - handle both itemid and itemID
+                  const fullItem = menuItems.find((menuItem) => {
+                    const menuItemId = menuItem.itemid || menuItem.itemID;
+                    const suggestedId = item.itemID || item.itemid;
+                    return menuItemId === suggestedId || menuItem.name === item.name;
+                  });
+
+                  if (!fullItem) return null; // skip if menu item not found
+
+                  return (
+                    <button
+                      key={fullItem.itemid || fullItem.itemID}
+                      className="menu-button suggested-button"
+                      onClick={() => openModification(fullItem)}
+                    >
+                      ✨ {fullItem.name}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
         </div>        
       </div>
       <div className="subtotal-container">
