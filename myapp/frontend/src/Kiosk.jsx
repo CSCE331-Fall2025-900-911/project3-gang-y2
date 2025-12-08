@@ -407,9 +407,15 @@ useEffect(() => {
               key={cat}
               className="category-nav-button"
               onClick={() => {
-                const el = document.getElementById(`section-${cat}`);
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
+              const el = document.getElementById(`section-${cat}`);
+              if (el) {
+                const yOffset = -140;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+                window.scrollTo({ top: y, behavior: "smooth" });
+              }
+            }}
+
             >
               {cat}
             </button>
