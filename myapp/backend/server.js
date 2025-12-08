@@ -38,7 +38,7 @@ app.post("/api/send-receipt", async (req, res) => {
     const itemLines = items
       .map(item => {
         return `${item.name} - $${item.price.toFixed(2)}  
-Ice: ${item.modifiers.iceLevel} | Sugar: ${item.modifiers.sugarLevel} | Topping: ${item.modifiers.topping}`;
+Ice: ${item.modifiers.iceLevel} | Sugar: ${item.modifiers.sugarLevel} | Toppings: ${item.modifiers.toppings.join(", ")}`;
       })
       .join("\n\n");
 
@@ -335,19 +335,26 @@ app.post("/api/orders", async (req, res) => {
 });
 // update orderitems
 app.post("/api/orderitems", async (req, res) => {
-  const {orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice} = req.body;
-
   try {
+    const { orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice } = req.body;
+
+    const toppingsArray = Array.isArray(toppings) ? toppings : [];
+
     const result = await pool.query(
-      "INSERT INTO orderitems (orderid, itemid, icelevel, sugarlevel, toppings, itemprice) VALUES ($1, $2, $3, $4, $5, $6) RETURNING orderdetailid as orderDetailID",
-      [orderID, itemID, iceLevel, sugarLevel, toppings, itemPrice]
+      `INSERT INTO orderitems (orderid, itemid, icelevel, sugarlevel, toppings, itemprice)
+       VALUES ($1, $2, $3, $4, $5::text[], $6)
+       RETURNING *;`,
+      [orderID, itemID, iceLevel, sugarLevel, toppingsArray, itemPrice]
     );
-    res.status(201).json(result.rows[0]);
+
+    res.json(result.rows[0]);
+
   } catch (err) {
-    console.error("Error creating order item:", err);
-    res.status(500).json({ error: "Failed to create order item" });
+    console.error("Error inserting order item:", err);
+    res.status(500).json({ error: "Failed to insert order item" });
   }
 });
+
 // get unique id for next order item
 // app.post("/api/orderitems/new-id", async (req, res) => {
 //   try {
