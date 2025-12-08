@@ -19,6 +19,7 @@
   "order.list.size": "Tomano",
   "order.list.temperature": "Temperatura",
   "order.list.quantity":"Cantidad",
+  "order.NoSuggestions":"Sin Sugerencias",
   "order.emptySpeech": "Tu pedido esta vacio. Elige una bebida para empezar.",
   "order.itemLine": "Articulo {num}: {name}, {price}, hielo {ice}, azucar {sugar}, topping {topping}.",
   "order.summary": "Tienes {count} articulos. {items} Subtotal {total} dolares.",

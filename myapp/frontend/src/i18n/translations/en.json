@@ -23,6 +23,7 @@
   "order.itemLine": "Item {num}: {name}, {price}, ice {ice}, sugar {sugar}, topping {topping}.",
   "order.summary": "You have {count} items. {items} Subtotal {total} dollars.",
   "order.added": "Added {name}. {price}. Ice {ice}. Sugar {sugar}. Topping {topping}.",
+  "order.NoSuggestions":"No Suggestions",
   "tts.helper.kiosk": "Need it read aloud? Use the speaker.",
   "tts.helper.cashier": "Read back the order aloud.",
   "tts.button.read": "Read Aloud",
