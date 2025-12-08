@@ -456,14 +456,14 @@ app.get("/api/reports/salesReport", async (req, res) => {
 
         const result = await pool.query(`
             SELECT 
-                mi.name AS itemName,
-                COUNT(oi.orderDetailID) AS salesCount
+                mi.name AS "itemName",
+                COUNT(oi.orderDetailID) AS "salesCount"
             FROM orders o
             JOIN orderItems oi ON o.orderID = oi.orderID
             JOIN menuItems mi ON oi.itemID = mi.itemID
             WHERE o.orderDate BETWEEN $1 AND $2
             GROUP BY mi.name
-            ORDER BY salesCount DESC;
+            ORDER BY "salesCount" DESC;
         `, [fromDate, toDate]);
 
         res.json(result.rows);

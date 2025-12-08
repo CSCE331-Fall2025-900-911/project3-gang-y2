@@ -69,7 +69,7 @@ function ZReport() {
               </>
             ) : (
               <tr>
-                <td colSpan="2">Loading...</td>
+                <td colSpan="2">No Z Report Available (Can only generate once!)</td>
               </tr>
             )}
           </tbody>
