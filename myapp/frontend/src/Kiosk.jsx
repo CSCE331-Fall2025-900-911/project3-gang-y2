@@ -94,8 +94,15 @@ function Kiosk() {
 
   // function to add the pressed item to the order
   const addToOrder = () => {
+    const toppingCount = currentModifiers.toppings?.length || 0;
+    const toppingCost = toppingCount * 0.50;
+
+    const basePrice = parseFloat(currentItem.price);
+    const finalPrice = basePrice + toppingCost;
+
     const modifiedItem = {
       ...currentItem,
+      price: finalPrice,
       modifiers: { ...currentModifiers }
     };
     const qtyToAdd = currentModifiers.quantity ?? 1;
@@ -127,7 +134,7 @@ function Kiosk() {
       return updated;
     });
 
-    setSubtotal((prev) => prev + qtyToAdd * parseFloat(modifiedItem.price));
+    setSubtotal((prev) => prev + qtyToAdd * finalPrice);
     closeModification();
   };
 
