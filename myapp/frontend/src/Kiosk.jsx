@@ -540,10 +540,10 @@ useEffect(() => {
                   aria-label={menuButtonLabel(item)}
                 >
                   <img
-                    src={`/assets/drinks/${item.itemid}.jpg`}
+                    src={`public/drinks/${item.itemid}.png`}
                     alt={item.name}
                     className="menu-drink-image"
-                  />
+                  /> <br></br>
 
                   ${Number.parseFloat(item.price).toFixed(2)} :
                   <strong>{" " + translate(item.name)}</strong>
