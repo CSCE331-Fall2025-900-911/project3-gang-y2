@@ -26,6 +26,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 app.post("/api/send-receipt", async (req, res) => {
   const { email, orderId, items, subtotal } = req.body;
 
@@ -34,11 +38,16 @@ app.post("/api/send-receipt", async (req, res) => {
   }
 
   try {
-    // receipt body
     const itemLines = items
       .map(item => {
-        return `${item.name} - $${item.price.toFixed(2)}  
-Ice: ${item.modifiers.iceLevel} | Sugar: ${item.modifiers.sugarLevel} | Toppings: ${item.modifiers.toppings.join(", ")}`;
+        const toppings = item.modifiers.toppings.length
+          ? item.modifiers.toppings.join(", ")
+          : "None";
+
+        return `${item.name} - $${item.price.toFixed(2)}
+  Ice: ${item.modifiers.iceLevel}
+  Sugar: ${item.modifiers.sugarLevel}
+  Toppings: ${toppings}`;
       })
       .join("\n\n");
 
@@ -53,23 +62,24 @@ ${itemLines}
 Subtotal: $${subtotal.toFixed(2)}
 
 Have a great day!
-    `;
+`;
 
-    // send email
-    await transporter.sendMail({
-      from: process.env.SMTP_EMAIL,
+    await resend.emails.send({
+      from: "orders@resend.dev", 
       to: email,
       subject: `Your Receipt - Order #${orderId}`,
       text: message,
     });
 
-    res.json({ success: true, message: "Email sent" });
+    res.json({ success: true, message: "Email sent via Resend" });
 
   } catch (err) {
-    console.error("Email send failed:", err);
+    console.error("Resend email failed:", err);
     res.status(500).json({ error: "Failed to send email" });
   }
 });
+
+
 
 // get a token for user login 
 // token stores their permission so we don't need to repeatedly query for their role
