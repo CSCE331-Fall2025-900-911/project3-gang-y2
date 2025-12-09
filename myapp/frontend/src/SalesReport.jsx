@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./SalesReport.css";
+import Navbar from "./Navbar"
 
 function SalesReport() {
   const [report, setReport] = useState([]);
@@ -44,7 +45,7 @@ function SalesReport() {
         </div>
 
         <div className="sales-report-results box">
-          <table>
+          <table className = "sales-report-table">
             <thead>
               <tr>
                 <th>Item</th>
