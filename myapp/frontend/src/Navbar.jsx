@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { useZoom } from "./ZoomContext";
 import { useTranslation } from "./i18n/TranslationContext.jsx";
 
-export default function Navbar() {
+export default function Navbar({ className = "" }) {
   const { updateZoom } = useZoom();
   const { translate } = useTranslation();
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${className}`}>
       <div className="nav-container">
         {/* <h1 className="logo"><a href = "./" text-decoration = "none">MatchaBoba POS</a></h1> */}
         <Link
