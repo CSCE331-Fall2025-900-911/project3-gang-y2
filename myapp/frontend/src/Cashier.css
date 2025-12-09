@@ -257,8 +257,38 @@
 }
 
 .cash-menu-category-title {
-  font-size: calc(1.6rem * var(--zoom-scale));
-  color:#460464;
+  font-size: 1.8rem;
   font-weight: 700;
-  margin-bottom: 0.75rem;
+  color: #390253;
+
+  text-align: left;
+  margin-left: 420px;
+  margin-top: 2rem;
+
+  border-left: 6px solid #62048e;
+  padding-left: 12px;
+
+  letter-spacing: 0.5px;
+}
+
+.cash-category-nav-button {
+  background: #e8f5e9;
+  border: 2px solid #a5d6a7;
+  border-radius: 18px;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.cash-category-nav-button:hover {
+  background: #dcedc8;
+  transform: translateY(-2px);
+}
+
+.cash-category-nav-button.active {
+  background: #7cb342;
+  color: white;
+  border-color: #5a8e2d;
 }
