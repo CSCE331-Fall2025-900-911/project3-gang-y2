@@ -303,9 +303,18 @@ function Cashier() {
       });
   }, []); // empty [] means this runs once, when the page first loads
 
+<<<<<<< HEAD
   // Display loading message until data is ready
   if (loading) {
     return <p className="cash-loading">Loading menu...</p>;
+=======
+  // Fetch top items from DB ONLY after menuItems is ready
+useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItems
+
+  // Display loading message until data is ready
+  if (loading) {
+    return <p className="cash.loading">Loading menu...</p>;
+>>>>>>> 52cbbbc2546f6de6b2999a688e3ef9fff38bff1c
   }
 
   // Render the actual page
@@ -314,6 +323,30 @@ function Cashier() {
     <div className="cash-kioskpage">
       <Navbar />
 
+<<<<<<< HEAD
+=======
+      <div className="cash-category-nav">
+          {Object.keys(groupedMenu).map((cat) => (
+            <button
+              key={cat}
+              className="cash-category-nav-button"
+              onClick={() => {
+              const el = document.getElementById(`section-${cat}`);
+              if (el) {
+                const yOffset = -140;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+                window.scrollTo({ top: y, behavior: "smooth" });
+              }
+            }}
+
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        
+>>>>>>> 52cbbbc2546f6de6b2999a688e3ef9fff38bff1c
       <div className="cash-sidebar-container">
         <div className="cash-sidebar">
           <h2>{translate("order.title")}</h2>
@@ -326,6 +359,7 @@ function Cashier() {
           </div>
           {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
           (<ul>
+<<<<<<< HEAD
               {currentOrder.map((item, index) => 
               ( <li
                   key={index}
@@ -333,6 +367,21 @@ function Cashier() {
                   data-tts={orderLineLabel(item, index)}
                 >
                   ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}    </strong>   
+=======
+            {currentOrder.map((item, index) => (
+              <li
+                key={index}
+                tabIndex={0}
+                data-tts={orderLineLabel(item, index)}
+              >
+                <strong>{translate(item.name)}</strong>{" "} <button
+                  type="button"
+                  onClick={() => removeLine(index)}
+                  className="cash-zoom-button"
+                >X</button>
+                <span>({item.modifiers.size})</span>
+                <div>
+>>>>>>> 52cbbbc2546f6de6b2999a688e3ef9fff38bff1c
                   <button
                     type="button"
                     onClick={() => removeFromOrder(index)}
@@ -352,7 +401,11 @@ function Cashier() {
         </div>        
       </div>
       <div className="cash-subtotal-container">
+<<<<<<< HEAD
         <strong>{translate("order.subtotal")} : </strong>${subtotal}
+=======
+        <strong>{translate("order.subtotal")}: </strong>${subtotal.toFixed(2)}
+>>>>>>> 52cbbbc2546f6de6b2999a688e3ef9fff38bff1c
       </div>
       <div className="cash-order-button-container">
           <button
@@ -365,9 +418,22 @@ function Cashier() {
           </button>
       </div>
 
+<<<<<<< HEAD
       <main className="cash-menu-container">
         {Object.keys(groupedMenu).map((category) => (
           <section key={category} className="menu-section">
+=======
+
+      
+      <main className="cash-menu-container">
+
+        {Object.keys(groupedMenu).map((category) => (
+          <section
+            key={category}
+            id={`section-${category}`}   // <-- enables scroll-to-section
+            className="menu-section"
+          >
+>>>>>>> 52cbbbc2546f6de6b2999a688e3ef9fff38bff1c
             <h2 className="cash-menu-category-title">{category}</h2>
 
             <div className="cash-menu-grid">
@@ -545,6 +611,48 @@ function Cashier() {
               </label>
             </div>
 
+<<<<<<< HEAD
+=======
+            <div style={{ margin: "1rem 0" }}>
+              <label>
+                {translate("order.list.quantity")}
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginTop: "0.5rem"
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentModifiers((prev) => ({
+                      ...prev,
+                      quantity: Math.max(1, prev.quantity - 1)
+                    }))
+                  }
+                  className="qty-button"
+                  aria-label={translate("modal.decreaseQuantity")}
+                >-</button>
+                <span>{currentModifiers.quantity}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentModifiers((prev) => ({
+                      ...prev,
+                      quantity: prev.quantity + 1
+                    }))
+                  }
+                  className="qty-button"
+                  aria-label={translate("modal.increaseQuantity")}
+                >+</button>
+              </div>
+            </div>
+
+>>>>>>> 52cbbbc2546f6de6b2999a688e3ef9fff38bff1c
             <button onClick={addToOrder} className="cash-modify-button" data-tts={translate("modal.add")}>
               {translate("modal.add")}
             </button>

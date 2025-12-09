@@ -10,7 +10,7 @@ function ManagerDash() {
     <div className="manager-page">
       <nav className="navbar">
         <div className="nav-container">
-          <h1 className="logo">MatchaBoba POS</h1>
+          <Link to="/" style={{textDecoration: "none", color: "inherit", fontWeight: "bold", fontSize: "1.5rem"}}>MatchaBoba POS</Link>
           <ul className="nav-links">
             <li><Link to="/">{"Back to Landing" || translate("nav.managerBack")}</Link></li>
             <li><Link to="/employees">{translate("nav.employees")}</Link></li>
