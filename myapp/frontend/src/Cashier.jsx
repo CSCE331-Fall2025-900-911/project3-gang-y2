@@ -369,38 +369,11 @@ function Cashier() {
   }, []); // empty [] means this runs once, when the page first loads
 
   // Fetch top items from DB ONLY after menuItems is ready
-<<<<<<< HEAD
 useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItems
 
   // Display loading message until data is ready
   if (loading) {
     return <p className="cash.loading">Loading menu...</p>;
-=======
-useEffect(() => {
-  // 💡 Only run this effect if menuItems has items
-  if (menuItems.length > 0) {
-    fetch("/api/reports/top-items")
-      .then(res => res.json())
-      .then(suggestedData => {
-        // Map the suggested items (which are partial) to the full item objects
-        const fullSuggestedItems = suggestedData
-          .map(suggested => 
-            // Find the complete item object - check both itemid and itemID
-            menuItems.find(menuItem => (menuItem.itemid || menuItem.itemID) === (suggested.itemID || suggested.itemid))
-          )
-          // Filter out any undefined results, just in case a suggested item is missing from the menu
-          .filter(item => item !== undefined);
-          
-        setSuggestedItems(fullSuggestedItems);
-      })
-      .catch(err => console.error("Error fetching suggested items:", err));
-  }
-}, [menuItems]); // 🔑 Dependency Array now includes menuItems
-
-  // Display loading message until data is ready
-  if (loading) {
-    return <p className="loading">Loading menu...</p>;
->>>>>>> 6a6021b509ba57741da13e0954f8f94d59bdd708
   }
 
   // Render the actual page
@@ -409,19 +382,11 @@ useEffect(() => {
     <div className="kioskpage">
       <Navbar />
 
-<<<<<<< HEAD
       <div className="cash-category-nav">
           {Object.keys(groupedMenu).map((cat) => (
             <button
               key={cat}
               className="cash-category-nav-button"
-=======
-      <div className="category-nav">
-          {Object.keys(groupedMenu).map((cat) => (
-            <button
-              key={cat}
-              className="category-nav-button"
->>>>>>> 6a6021b509ba57741da13e0954f8f94d59bdd708
               onClick={() => {
               const el = document.getElementById(`section-${cat}`);
               if (el) {
@@ -438,13 +403,8 @@ useEffect(() => {
           ))}
         </div>
         
-<<<<<<< HEAD
       <div className="cash-sidebar-container">
         <div className="cash-sidebar">
-=======
-      <div className="sidebar-container">
-        <div className="sidebar">
->>>>>>> 6a6021b509ba57741da13e0954f8f94d59bdd708
           <h2>{translate("order.title")}</h2>
           <div className="tts-stack">
             <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
@@ -464,11 +424,7 @@ useEffect(() => {
                 <strong>{translate(item.name)}</strong>{" "} <button
                   type="button"
                   onClick={() => removeLine(index)}
-<<<<<<< HEAD
                   className="cash-zoom-button"
-=======
-                  className="zoom-button"
->>>>>>> 6a6021b509ba57741da13e0954f8f94d59bdd708
                 >X</button>
                 <span>({item.modifiers.size})</span>
                 <div>
@@ -500,11 +456,7 @@ useEffect(() => {
           )}
         </div>        
       </div>
-<<<<<<< HEAD
       <div className="cash-subtotal-container">
-=======
-      <div className="subtotal-container">
->>>>>>> 6a6021b509ba57741da13e0954f8f94d59bdd708
         <strong>{translate("order.subtotal")}: </strong>${subtotal.toFixed(2)}
       </div>
       <div className="order-button-container">
@@ -518,7 +470,6 @@ useEffect(() => {
           </button>
       </div>
 
-<<<<<<< HEAD
 
       
       <main className="cash-menu-container">
@@ -531,20 +482,6 @@ useEffect(() => {
           >
             <h2 className="cash-menu-category-title">{category}</h2>
 
-=======
-
-      
-      <main className="menu-container">
-
-        {Object.keys(groupedMenu).map((category) => (
-          <section
-            key={category}
-            id={`section-${category}`}   // <-- enables scroll-to-section
-            className="menu-section"
-          >
-            <h2 className="menu-category-title">{category}</h2>
-
->>>>>>> 6a6021b509ba57741da13e0954f8f94d59bdd708
             <div className="menu-grid">
               {groupedMenu[category].map((item) => (
                 <button
@@ -805,11 +742,7 @@ useEffect(() => {
               </div>
             </div>
 
-<<<<<<< HEAD
             <button onClick={addToOrder} className="cash-modify-button" data-tts={translate("modal.add")}>
-=======
-            <button onClick={addToOrder} className="modify-button" data-tts={translate("modal.add")}>
->>>>>>> 6a6021b509ba57741da13e0954f8f94d59bdd708
               {translate("modal.add")}
             </button>
             <button onClick={closeModification} className="cancel-button" data-tts={translate("modal.cancel")}>
