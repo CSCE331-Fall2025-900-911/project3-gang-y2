@@ -42,11 +42,20 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2>{translate("login.title")}</h2>
-      <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('Failed')} />
+    <div className="login-page">
+      <div className="login-card">
+        <h1>{translate("login.title")}</h1>
+        <br></br>
+        <GoogleLogin onSuccess={handleSuccess} onError={() => {}} />
+          <button
+            type="button"
+            className="back-button"
+            onClick={() => navigate('/')}
+          >
+            {"Back"}
+          </button>
+      </div>
     </div>
   );
 };
-
 export default Login;
