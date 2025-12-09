@@ -379,7 +379,7 @@ useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItem
   // Render the actual page
   return (
     <ZoomProvider>
-    <div className="kioskpage">
+    <div className="cash-kioskpage">
       <Navbar />
 
       <div className="cash-category-nav">
@@ -459,9 +459,9 @@ useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItem
       <div className="cash-subtotal-container">
         <strong>{translate("order.subtotal")}: </strong>${subtotal.toFixed(2)}
       </div>
-      <div className="order-button-container">
+      <div className="cash-order-button-container">
           <button
-            className="order-button"
+            className="cash-order-button"
             onClick={startOrderSubmission}
             data-tts={translate("order.place")}
             aria-label={translate("order.place")}
@@ -482,11 +482,11 @@ useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItem
           >
             <h2 className="cash-menu-category-title">{category}</h2>
 
-            <div className="menu-grid">
+            <div className="cash-menu-grid">
               {groupedMenu[category].map((item) => (
                 <button
                   key={item.itemid}
-                  className="menu-button"
+                  className="cash-menu-button"
                   onClick={() => openModification(item)}
                   data-tts={menuButtonLabel(item)}
                   aria-label={menuButtonLabel(item)}
