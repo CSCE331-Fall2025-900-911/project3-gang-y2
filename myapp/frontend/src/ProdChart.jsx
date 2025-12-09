@@ -19,7 +19,7 @@ function ProdChart() {
     <div className="prod-chart-page">
       <nav className="navbar">
         <div className="nav-container">
-          <h1 className="logo">MatchaBoba POS</h1>
+          <Link to="/" style={{textDecoration: "none", color: "inherit", fontWeight: "bold", fontSize: "1.5rem"}}>MatchaBoba POS</Link>
           <ul className="nav-links">
             <li><Link to="/manager">Back to Manager Menu</Link></li>
             <li><Link to="/employees">Employees</Link></li>
