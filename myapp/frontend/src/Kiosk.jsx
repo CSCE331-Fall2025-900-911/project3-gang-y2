@@ -94,8 +94,15 @@ function Kiosk() {
 
   // function to add the pressed item to the order
   const addToOrder = () => {
+    const toppingCount = currentModifiers.toppings?.length || 0;
+    const toppingCost = toppingCount * 0.50;
+
+    const basePrice = parseFloat(currentItem.price);
+    const finalPrice = basePrice + toppingCost;
+
     const modifiedItem = {
       ...currentItem,
+      price: finalPrice,
       modifiers: { ...currentModifiers }
     };
     const qtyToAdd = currentModifiers.quantity ?? 1;
@@ -127,7 +134,7 @@ function Kiosk() {
       return updated;
     });
 
-    setSubtotal((prev) => prev + qtyToAdd * parseFloat(modifiedItem.price));
+    setSubtotal((prev) => prev + qtyToAdd * finalPrice);
     closeModification();
   };
 
@@ -281,7 +288,7 @@ function Kiosk() {
     (item) => {
       const numericPrice = parseFloat(item.price);
       const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
-      return translate("tts.menuButton", { name: item.name, price: priceText });
+      return translate("tts.menuButton", { name: translate(item.name), price: priceText });
     },
     [translate]
   );
@@ -400,9 +407,15 @@ useEffect(() => {
               key={cat}
               className="category-nav-button"
               onClick={() => {
-                const el = document.getElementById(`section-${cat}`);
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
+              const el = document.getElementById(`section-${cat}`);
+              if (el) {
+                const yOffset = -140;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+                window.scrollTo({ top: y, behavior: "smooth" });
+              }
+            }}
+
             >
               {cat}
             </button>
@@ -427,7 +440,7 @@ useEffect(() => {
                 tabIndex={0}
                 data-tts={orderLineLabel(item, index)}
               >
-                <strong>{item.name}</strong>{" "} <button
+                <strong>{translate(item.name)}</strong>{" "} <button
                   type="button"
                   onClick={() => removeLine(index)}
                   className="zoom-button"
@@ -493,7 +506,7 @@ useEffect(() => {
         </div>        
       </div>
       <div className="subtotal-container">
-        <strong>{translate("order.subtotal")} : </strong>${subtotal}
+        <strong>{translate("order.subtotal")}: </strong>${subtotal.toFixed(2)}
       </div>
       <div className="order-button-container">
           <button
@@ -528,7 +541,7 @@ useEffect(() => {
                   aria-label={menuButtonLabel(item)}
                 >
                   ${Number.parseFloat(item.price).toFixed(2)} :
-                  <strong>{item.name}</strong>
+                  <strong>{" " + translate(item.name)}</strong>
                 </button>
               ))}
             </div>
@@ -614,6 +627,7 @@ useEffect(() => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            zIndex: 9999,
           }}
         >
           <div

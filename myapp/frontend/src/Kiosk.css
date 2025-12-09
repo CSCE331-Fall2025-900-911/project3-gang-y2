@@ -97,7 +97,7 @@ body {
   top: 58px;
   left: 0px;
   margin: 0px;
-  bottom: calc(150px * var(--kiosk-zoom));
+  bottom: calc(140px * var(--kiosk-zoom));
   transform: scale(var(--kiosk-zoom));
   transform-origin: top left;
   overflow-y: scroll;
