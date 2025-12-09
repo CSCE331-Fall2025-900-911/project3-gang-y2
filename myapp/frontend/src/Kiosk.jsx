@@ -522,11 +522,10 @@ useEffect(() => {
 
       
       <main className="menu-container">
-
         {Object.keys(groupedMenu).map((category) => (
           <section
             key={category}
-            id={`section-${category}`}   // <-- enables scroll-to-section
+            id={`section-${category}`}
             className="menu-section"
           >
             <h2 className="menu-category-title">{category}</h2>
@@ -540,6 +539,12 @@ useEffect(() => {
                   data-tts={menuButtonLabel(item)}
                   aria-label={menuButtonLabel(item)}
                 >
+                  <img
+                    src={`/assets/drinks/${item.itemid}.jpg`}
+                    alt={item.name}
+                    className="menu-drink-image"
+                  />
+
                   ${Number.parseFloat(item.price).toFixed(2)} :
                   <strong>{" " + translate(item.name)}</strong>
                 </button>
