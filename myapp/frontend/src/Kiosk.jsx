@@ -540,7 +540,7 @@ useEffect(() => {
                   aria-label={menuButtonLabel(item)}
                 >
                   <img
-                    src={`${process.env.PUBLIC_URL}/drinks/${item.itemid}.png`}
+                    src={`drinks/${item.itemid}.png`}
                     alt={item.name}
                     className="menu-drink-image"
                   /> <br></br>
