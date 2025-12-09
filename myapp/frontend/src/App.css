@@ -11,12 +11,6 @@
                      calc(1rem * var(--zoom-scale));
 }
 
-/* * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-} */
-
 body {
   font-family: "Poppins", sans-serif;
   background-color: var(--white);
@@ -78,7 +72,7 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  margin-top: 90px; /* height of navbar */
+  margin-top: 90px;
 }
 
 .content h2 {
@@ -90,4 +84,31 @@ body {
   font-size: calc(1.1rem * var(--zoom-scale));
   color: #555;
   max-width: 600px;
+}
+
+.weather-bar {
+  width: 200%;
+  background-color: #448300;
+  padding: 1rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.weather-card {
+  background-color: #7cb342;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.weather-description {
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  background-color: #daffdf;
+  border-radius: 6px;
+  display: inline-block; 
+  font-weight: bold;      
 }

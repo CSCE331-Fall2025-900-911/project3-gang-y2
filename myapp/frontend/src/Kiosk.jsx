@@ -543,6 +543,7 @@ useEffect(() => {
                     src={`public/drinks/${item.itemid}.png`}
                     alt={item.name}
                     className="menu-drink-image"
+                    size="0.1"
                   /> <br></br>
 
                   ${Number.parseFloat(item.price).toFixed(2)} :

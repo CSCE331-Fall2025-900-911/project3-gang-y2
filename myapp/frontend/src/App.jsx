@@ -17,7 +17,7 @@ function App() {
         <h2>{translate("home.title")}</h2>
         <p>{translate("home.body")}</p>
         <br />
-        <p>{translate("home.weather")}</p>
+        <p className="weather-description">{translate("home.weather")}</p>
 
         <WeatherWidget/>
 

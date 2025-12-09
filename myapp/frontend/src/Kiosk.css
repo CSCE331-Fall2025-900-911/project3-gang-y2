@@ -286,6 +286,13 @@ body {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.menu-drink-image {
+  width: 250px;        /* or a fixed value like 200px */
+  height: 300px;      /* pick the height you want */
+  object-fit: cover;  /* scale & crop to fill area */
+  border-radius: 8px;
+}
+
 .menu-button:hover {
   transform: translateY(calc(-2px * var(--kiosk-zoom)));
   box-shadow: 0 calc(4px * var(--kiosk-zoom)) calc(8px * var(--kiosk-zoom)) rgba(0,0,0,0.18);
