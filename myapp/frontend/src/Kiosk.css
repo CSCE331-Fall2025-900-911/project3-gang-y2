@@ -271,16 +271,27 @@ body {
   border: 2px solid black;
   border-radius: 16px;
 
-  padding: 1.5rem;  
+  padding: 1.5rem;
   font-size: 1.4rem;  
-  height: 100px;   
+  height: 100%;
   width: 450px;
 
   cursor: pointer;
-  text-align: left;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.menu-drink-image {
+  width: 250px;        /* or a fixed value like 200px */
+  height: 300px;      /* pick the height you want */
+  object-fit: cover;  /* scale & crop to fill area */
+  border-radius: 8px;
+}
 
 .menu-button:hover {
   transform: translateY(calc(-2px * var(--kiosk-zoom)));
