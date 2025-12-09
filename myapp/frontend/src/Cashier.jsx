@@ -19,13 +19,13 @@ function Cashier() {
 
   // currentOrder holds the list of the items on the current order
   const [currentOrder, setCurrentOrder] = useState([]);
-
+  
   // currentItem holds the item currently being modified
   const [currentItem, setCurrentItem] = useState(null);
   const firstOptionRef = useRef(null);
 
   // holds a value for modifiers 
-  const [currentModifiers, setCurrentModifiers] = useState([{iceLevel:"medium", sugarLevel:"medium", topping:"none"}]);
+  const [currentModifiers, setCurrentModifiers] = useState({iceLevel:"high", sugarLevel:"high", toppings:[], quantity:1});
 
   // sub total for order
   const[subtotal, setSubtotal] = useState(0.0);
@@ -45,8 +45,10 @@ function Cashier() {
   const [itemData, setItemData] = useState({
     orderID:null,
     itemID:0,
-    iceLevel:"MEDIUM",
-    sugarLevel:"MEDIUM",
+    size:"Medium",
+    temperature:"Cold",
+    iceLevel:"HIGH",
+    sugarLevel:"HIGH",
     topping:"NONE",
     itemPrice:0.0
   });
@@ -54,14 +56,15 @@ function Cashier() {
   //email receipt states
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("");
+  const [suggestedItems, setSuggestedItems] = useState([]);
 
   function startOrderSubmission() {
-  setShowEmailModal(true);
+    setShowEmailModal(true);
   }
 
   const openModification = (item) => {
     setCurrentItem(item);
-    setCurrentModifiers({iceLevel:"medium", sugarLevel:"medium", topping:"none"}); // default values for each item
+    setCurrentModifiers({size:"Medium", iceLevel:"high", sugarLevel:"high", temperature:"Cold", toppings:[], quantity:1 }); // default values for each item
   };
 
   const closeModification = () => {
@@ -91,42 +94,50 @@ function Cashier() {
 
   // function to add the pressed item to the order
   const addToOrder = () => {
+    const toppingCount = currentModifiers.toppings?.length || 0;
+    const toppingCost = toppingCount * 0.50;
+
+    const basePrice = parseFloat(currentItem.price);
+    const finalPrice = basePrice + toppingCost;
+
     const modifiedItem = {
-        ...currentItem, modifiers: {...currentModifiers}, // copies the state of modifiers and adds it to list
+      ...currentItem,
+      price: finalPrice,
+      modifiers: { ...currentModifiers }
     };
-    
-    
-    setCurrentOrder((prevOrder) => [...prevOrder, modifiedItem]);
-    setSubtotal(prev => prev + parseFloat(modifiedItem.price));
-    setItemData({
-      orderID: formData.orderID, 
-      itemID: modifiedItem.itemID,
-      iceLevel: (currentModifiers.iceLevel).toUpperCase(),
-      sugarLevel: (currentModifiers.sugarLevel).toUpperCase(),
-      topping: (currentModifiers.topping).toUpperCase(),
-      itemPrice: modifiedItem.price
-    });
-    if (canSpeakSelection && modifiedItem && ttsEnabled) {
-      const price = Number.isFinite(parseFloat(modifiedItem.price))
-        ? `${parseFloat(modifiedItem.price).toFixed(2)} dollars`
-        : modifiedItem.price;
-      const ice = translate(`mod.ice.${modifiedItem.modifiers.iceLevel}`);
-      const sugar = translate(`mod.sugar.${modifiedItem.modifiers.sugarLevel}`);
-      const topping = translate(`mod.topping.${modifiedItem.modifiers.topping}`);
-      saySelection(
-        translate("order.added", {
-          name: modifiedItem.name,
-          price,
-          ice,
-          sugar,
-          topping,
-        })
+    const qtyToAdd = currentModifiers.quantity ?? 1;
+
+    setCurrentOrder((prevOrder) => {
+      const index = prevOrder.findIndex(
+        (line) =>
+          line.itemid === modifiedItem.itemid &&
+          line.modifiers.size === modifiedItem.modifiers.size &&
+          line.modifiers.temperature === modifiedItem.modifiers.temperature &&
+          line.modifiers.iceLevel === modifiedItem.modifiers.iceLevel &&
+          line.modifiers.sugarLevel === modifiedItem.modifiers.sugarLevel &&
+          JSON.stringify(line.modifiers.toppings) ===
+            JSON.stringify(modifiedItem.modifiers.toppings)
       );
-    }
-    
-    console.log("current subtotal: ", subtotal);
+
+      if (index === -1) {
+        return [
+          ...prevOrder,
+          { ...modifiedItem, quantity: qtyToAdd }
+        ];
+      }
+
+      const updated = [...prevOrder];
+      updated[index] = {
+        ...updated[index],
+        quantity: updated[index].quantity + qtyToAdd
+      };
+      return updated;
+    });
+
+    setSubtotal((prev) => prev + qtyToAdd * finalPrice);
     closeModification();
   };
+
 
   // submit order & get payment
   function resetOrder() {
@@ -152,6 +163,23 @@ function Cashier() {
   //       .then((data) => setOrders(data))
   //       .catch((err) => console.error("Error fetching orders:", err));
   //   }, []);
+  const handleToppingChange = (e) => {
+    const { value, checked } = e.target;
+
+    setCurrentModifiers((prev) => {
+      let updated;
+
+      if (checked) {
+        updated = [...prev.toppings, value];
+      } else {
+        updated = prev.toppings.filter((t) => t !== value);
+      }
+
+      return { ...prev, toppings: updated };
+    });
+  };
+
+
   const handleSubmitWithEmail = (email) => {
     setFormData((prev) => ({
       ...prev,
@@ -176,6 +204,8 @@ function Cashier() {
     formData.orderCost = subtotal;
     formData.customerEmail = customerEmail || null;
 
+    formData.currentTime = `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`;
+
     // create order in table by submitting order metadata and receive orderID
     const res = await fetch(url, {
       method,
@@ -188,20 +218,23 @@ function Cashier() {
     
     // for each item in the order
     for (let item of currentOrder) {
+      for (let i = 0; i < item.quantity; i++) {
         const dbPayload = {
-            orderID: newOrderID, 
-            itemID: item.itemid,
-            iceLevel: item.modifiers.iceLevel.toUpperCase(),
-            sugarLevel: item.modifiers.sugarLevel.toUpperCase(),
-            toppings: item.modifiers.topping.toUpperCase(), 
-            itemPrice: parseFloat(item.price)
+          orderID: newOrderID,
+          itemID: item.itemid,
+          iceLevel: item.modifiers.iceLevel.toUpperCase(),
+          sugarLevel: item.modifiers.sugarLevel.toUpperCase(),
+          toppings: item.modifiers.toppings.map((t) => t.toUpperCase()),
+          itemPrice: parseFloat(item.price),
+          size: item.modifiers.size.toLowerCase(),
+          temperature: item.modifiers.temperature.toLowerCase()
         };
-
         await fetch(itemUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dbPayload)
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dbPayload)
         });
+      }
     }
     if (formData.customerEmail) {
       await fetch("/api/send-receipt", {
@@ -255,7 +288,7 @@ function Cashier() {
     (item) => {
       const numericPrice = parseFloat(item.price);
       const priceText = Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : item.price;
-      return translate("tts.menuButton", { name: item.name, price: priceText });
+      return translate("tts.menuButton", { name: translate(item.name), price: priceText });
     },
     [translate]
   );
@@ -275,8 +308,12 @@ function Cashier() {
     (item, index) => {
       const ice = translate(`mod.ice.${item.modifiers.iceLevel}`);
       const sugar = translate(`mod.sugar.${item.modifiers.sugarLevel}`);
-      const topping = translate(`mod.topping.${item.modifiers.topping}`);
+      const topping = item.modifiers.toppings.length > 0
+        ? item.modifiers.toppings.map(t => translate(`mod.topping.${t}`)).join(", ")
+        : translate("mod.topping.none");
       const priceText = Number.parseFloat(item.price).toFixed(2);
+      const size = item.modifiers.size;
+      const temperature = item.modifiers.temparature;
       return translate("tts.orderLine", {
         num: index + 1,
         name: item.name,
@@ -284,10 +321,38 @@ function Cashier() {
         ice,
         sugar,
         topping,
+        size,
+        temperature
       });
     },
     [translate]
   );
+
+  const changeQuantity = (index, delta) => {
+    setCurrentOrder((prevOrder) => {
+      const updated = [...prevOrder];
+      const item = updated[index];
+      const newQty = item.quantity + delta;
+
+      if (newQty <= 0) {
+        setSubtotal((prev) => prev - item.quantity * parseFloat(item.price));
+        return updated.filter((_, i) => i !== index);
+      }
+
+      updated[index] = { ...item, quantity: newQty };
+      setSubtotal((prev) => prev + delta * parseFloat(item.price));
+      return updated;
+    });
+  };
+
+  const removeLine = (indexToRemove) => {
+    setCurrentOrder((prevOrder) => {
+      const item = prevOrder[indexToRemove];
+      if (!item) return prevOrder;
+      setSubtotal((prev) => prev - item.quantity * parseFloat(item.price));
+      return prevOrder.filter((_, idx) => idx !== indexToRemove);
+    });
+  };
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
@@ -303,19 +368,62 @@ function Cashier() {
       });
   }, []); // empty [] means this runs once, when the page first loads
 
+  // Fetch top items from DB ONLY after menuItems is ready
+useEffect(() => {
+  // 💡 Only run this effect if menuItems has items
+  if (menuItems.length > 0) {
+    fetch("/api/reports/top-items")
+      .then(res => res.json())
+      .then(suggestedData => {
+        // Map the suggested items (which are partial) to the full item objects
+        const fullSuggestedItems = suggestedData
+          .map(suggested => 
+            // Find the complete item object - check both itemid and itemID
+            menuItems.find(menuItem => (menuItem.itemid || menuItem.itemID) === (suggested.itemID || suggested.itemid))
+          )
+          // Filter out any undefined results, just in case a suggested item is missing from the menu
+          .filter(item => item !== undefined);
+          
+        setSuggestedItems(fullSuggestedItems);
+      })
+      .catch(err => console.error("Error fetching suggested items:", err));
+  }
+}, [menuItems]); // 🔑 Dependency Array now includes menuItems
+
   // Display loading message until data is ready
   if (loading) {
-    return <p className="cash-loading">Loading menu...</p>;
+    return <p className="loading">Loading menu...</p>;
   }
 
   // Render the actual page
   return (
     <ZoomProvider>
-    <div className="cash-kioskpage">
+    <div className="kioskpage">
       <Navbar />
 
-      <div className="cash-sidebar-container">
-        <div className="cash-sidebar">
+      <div className="category-nav">
+          {Object.keys(groupedMenu).map((cat) => (
+            <button
+              key={cat}
+              className="category-nav-button"
+              onClick={() => {
+              const el = document.getElementById(`section-${cat}`);
+              if (el) {
+                const yOffset = -140;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+                window.scrollTo({ top: y, behavior: "smooth" });
+              }
+            }}
+
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        
+      <div className="sidebar-container">
+        <div className="sidebar">
           <h2>{translate("order.title")}</h2>
           <div className="tts-stack">
             <p className="tts-helper">{translate("tts.helper.kiosk")}</p>
@@ -326,37 +434,53 @@ function Cashier() {
           </div>
           {currentOrder.length === 0 ? ( <p>{translate("order.empty")}</p>) : 
           (<ul>
-              {currentOrder.map((item, index) => 
-              ( <li
-                  key={index}
-                  tabIndex="0"
-                  data-tts={orderLineLabel(item, index)}
-                >
-                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}    </strong>   
+            {currentOrder.map((item, index) => (
+              <li
+                key={index}
+                tabIndex={0}
+                data-tts={orderLineLabel(item, index)}
+              >
+                <strong>{translate(item.name)}</strong>{" "} <button
+                  type="button"
+                  onClick={() => removeLine(index)}
+                  className="zoom-button"
+                >X</button>
+                <span>({item.modifiers.size})</span>
+                <div>
                   <button
                     type="button"
-                    onClick={() => removeFromOrder(index)}
-                    className="zoom-button"
-                  >
-                    X
-                  </button>
-                  <small>
-                      <br/>
-                      {translate("order.list.ice")}:     {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br/>
-                      {translate("order.list.sugar")}:   {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br/>
-                      {translate("order.list.topping")}: {translate(`mod.topping.${item.modifiers.topping}`)}<br/>
-                  </small>
-              </li>))}
+                    onClick={() => changeQuantity(index, -1)}
+                    className="qty-button"
+                  >-</button>
+                  <span>{item.quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => changeQuantity(index, 1)}
+                    className="qty-button"
+                  >+</button>
+                </div>
+                <small>
+                  {translate("order.list.ice")}: {translate(`mod.ice.${item.modifiers.iceLevel}`)}<br />
+                  {translate("order.list.sugar")}: {translate(`mod.sugar.${item.modifiers.sugarLevel}`)}<br />
+                  {translate("order.list.topping")}:{" "}
+                  {item.modifiers.toppings.length > 0
+                    ? item.modifiers.toppings.map((t) => translate(`mod.topping.${t}`)).join(", ")
+                    : translate("mod.topping.none")} <br />
+                  {/* {translate("order.list.size")}: {translate(`mod.size.${item.modifiers.size}`)}<br /> */}
+                  {translate("order.list.temperature")}: {translate(`mod.temperature.${item.modifiers.temperature.toLowerCase()}`)}<br />
+                </small>
+              </li>
+            ))}
           </ul>
           )}
         </div>        
       </div>
-      <div className="cash-subtotal-container">
-        <strong>{translate("order.subtotal")} : </strong>${subtotal}
+      <div className="subtotal-container">
+        <strong>{translate("order.subtotal")}: </strong>${subtotal.toFixed(2)}
       </div>
-      <div className="cash-order-button-container">
+      <div className="order-button-container">
           <button
-            className="cash-order-button"
+            className="order-button"
             onClick={startOrderSubmission}
             data-tts={translate("order.place")}
             aria-label={translate("order.place")}
@@ -365,21 +489,29 @@ function Cashier() {
           </button>
       </div>
 
-      <main className="cash-menu-container">
-        {Object.keys(groupedMenu).map((category) => (
-          <section key={category} className="menu-section">
-            <h2 className="cash-menu-category-title">{category}</h2>
 
-            <div className="cash-menu-grid">
+      
+      <main className="menu-container">
+
+        {Object.keys(groupedMenu).map((category) => (
+          <section
+            key={category}
+            id={`section-${category}`}   // <-- enables scroll-to-section
+            className="menu-section"
+          >
+            <h2 className="menu-category-title">{category}</h2>
+
+            <div className="menu-grid">
               {groupedMenu[category].map((item) => (
                 <button
                   key={item.itemid}
-                  className="cash-menu-button"
+                  className="menu-button"
                   onClick={() => openModification(item)}
                   data-tts={menuButtonLabel(item)}
                   aria-label={menuButtonLabel(item)}
                 >
-                  ${Number.parseFloat(item.price).toFixed(2)} : <strong>{item.name}</strong>
+                  ${Number.parseFloat(item.price).toFixed(2)} :
+                  <strong>{" " + translate(item.name)}</strong>
                 </button>
               ))}
             </div>
@@ -432,7 +564,7 @@ function Cashier() {
                 setShowEmailModal(false);
                 handleSubmitWithEmail(customerEmail || null);
               }}
-              className="cash-modify-button"
+              className="modify-button"
               style={{ marginBottom: "1rem", width: "100%" }}
             >
               Submit with Email
@@ -443,7 +575,7 @@ function Cashier() {
                 setShowEmailModal(false);
                 handleSubmitWithEmail(null);
               }}
-              className="cash-cancel-button"
+              className="cancel-button"
               style={{ width: "100%" }}
             >
               Skip
@@ -465,6 +597,7 @@ function Cashier() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            zIndex: 9999,
           }}
         >
           <div
@@ -521,34 +654,117 @@ function Cashier() {
 
             <div style={{ margin: "1rem 0" }}>
               <label>
-                {translate("order.list.topping")}:
+                {translate("order.list.size")}:
                 <select
-                  name="topping"
-                  value={currentModifiers.topping}
+                  name="size"
+                  value={currentModifiers.size}
                   onChange={changeModifiers}
-                  aria-label={translate("modal.selectTopping")}
+                  aria-label={translate("order.list.size")}
                   style={{ marginLeft: "0.5rem" }}
                 >
-                  <option value="none">{translate("mod.topping.none")}</option>
-                  <option value="pearl" data-tts={translate("mod.topping.pearl")}>{translate("mod.topping.pearl")}</option>
-                  <option value="mini_pearl" data-tts={translate("mod.topping.mini_pearl")}>{translate("mod.topping.mini_pearl")}</option>
-                  <option value="crystal_boba" data-tts={translate("mod.topping.crystal_boba")}>{translate("mod.topping.crystal_boba")}</option>
-                  <option value="pudding" data-tts={translate("mod.topping.pudding")}>{translate("mod.topping.pudding")}</option>
-                  <option value="aloe_vera" data-tts={translate("mod.topping.aloe_vera")}>{translate("mod.topping.aloe_vera")}</option>
-                  <option value="red_bean" data-tts={translate("mod.topping.red_bean")}>{translate("mod.topping.red_bean")}</option>
-                  <option value="herb_jelly" data-tts={translate("mod.topping.herb_jelly")}>{translate("mod.topping.herb_jelly")}</option>
-                  <option value="aiyu_jelly" data-tts={translate("mod.topping.aiyu_jelly")}>{translate("mod.topping.aiyu_jelly")}</option>
-                  <option value="lychee_jelly" data-tts={translate("mod.topping.lychee_jelly")}>{translate("mod.topping.lychee_jelly")}</option>
-                  <option value="crema" data-tts={translate("mod.topping.crema")}>{translate("mod.topping.crema")}</option>
-                  <option value="ice_cream" data-tts={translate("mod.topping.ice_cream")}>{translate("mod.topping.ice_cream")}</option>
+                  <option value={translate("mod.size.small")}>{translate("mod.size.small")}</option>
+                  <option value={translate("mod.size.medium")}>{translate("mod.size.medium")}</option>
+                  <option value={translate("mod.size.large")}>{translate("mod.size.large")}</option>
                 </select>
               </label>
             </div>
 
-            <button onClick={addToOrder} className="cash-modify-button" data-tts={translate("modal.add")}>
+            <div style={{ margin: "1rem 0" }}>
+              <label>
+                {translate("order.list.temperature")}:
+                <select
+                  name="temperature"
+                  value={currentModifiers.temperature}
+                  onChange={changeModifiers}
+                  aria-label={translate("order.list.temperature")}
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  <option value={translate("mod.temperature.cold")}>{translate("mod.temperature.cold")}</option>
+                  <option value={translate("mod.temperature.hot")}>{translate("mod.temperature.hot")}</option>
+                </select>
+              </label>
+            </div>
+
+            <div style={{ margin: "1rem 0" }}>
+              <label>
+                {translate("order.list.topping")}:
+                <div style={{ margin: "1rem 0" }}>
+
+                  <div style={{ textAlign: "left", marginTop: "0.5rem" }}>
+                    {[
+                      "pearl",
+                      "mini_pearl",
+                      "crystal_boba",
+                      "pudding",
+                      "aloe_vera",
+                      "red_bean",
+                      "herb_jelly",
+                      "aiyu_jelly",
+                      "lychee_jelly",
+                      "crema",
+                      "ice_cream"
+                    ].map((t) => (
+                      <div key={t}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="toppings"
+                            value={t}
+                            checked={currentModifiers.toppings?.includes(t)}
+                            onChange={handleToppingChange}
+                          />
+                          {translate(`mod.topping.${t}`)}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <div style={{ margin: "1rem 0" }}>
+              <label>
+                {translate("order.list.quantity")}
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  marginTop: "0.5rem"
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentModifiers((prev) => ({
+                      ...prev,
+                      quantity: Math.max(1, prev.quantity - 1)
+                    }))
+                  }
+                  className="qty-button"
+                  aria-label={translate("modal.decreaseQuantity")}
+                >-</button>
+                <span>{currentModifiers.quantity}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentModifiers((prev) => ({
+                      ...prev,
+                      quantity: prev.quantity + 1
+                    }))
+                  }
+                  className="qty-button"
+                  aria-label={translate("modal.increaseQuantity")}
+                >+</button>
+              </div>
+            </div>
+
+            <button onClick={addToOrder} className="modify-button" data-tts={translate("modal.add")}>
               {translate("modal.add")}
             </button>
-            <button onClick={closeModification} className="cash-cancel-button" data-tts={translate("modal.cancel")}>
+            <button onClick={closeModification} className="cancel-button" data-tts={translate("modal.cancel")}>
               {translate("modal.cancel")}
             </button>
           </div>
