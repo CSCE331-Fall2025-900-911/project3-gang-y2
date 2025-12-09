@@ -91,6 +91,7 @@
   color: #333;
 }
 
+/* comment for a git change or something */
 .menuboard-page .item-price {
   font-size: calc(1.1rem * var(--zoom-scale));
   font-weight: 700;
