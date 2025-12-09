@@ -86,20 +86,20 @@
 }
 
 .menuboard-page .item-name {
-  font-size: 1.15rem;
+  font-size: calc(1.15rem * var(--zoom-scale));
   font-weight: 600;
   color: #333;
 }
 
 .menuboard-page .item-price {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--zoom-scale));
   font-weight: 700;
   color: #4C8C2B;
 }
 
 
 .menuboard-page .item-cal {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--zoom-scale));
   color: #888;
   text-align: right;
   margin-top: 2px;
@@ -117,7 +117,7 @@
 
 .section-title {
   text-align: center;
-  font-size: 1.7rem;
+  font-size: calc(1.7rem * var(--zoom-scale));
   color: #4C8C2B;
   margin-bottom: 1rem;
   margin-top: 2rem;
@@ -128,7 +128,7 @@
   display: flex;
   justify-content: center;
   gap: 1.2rem;
-  font-size: 1.2rem;
+  font-size: calc(1.2rem * var(--zoom-scale));
   flex-wrap: wrap;
   margin-bottom: 1rem;
 }
