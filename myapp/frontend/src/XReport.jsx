@@ -30,7 +30,7 @@ function XReport() {
 
       <main className="content">
         <h2>X Report (Hourly Sales Breakdown)</h2>
-
+      <div className = "x-report-results box">
         <table className="x-report-table">
           <thead>
             <tr>
@@ -49,7 +49,7 @@ function XReport() {
             ))}
           </tbody>
         </table>
-
+      </div>
       </main>
     </div>
   );

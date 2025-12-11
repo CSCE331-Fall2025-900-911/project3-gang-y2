@@ -18,15 +18,6 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.SMTP_EMAIL,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-
 const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -432,12 +423,7 @@ app.delete("/api/menu/:itemid", async (req, res) => {
 //get X Report Data
 app.get("/api/reports/xreport", async (req, res) => {
     try {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); 
-        const day = String(date.getDate()).padStart(2, '0');
-
-        const today = `${year}-${month}-${day}`;  
+        const today = new Date().toLocaleDateString("en-US", { timeZone: "America/Chicago" });
 
         const result = await pool.query(`
             SELECT
@@ -464,13 +450,7 @@ let zReportGenerated = false;
 
 app.get("/api/reports/zreport", async (req, res) => {
     try {
-        
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); 
-        const day = String(date.getDate()).padStart(2, '0');
-
-        const today = `${year}-${month}-${day}`;  
+        const today = new Date().toLocaleDateString("en-US", { timeZone: "America/Chicago" });
 
         if (zReportGenerated) {
           return res.json({ zReportGenerated: true, message: "Z Report can only be generated once per day." });

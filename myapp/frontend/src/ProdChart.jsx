@@ -43,6 +43,7 @@ function ProdChart() {
           <button onClick={fetchData}>Generate</button>
         </div>
 
+      <div className = "prod-chart-results box">
         <table className="prod-chart-table">
           <thead>
             <tr>
@@ -65,6 +66,7 @@ function ProdChart() {
             )}
           </tbody>
         </table>
+      </div>
       </main>
     </div>
   );
