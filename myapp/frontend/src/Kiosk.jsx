@@ -152,17 +152,6 @@ function Kiosk() {
     setSubtotal(0.0);
   };
 
-  // function prepareItemData() {
-  //   map
-  // }
-
-
-  // useEffect(() => {
-  //     fetch("/api/orders")
-  //       .then((res) => res.json())
-  //       .then((data) => setOrders(data))
-  //       .catch((err) => console.error("Error fetching orders:", err));
-  //   }, []);
   const handleToppingChange = (e) => {
     const { value, checked } = e.target;
 
@@ -256,23 +245,6 @@ function Kiosk() {
     }
   };
 
-  // const itemSubmit = async (e) => {
-    
-  //   e.preventDefault();
-  //   const methodItems = "POST";
-  //   const urlItems = `/api/orderitems/`;
-
-  //   const resItems = await fetch(urlItems, {
-  //     methodItems,
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(itemData),
-  //   });
-
-  //   if (resItems.ok) {
-
-  //   }
-  // };
-
   useEffect(() => {
     if (currentItem && firstOptionRef.current) {
       firstOptionRef.current.focus();
@@ -356,26 +328,24 @@ function Kiosk() {
 
   // Fetch menu items from backend when the component loads
   useEffect(() => {
-    fetch("/api/menu") // replace with real backend URL
+    fetch("/api/menu")
       .then((res) => res.json())
       .then((data) => {
-        setMenuItems(data);   // store the menu data from backend
-        setLoading(false);    // hide loading text once data arrives
+        setMenuItems(data);
+        setLoading(false); 
       })
       .catch((err) => {
         console.error("Error fetching menu:", err);
-        setLoading(false);    // still hide loading if there's an error
+        setLoading(false); 
       });
-  }, []); // empty [] means this runs once, when the page first loads
+  }, []);
 
   // Fetch top items from DB ONLY after menuItems is ready
 useEffect(() => {
-  // 💡 Only run this effect if menuItems has items
   if (menuItems.length > 0) {
     fetch("/api/reports/top-items")
       .then(res => res.json())
       .then(suggestedData => {
-        // Map the suggested items (which are partial) to the full item objects
         const fullSuggestedItems = suggestedData
           .map(suggested => 
             // Find the complete item object - check both itemid and itemID
@@ -388,14 +358,12 @@ useEffect(() => {
       })
       .catch(err => console.error("Error fetching suggested items:", err));
   }
-}, [menuItems]); // 🔑 Dependency Array now includes menuItems
+}, [menuItems]);
 
-  // Display loading message until data is ready
   if (loading) {
     return <p className="loading">Loading menu...</p>;
   }
 
-  // Render the actual page
   return (
     <ZoomProvider>
     <div className="kioskpage">
@@ -466,7 +434,6 @@ useEffect(() => {
                   {item.modifiers.toppings.length > 0
                     ? item.modifiers.toppings.map((t) => translate(`mod.topping.${t}`)).join(", ")
                     : translate("mod.topping.none")} <br />
-                  {/* {translate("order.list.size")}: {translate(`mod.size.${item.modifiers.size}`)}<br /> */}
                   {translate("order.list.temperature")}: {translate(`mod.temperature.${item.modifiers.temperature.toLowerCase()}`)}<br />
                 </small>
               </li>
@@ -488,7 +455,7 @@ useEffect(() => {
                     return menuItemId === suggestedId || menuItem.name === item.name;
                   });
 
-                  if (!fullItem) return null; // skip if menu item not found
+                  if (!fullItem) return null;
 
                   return (
                     <button
@@ -618,8 +585,6 @@ useEffect(() => {
           </div>
         </div>
       )}
-
-      {/* Modal for customization */}
       {currentItem && (
         <div
           style={{
