@@ -18,15 +18,6 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.SMTP_EMAIL,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-
 const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 
