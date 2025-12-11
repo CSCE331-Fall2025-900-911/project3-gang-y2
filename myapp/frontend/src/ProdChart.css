@@ -9,6 +9,22 @@
   background-color: #7bb661;
   padding: 1rem 2rem;
   color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.content {
+  padding: 2rem;
+  text-align: center;
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  overflow-y: auto;
 }
 
 .nav-container {
@@ -29,11 +45,6 @@
   font-weight: bold;
 }
 
-.content {
-  padding: 2rem;
-  text-align: center;
-}
-
 .prod-chart-table {
   width: 90%;
   margin: 2rem auto;
@@ -47,6 +58,11 @@
 
 .prod-chart-table th {
   background-color: #f3f3f3;
+}
+
+.prod-chart-results {
+  width: 90%;
+  overflow-x: auto;
 }
 
 #current-item a {
