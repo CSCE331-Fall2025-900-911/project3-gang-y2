@@ -1,14 +1,16 @@
+/* Root variables */
 :root {
-  --matcha-green: #7cb342;
-  --white: #ffffff;
-
   --zoom-scale: 1;
+  --kiosk-zoom: var(--zoom-scale);
 
-  /* Use variables for sizing */
   --font-size-base: calc(16px * var(--kiosk-zoom));
+  --button-padding: calc(0.5rem * var(--kiosk-zoom)) calc(1rem * var(--kiosk-zoom));
+  --menu-gap: calc(1.2rem * var(--kiosk-zoom));
+  --menu-button-width: calc(400px * var(--kiosk-zoom));
+  --menu-button-height: calc(450px * var(--kiosk-zoom));
+  --category-nav-height: calc(60px * var(--kiosk-zoom));
+  --navbar-height: calc(80px * var(--kiosk-zoom));
   --spacing-base: calc(1rem * var(--kiosk-zoom));
-  --button-padding: calc(0.5rem * var(--kiosk-zoom))
-                     calc(1rem * var(--kiosk-zoom));
 }
 
 * {
@@ -23,6 +25,7 @@ body {
   color: #333;
   font-size: var(--font-size-base);
 }
+
 .kioskpage {
   --kiosk-zoom: calc(0.80 + 0.19 * var(--zoom-scale));
 
@@ -109,10 +112,9 @@ body {
   margin: 10px;
 }
 
-/* ----------- Suggested Items Bubble (Fixed Width) ----------- */
 .suggested-bubble {
-  width: 100%;              /* lock to sidebar width */
-  box-sizing: border-box;  /* include padding in width */
+  width: 100%;
+  box-sizing: border-box;
   margin-top: 1.5rem;
   padding: 1rem;
   background: linear-gradient(135deg, #ffffff, #e8f5e9);
@@ -120,25 +122,26 @@ body {
   border: 2px solid #4C8C2B;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   text-align: center;
-  overflow: hidden;        /* prevent overflow spill */
+  overflow: hidden;
 }
 
 .suggested-bubble button {
-  width: 95%;              /* takes 80% of the bubble width */
-  max-width: 100%;         /* never overflow */
-  padding: 10px 10px;         /* nice vertical padding */
-  margin: 6px auto;        /* center horizontally with spacing */
-  display: block;          /* needed for margin auto to work */
-  border-radius: 10px;     /* rounded corners */
+  width: 95%;
+  max-width: 100%;
+  padding: 10px 10px;
+  margin: 6px auto;
+  display: block;
+  border-radius: 10px;
   font-size: 1rem;
   cursor: pointer;
   font-weight: bold; 
   border: 1px solid #333;
   transition: background 0.2s ease;
   border: 2px solid #333;
+  max-height: 100px;
+  overflow-y: auto;
 }
 
-/* Make sure its parent doesn't stretch it */
 .sidebar .suggested-bubble {
   max-width: 100%;
 }
@@ -162,7 +165,6 @@ body {
   font-size: 0.95rem;
   height: auto;
 }
-
 
 .subtotal-container {
   z-index: 101;
@@ -230,67 +232,47 @@ body {
 }
 
 .menu-container {
-  left: calc(400px * var(--kiosk-zoom));
-  text-align: center;
+  margin-left: 400px;
+  margin-top: calc(var(--navbar-height) + 100px);
   padding: 20px;
   overflow: auto;
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: left;
-  align-items: left;
-  text-align: center;
-  margin-top: 90px;
-  margin-left: 10px;
-  transform: scale(var(--kiosk-zoom));
-  transform-origin: top left;
 }
 
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(calc(400px*var(--kiosk-zoom)), 1fr)); 
-  gap: 1.2rem;
-  justify-items: left;
+  grid-template-columns: repeat(auto-fit, minmax(var(--menu-button-width), 1fr));
+  gap: var(--menu-gap);
+  justify-items: center;
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
-  margin-left: 400px;
-  margin-right: 0px;
-  transform: scale(var(--kiosk-zoom));
-  transform-origin: top left;
 }
 
 .menu-button {
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #e8f5e9 40%,
-    #c5e1a5 100%
-  );
-  color: black;
-  border: 2px solid black;
-  border-radius: 16px;
+  width: var(--menu-button-width);
+  height: var(--menu-button-height);
+  padding: calc(20px * var(--kiosk-zoom));
+  font-size: calc(1.2rem * var(--kiosk-zoom));
+  border-radius: calc(14px * var(--kiosk-zoom));
 
-  padding: 1.5rem;
-  font-size: 1.4rem;  
-  height: 100%;
-  width: 450px;
-
-  cursor: pointer;
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
+  background: linear-gradient(135deg, #ffffff 0%, #e8f5e9 40%, #c5e1a5 100%);
+  border: 2px solid black;
+  cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .menu-drink-image {
-  width: 250px;        /* or a fixed value like 200px */
-  height: 300px;      /* pick the height you want */
-  object-fit: cover;  /* scale & crop to fill area */
-  border-radius: 8px;
+  width: calc(250px * var(--kiosk-zoom));
+  height: calc(300px * var(--kiosk-zoom));
+  object-fit: cover;
+  border-radius: calc(8px * var(--kiosk-zoom));
 }
 
 .menu-button:hover {
@@ -337,11 +319,17 @@ body {
     width: 100%;
     height: auto;
   }
+ 
   .menu-container {
     margin-left: 0;
-    margin-top: 0;
-    padding: 12px;
+    margin-top: calc(var(--navbar-height) + 20px);
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: column;
   }
+
   .menu-grid {
     grid-template-columns: 1fr;
     width: 100%;
@@ -377,56 +365,50 @@ body {
   padding-left: 0;
 }
 
-
 .menu-category-title {
-  font-size: 1.8rem;
+  font-size: calc(1.8rem * var(--kiosk-zoom));
   font-weight: 700;
   color: #2e5e1a;
-
   text-align: left;
-  margin-left: 420px;
-  margin-top: 2rem;
-
-  border-left: 6px solid #7cb342;
-  padding-left: 12px;
-
-  letter-spacing: 0.5px;
+  margin-left: 55px; /* sidebar width + spacing */
+  margin-top: calc(2rem * var(--kiosk-zoom));
+  border-left: calc(6px * var(--kiosk-zoom)) solid #7cb342;
+  padding-left: calc(12px * var(--kiosk-zoom));
 }
 
-
 .category-nav {
-  position: sticky;
-  top: 80px;
-  z-index: 1000;
-  background: white;
-  padding: 12px 0;
+  position: fixed;
+  top: calc(var(--navbar-height) - 21px);
+  left: 400px; /* sidebar width */
+  width: calc(100% - 400px); /* subtract sidebar width */
+  z-index: 10;
+
   display: flex;
   justify-content: center;
-  gap: 1.2rem;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  width: calc(100% - 400px);
-  margin-left: 400px; 
-  border: 2px solid #000;
-  border-radius: 14px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  gap: calc(1.2rem * var(--kiosk-zoom));
+  padding: calc(12px * var(--kiosk-zoom)) 0;
+
+  background: white;
+  border: calc(2px * var(--kiosk-zoom)) solid #000;
+  border-radius: calc(14px * var(--kiosk-zoom));
+  box-shadow: 0 calc(3px * var(--kiosk-zoom)) calc(6px * var(--kiosk-zoom)) rgba(0,0,0,0.1);
 }
 
 
 .category-nav-button {
   background: #e8f5e9;
-  border: 2px solid #a5d6a7;
-  border-radius: 18px;
-  padding: 10px 20px;
-  font-size: 1.1rem;
+  border: calc(2px * var(--kiosk-zoom)) solid #a5d6a7;
+  border-radius: calc(18px * var(--kiosk-zoom));
+  padding: calc(8px * var(--kiosk-zoom)) calc(16px * var(--kiosk-zoom));
+  font-size: calc(1.1rem * var(--kiosk-zoom));
   font-weight: 600;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .category-nav-button:hover {
   background: #dcedc8;
-  transform: translateY(-2px);
+  transform: translateY(calc(-2px * var(--kiosk-zoom)));
 }
 
 .category-nav-button.active {
@@ -434,7 +416,6 @@ body {
   color: white;
   border-color: #5a8e2d;
 }
-
 
 .menu-button {
   padding: 20px;
@@ -444,4 +425,47 @@ body {
 
 .menu-grid {
   gap: 1.2rem;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --zoom-scale: 1 !important;
+    --kiosk-zoom: 1 !important;
+    --font-size-base: 16px !important;
+  }
+
+  .sidebar-container {
+    margin-top: 120px;
+    transform: none !important;
+  }
+
+  .subtotal-container{
+    transform: none !important;
+  }
+
+  .order-button-container {
+    margin-bottom: -80px;
+    transform: none !important;
+  }
+
+    .menu-grid {
+    grid-template-columns: 1fr;
+    width: 100%;
+    padding: 0;
+  }
+
+  .menu-button {
+    width: 100%;
+    height: auto;
+  }
+
+    .category-nav {
+    position: sticky;
+    left: 0;
+    width: 100%;
+    top: calc(var(--navbar-height) + 10px);
+    justify-content: center;
+    z-index: 10;
+    margin-bottom: 100px;
+  }
 }

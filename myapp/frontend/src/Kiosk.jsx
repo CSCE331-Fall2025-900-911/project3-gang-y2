@@ -368,28 +368,6 @@ useEffect(() => {
     <ZoomProvider>
     <div className="kioskpage">
       <Navbar />
-
-      <div className="category-nav">
-          {Object.keys(groupedMenu).map((cat) => (
-            <button
-              key={cat}
-              className="category-nav-button"
-              onClick={() => {
-              const el = document.getElementById(`section-${cat}`);
-              if (el) {
-                const yOffset = -140;
-                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-                window.scrollTo({ top: y, behavior: "smooth" });
-              }
-            }}
-
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-        
       <div className="sidebar-container">
         <div className="sidebar">
           <h2>{translate("order.title")}</h2>
@@ -472,6 +450,7 @@ useEffect(() => {
           </div>
         </div>        
       </div>
+
       <div className="subtotal-container">
         <strong>{translate("order.subtotal")}: </strong>${subtotal.toFixed(2)}
       </div>
@@ -489,37 +468,57 @@ useEffect(() => {
 
       
       <main className="menu-container">
-        {Object.keys(groupedMenu).map((category) => (
-          <section
-            key={category}
-            id={`section-${category}`}
-            className="menu-section"
+        
+  {Object.keys(groupedMenu).map((category) => (
+    <section
+      key={category}
+      id={`section-${category}`}
+      className="menu-section"
+    >
+
+    <div className="category-nav">
+          {Object.keys(groupedMenu).map((cat) => (
+            <button
+              key={cat}
+              className="category-nav-button"
+              onClick={() => {
+                const el = document.getElementById(`section-${cat}`);
+                if (el) {
+                  const yOffset = -140; // adjust for navbar height
+                  const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                  window.scrollTo({ top: y, behavior: "smooth" });
+                }
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+      <h2 className="menu-category-title">{category}</h2>
+
+      <div className="menu-grid">
+        {groupedMenu[category].map((item) => (
+          <button
+            key={item.itemid}
+            className="menu-button"
+            onClick={() => openModification(item)}
+            data-tts={menuButtonLabel(item)}
+            aria-label={menuButtonLabel(item)}
           >
-            <h2 className="menu-category-title">{category}</h2>
-
-            <div className="menu-grid">
-              {groupedMenu[category].map((item) => (
-                <button
-                  key={item.itemid}
-                  className="menu-button"
-                  onClick={() => openModification(item)}
-                  data-tts={menuButtonLabel(item)}
-                  aria-label={menuButtonLabel(item)}
-                >
-                  <img
-                    src={`drinks/${item.itemid}.png`}
-                    alt={item.name}
-                    className="menu-drink-image"
-                  /> <br></br>
-
-                  ${Number.parseFloat(item.price).toFixed(2)} :
-                  <strong>{" " + translate(item.name)}</strong>
-                </button>
-              ))}
-            </div>
-          </section>
+            <img
+              src={`drinks/${item.itemid}.png`}
+              alt={item.name}
+              className="menu-drink-image"
+            /> <br />
+            ${Number.parseFloat(item.price).toFixed(2)} : <strong>{" " + translate(item.name)}</strong>
+          </button>
         ))}
-      </main>
+      </div>
+    </section>
+  ))}
+</main>
+
 
       {showEmailModal && (
         <div
