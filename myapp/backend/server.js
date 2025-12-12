@@ -35,7 +35,7 @@ app.post("/api/send-receipt", async (req, res) => {
           ? item.modifiers.toppings.join(", ")
           : "None";
 
-        return `${item.name} - $${item.price.toFixed(2)}
+        return `${item.name} - $${item.price.toFixed(2)} x ${item.modifiers.quantity}
   Ice: ${item.modifiers.iceLevel}
   Sugar: ${item.modifiers.sugarLevel}
   Toppings: ${toppings}`;
