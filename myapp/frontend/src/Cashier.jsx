@@ -354,6 +354,9 @@ function Cashier() {
     });
   };
 
+  const categoryKey = (cat) =>
+  `category.${cat.toLowerCase().replace(/\s+/g, "_")}`;
+
   // Fetch menu items from backend when the component loads
   useEffect(() => {
     fetch("/api/menu") // replace with real backend URL
@@ -398,7 +401,7 @@ useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItem
             }}
 
             >
-              {cat}
+              {translate(categoryKey(cat))}
             </button>
           ))}
         </div>
@@ -480,7 +483,9 @@ useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItem
             id={`section-${category}`}   // <-- enables scroll-to-section
             className="menu-section"
           >
-            <h2 className="cash-menu-category-title">{category}</h2>
+            <h2 className="cash-menu-category-title">
+              {translate(category)}
+            </h2>
 
             <div className="cash-menu-grid">
               {groupedMenu[category].map((item) => (
