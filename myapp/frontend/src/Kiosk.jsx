@@ -138,6 +138,9 @@ function Kiosk() {
     closeModification();
   };
 
+  const categoryKey = (cat) =>
+  `category.${cat.toLowerCase().replace(/\s+/g, "_")}`;
+
 
   // submit order & get payment
   function resetOrder() {
@@ -285,7 +288,7 @@ function Kiosk() {
         : translate("mod.topping.none");
       const priceText = Number.parseFloat(item.price).toFixed(2);
       const size = item.modifiers.size;
-      const temperature = item.modifiers.temparature;
+      const temperature = item.modifiers.temperature;
       return translate("tts.orderLine", {
         num: index + 1,
         name: item.name,
@@ -419,7 +422,7 @@ useEffect(() => {
           </ul>
           )}
           <div className="suggested-bubble">
-            <h3 className="suggested-title">{translate("Try These Most Popular Items!")}</h3>
+            <h3 className="suggested-title">{translate("suggested.title")}</h3>
 
             <div className="suggested-buttons">
               {suggestedItems.length === 0 ? (
@@ -440,8 +443,9 @@ useEffect(() => {
                       key={fullItem.itemid || fullItem.itemID}
                       className="menu-button suggested-button"
                       onClick={() => openModification(fullItem)}
+                      data-tts={translate(fullItem.name)}
                     >
-                      ✨ {fullItem.name}
+                      ✨ {translate(fullItem.name)}
                     </button>
                   );
                 })
@@ -490,12 +494,12 @@ useEffect(() => {
                 }
               }}
             >
-              {cat}
+              {translate(categoryKey(cat))}
             </button>
           ))}
         </div>
 
-      <h2 className="menu-category-title">{category}</h2>
+      <h2 className="menu-category-title">{translate(categoryKey(category))}</h2>
 
       <div className="menu-grid">
         {groupedMenu[category].map((item) => (
