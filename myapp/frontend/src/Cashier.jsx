@@ -191,6 +191,9 @@ function Cashier() {
     
   };
 
+  const categoryKey = (cat) =>
+  `category.${cat.toLowerCase().replace(/\s+/g, "_")}`;
+
   // Add order to DB
   const handleSubmit = async (e) => {
     
@@ -255,23 +258,6 @@ function Cashier() {
       resetOrder();
     }
   };
-
-  // const itemSubmit = async (e) => {
-    
-  //   e.preventDefault();
-  //   const methodItems = "POST";
-  //   const urlItems = `/api/orderitems/`;
-
-  //   const resItems = await fetch(urlItems, {
-  //     methodItems,
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(itemData),
-  //   });
-
-  //   if (resItems.ok) {
-
-  //   }
-  // };
 
   useEffect(() => {
     if (currentItem && firstOptionRef.current) {
@@ -359,17 +345,17 @@ function Cashier() {
     fetch("/api/menu") // replace with real backend URL
       .then((res) => res.json())
       .then((data) => {
-        setMenuItems(data);   // store the menu data from backend
-        setLoading(false);    // hide loading text once data arrives
+        setMenuItems(data);
+        setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching menu:", err);
-        setLoading(false);    // still hide loading if there's an error
+        setLoading(false)
       });
-  }, []); // empty [] means this runs once, when the page first loads
+  }, []);
 
   // Fetch top items from DB ONLY after menuItems is ready
-useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItems
+useEffect(() => {}, [menuItems]);
 
   // Display loading message until data is ready
   if (loading) {
@@ -398,7 +384,7 @@ useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItem
             }}
 
             >
-              {cat}
+              {translate(cat)}
             </button>
           ))}
         </div>
@@ -480,7 +466,9 @@ useEffect(() => {}, [menuItems]); // 🔑 Dependency Array now includes menuItem
             id={`section-${category}`}   // <-- enables scroll-to-section
             className="menu-section"
           >
-            <h2 className="cash-menu-category-title">{category}</h2>
+            <h2 className="cash-menu-category-title">
+              {translate(categoryKey(category))}
+            </h2>
 
             <div className="cash-menu-grid">
               {groupedMenu[category].map((item) => (
