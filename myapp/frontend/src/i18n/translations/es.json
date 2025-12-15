@@ -153,6 +153,8 @@
   "Gingerbread Blended Tea": "Té mezclado de pan de jengibre",
   "Candy Cane Milk Oolong Tea": "Té Oolong con leche y bastón de caramelo",
   "The Goat Slushy Tea": "El té helado GOAT",
+  "Oreo Slush": "Granizado Oreo",
+  "Fruit Smoothie": "Smoothie de frutas",
   "menuboard.title": "Nuestro Menú",
   "menuboard.cal": "cal",
   "menuboard.ice": "Niveles de hielo",
@@ -163,5 +165,6 @@
   "category.fruit": "Té de frutas",
   "category.brewed": "Matcha",
   "category.seasonal": "Estacional",
-  "category.other": "Slushee"
+  "category.other": "Otro",
+  "category.slushee": "Granizado"
 }
